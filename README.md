@@ -102,3 +102,8 @@ spec/                 # Git submodule with OpenAPI specification
 └── spec/             # Nested spec directory
     └── openapi.json  # OpenAPI spec file
 ```
+
+## Contact
+
+* [Open an Issue](https://github.com/aviaryhq/cloudglue-python/issues/new)
+* [Email](mailto:support@aviaryhq.com)
