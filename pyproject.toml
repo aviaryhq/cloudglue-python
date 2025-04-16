@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloudglue"
+version = "0.0.9"
+description = "Python SDK for CloudGlue API"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Elastic License 2.0"}
+keywords = ["cloudglue", "api", "sdk"]
+authors = [
+    {name = "Aviary Inc.", email = "hello@aviaryhq.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "urllib3>=2.2.3",
+    "python-dateutil",
+    "requests>=2.32.2",
+    "certifi>=2024.12.14",
+    "pydantic>=2.10.6"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/aviaryhq/cloudglue-python"
+"Bug Tracker" = "https://github.com/aviaryhq/cloudglue-python/issues"
+
+[tool.setuptools]
+packages = ["cloudglue", "cloudglue.client", "cloudglue.sdk", "cloudglue.sdk.api", "cloudglue.sdk.models"]
+
+[tool.setuptools.package-data]
+cloudglue = ["*.json", "*.yaml"]
