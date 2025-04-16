@@ -34,7 +34,7 @@ messages = [
 ]
 
 # Make an API request
-response = client.chat_completions(
+response = client.chat.completions.create(
     messages=messages,
     model="nimbus-001",
     collections=["abc123"], # Assumes collection already exists, otherwise create one first then reference here by collection id    
