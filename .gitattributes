@@ -1,0 +1,2 @@
+# Mark SDK files as generated to exclude from GitHub diffs
+cloudglue/sdk/** linguist-generated=true 
