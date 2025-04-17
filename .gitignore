@@ -36,9 +36,6 @@ venv.bak/
 *.swo
 .DS_Store
 
-# Generated SDK (optional - remove if you want to version control the SDK)
-cloudglue/sdk/
-
 # Jupyter Notebooks
 .ipynb_checkpoints
 *.ipynb
