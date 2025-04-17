@@ -106,4 +106,4 @@ spec/                 # Git submodule with OpenAPI specification
 ## Contact
 
 * [Open an Issue](https://github.com/aviaryhq/cloudglue-python/issues/new)
-* [Email](mailto:support@aviaryhq.com)
+* [Email](mailto:support@cloudglue.dev)
