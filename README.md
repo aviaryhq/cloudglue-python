@@ -1,7 +1,6 @@
 # CloudGlue Python SDK
 
-[![PyPI - Version](https://img.shields.io/pypi/v/cloudglue)
-](https://pypi.org/project/cloudglue) 
+[![PyPI - Version](https://img.shields.io/pypi/v/cloudglue)](https://pypi.org/project/cloudglue)
 [![License](https://img.shields.io/badge/License-ELv2-blue.svg)](LICENSE.md)
 [![Discord](https://img.shields.io/discord/1366541583272382536?logo=discord&label=Discord)](https://discord.gg/QD5KWFVner)
 
