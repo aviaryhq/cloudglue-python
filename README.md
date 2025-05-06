@@ -1,6 +1,10 @@
 # CloudGlue Python SDK
 
-Official Python SDK for the CloudGlue API.
+[![PyPI - Version](https://img.shields.io/pypi/v/cloudglue)](https://pypi.org/project/cloudglue)
+[![License](https://img.shields.io/badge/License-ELv2-blue.svg)](LICENSE.md)
+[![Discord](https://img.shields.io/discord/1366541583272382536?logo=discord&label=Discord)](https://discord.gg/QD5KWFVner)
+
+CloudGlue makes it easy to turn video into LLM ready data. Official Python SDK for the CloudGlue API.
 
 ## 📖 Resources
 
