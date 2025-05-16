@@ -93,7 +93,7 @@ make build     # Build the package
 
 ### Project Structure
 
-Project directory structure describe below:
+Project directory structure described below:
 
 ```
 cloudglue/
