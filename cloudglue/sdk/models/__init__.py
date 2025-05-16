@@ -45,6 +45,7 @@ from cloudglue.sdk.models.extract_extract_config import ExtractExtractConfig
 from cloudglue.sdk.models.extract_list import ExtractList
 from cloudglue.sdk.models.file import File
 from cloudglue.sdk.models.file_delete import FileDelete
+from cloudglue.sdk.models.file_description import FileDescription
 from cloudglue.sdk.models.file_entities import FileEntities
 from cloudglue.sdk.models.file_entities_entities import FileEntitiesEntities
 from cloudglue.sdk.models.file_list import FileList
