@@ -5,14 +5,14 @@ import os
 # Import from the generated SDK
 from cloudglue.sdk.api.chat_api import ChatApi
 from cloudglue.sdk.api.collections_api import CollectionsApi
-from cloudglue.sdk.api.describe_api import DescribeApi
+from cloudglue.sdk.api.transcribe_api import TranscribeApi
 from cloudglue.sdk.api.extract_api import ExtractApi
 from cloudglue.sdk.api.files_api import FilesApi
 from cloudglue.sdk.configuration import Configuration
 from cloudglue.sdk.api_client import ApiClient
 
 # Import resource classes
-from cloudglue.client.resources import Chat, Files, Describe, Extract, Collections
+from cloudglue.client.resources import Chat, Files, Transcribe, Extract, Collections
 
 
 class CloudGlue:
@@ -40,14 +40,14 @@ class CloudGlue:
         # Initialize the specific API clients
         self.chat_api = ChatApi(self.api_client)
         self.collections_api = CollectionsApi(self.api_client)
-        self.describe_api = DescribeApi(self.api_client)
+        self.transcribe_api = TranscribeApi(self.api_client)
         self.extract_api = ExtractApi(self.api_client)
         self.files_api = FilesApi(self.api_client)
 
         # Set up resources with their respective API clients
         self.chat = Chat(self.chat_api)
         self.files = Files(self.files_api)
-        self.describe = Describe(self.describe_api)
+        self.transcribe = Transcribe(self.transcribe_api)
         self.extract = Extract(self.extract_api)
         self.collections = Collections(self.collections_api)
 

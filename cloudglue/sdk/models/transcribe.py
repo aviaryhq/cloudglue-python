@@ -18,27 +18,30 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List
-from cloudglue.sdk.models.collection_file import CollectionFile
+from typing import Any, ClassVar, Dict, List, Optional
+from cloudglue.sdk.models.transcribe_data import TranscribeData
+from cloudglue.sdk.models.transcribe_transcribe_config import TranscribeTranscribeConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
-class CollectionFileList(BaseModel):
+class Transcribe(BaseModel):
     """
-    CollectionFileList
+    Transcribe
     """ # noqa: E501
-    object: StrictStr = Field(description="Object type, always 'list'")
-    data: List[CollectionFile] = Field(description="Array of collection file objects")
-    total: StrictInt = Field(description="Total number of files matching the query")
-    limit: StrictInt = Field(description="Number of items returned in this response")
-    offset: StrictInt = Field(description="Offset from the start of the list")
-    __properties: ClassVar[List[str]] = ["object", "data", "total", "limit", "offset"]
+    job_id: StrictStr
+    status: StrictStr
+    url: Optional[StrictStr] = Field(default=None, description="The URL of the processed video")
+    created_at: Optional[StrictInt] = Field(default=None, description="Unix timestamp of when the job was created")
+    transcribe_config: Optional[TranscribeTranscribeConfig] = None
+    data: Optional[TranscribeData] = None
+    error: Optional[StrictStr] = Field(default=None, description="Error message if status is 'failed'")
+    __properties: ClassVar[List[str]] = ["job_id", "status", "url", "created_at", "transcribe_config", "data", "error"]
 
-    @field_validator('object')
-    def object_validate_enum(cls, value):
+    @field_validator('status')
+    def status_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in set(['list']):
-            raise ValueError("must be one of enum values ('list')")
+        if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
+            raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
         return value
 
     model_config = ConfigDict(
@@ -59,7 +62,7 @@ class CollectionFileList(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of CollectionFileList from a JSON string"""
+        """Create an instance of Transcribe from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -80,18 +83,17 @@ class CollectionFileList(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
-        _items = []
+        # override the default output from pydantic by calling `to_dict()` of transcribe_config
+        if self.transcribe_config:
+            _dict['transcribe_config'] = self.transcribe_config.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of data
         if self.data:
-            for _item_data in self.data:
-                if _item_data:
-                    _items.append(_item_data.to_dict())
-            _dict['data'] = _items
+            _dict['data'] = self.data.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of CollectionFileList from a dict"""
+        """Create an instance of Transcribe from a dict"""
         if obj is None:
             return None
 
@@ -99,11 +101,13 @@ class CollectionFileList(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "object": obj.get("object"),
-            "data": [CollectionFile.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None,
-            "total": obj.get("total"),
-            "limit": obj.get("limit"),
-            "offset": obj.get("offset")
+            "job_id": obj.get("job_id"),
+            "status": obj.get("status"),
+            "url": obj.get("url"),
+            "created_at": obj.get("created_at"),
+            "transcribe_config": TranscribeTranscribeConfig.from_dict(obj["transcribe_config"]) if obj.get("transcribe_config") is not None else None,
+            "data": TranscribeData.from_dict(obj["data"]) if obj.get("data") is not None else None,
+            "error": obj.get("error")
         })
         return _obj
 

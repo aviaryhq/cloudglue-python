@@ -1,5 +1,9 @@
 # coding: utf-8
 
+############################################################################
+# TODO: TO BE REMOVED - manually overriding while transitioning collections API to use new abstractions for transcription/description
+############################################################################
+
 """
     cloudglue API
 

@@ -3,10 +3,9 @@ from typing import List, Dict, Any, Optional, Union
 import os
 import pathlib
 import time
-import json
 
 from cloudglue.sdk.models.chat_completion_request import ChatCompletionRequest
-from cloudglue.sdk.models.new_describe import NewDescribe
+from cloudglue.sdk.models.new_transcribe import NewTranscribe
 from cloudglue.sdk.models.new_extract import NewExtract
 from cloudglue.sdk.models.new_collection import NewCollection
 from cloudglue.sdk.models.add_collection_file import AddCollectionFile
@@ -105,7 +104,6 @@ class Collections:
         self,
         name: str,
         description: Optional[str] = None,
-        describe_config: Optional[Dict[str, Any]] = None,
         extract_config: Optional[Dict[str, Any]] = None,
     ):
         """Create a new collection.
@@ -113,8 +111,6 @@ class Collections:
         Args:
             name: Name of the collection (must be unique)
             description: Optional description of the collection
-            describe_config: Optional configuration for description processing
-                             Contains enable_speech, enable_scene_text, enable_visual_scene_description
             extract_config: Optional configuration for extraction processing
 
         Returns:
@@ -131,7 +127,6 @@ class Collections:
             request = NewCollection(
                 name=name,
                 description=description,
-                describe_config=describe_config,
                 extract_config=extract_config,
             )
             # Use the standard method to get a properly typed object
@@ -365,6 +360,8 @@ class Collections:
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         status: Optional[str] = None,
+        added_before: Optional[str] = None,
+        added_after: Optional[str] = None,
         order: Optional[str] = None,
         sort: Optional[str] = None,
     ):
@@ -375,6 +372,8 @@ class Collections:
             limit: Maximum number of videos to return (max 100)
             offset: Number of videos to skip
             status: Filter by processing status ('pending', 'processing', 'ready', 'failed')
+            added_before: Filter by videos added before a specific date, YYYY-MM-DD format in UTC
+            added_after: Filter by videos added after a specific date, YYYY-MM-DD format in UTC
             order: Field to sort by ('created_at'). Defaults to 'created_at'
             sort: Sort direction ('asc', 'desc'). Defaults to 'desc'
 
@@ -391,6 +390,8 @@ class Collections:
                 limit=limit,
                 offset=offset,
                 status=status,
+                added_before=added_before,
+                added_after=added_after,
                 order=order,
                 sort=sort,
             )
@@ -546,6 +547,42 @@ class Extract:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
             raise CloudGlueError(str(e))
+        
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        status: Optional[str] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
+    ):
+        """List extraction jobs.
+
+        Args:
+            limit: Maximum number of jobs to return.
+            offset: Number of jobs to skip.
+            status: Filter by job status.
+            created_before: Filter by jobs created before a specific date, YYYY-MM-DD format in UTC.
+            created_after: Filter by jobs created after a specific date, YYYY-MM-DD format in UTC.
+
+        Returns:
+            A list of extraction jobs.
+
+        Raises:
+            CloudGlueError: If there is an error listing the extraction jobs or processing the request.
+        """
+        try:
+            return self.api.list_extracts(
+                limit=limit,
+                offset=offset,
+                status=status,
+                created_before=created_before,
+                created_after=created_after,
+            )
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
 
     def run(
         self,
@@ -595,8 +632,8 @@ class Extract:
             raise CloudGlueError(str(e))
 
 
-class Describe:
-    """Handles video description operations."""
+class Transcribe:
+    """Handles rich video transcription operations."""
 
     def __init__(self, api):
         """Initialize with the API client."""
@@ -605,34 +642,37 @@ class Describe:
     def create(
         self,
         url: str,
+        enable_summary: bool = True,
         enable_speech: bool = True,
-        enable_scene_text: bool = True,
-        enable_visual_scene_description: bool = True,
+        enable_scene_text: bool = False,
+        enable_visual_scene_description: bool = False,
     ):
-        """Create a new describe job for a video.
+        """Create a new transcribe job for a video.
 
         Args:
             url: Input video URL. Can be YouTube URLs or URIs of uploaded files.
+            enable_summary: Whether to generate a summary of the video.
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text.
             enable_visual_scene_description: Whether to generate visual scene description.
 
         Returns:
-            The typed Describe job object with job_id and status.
+            The typed Transcribe job object with job_id and status.
 
         Raises:
-            CloudGlueError: If there is an error creating the describe job or processing the request.
+            CloudGlueError: If there is an error creating the transcribe job or processing the request.
         """
         try:
-            request = NewDescribe(
+            request = NewTranscribe(
                 url=url,
+                enable_summary=enable_summary,
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
             )
 
             # Use the regular SDK method to create the job
-            response = self.api.create_describe(new_describe=request)
+            response = self.api.create_transcribe(new_transcribe=request)
             return response
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -640,22 +680,63 @@ class Describe:
             raise CloudGlueError(str(e))
 
     # TODO (kdr): asyncio version of this
-    def get(self, job_id: str):
-        """Get the current state of a describe job.
+    def get(self, job_id: str, response_format: Optional[str] = None):
+        """Get the current state of a transcribe job.
 
         Args:
-            job_id: The unique identifier of the describe job.
+            job_id: The unique identifier of the transcribe job.
+            response_format: The format of the response, one of 'json' or 'markdown' (json by default)
 
         Returns:
-            The typed Describe job object with status and data.
+            The typed Transcribe job object with status and data.
 
         Raises:
-            CloudGlueError: If there is an error retrieving the describe job or processing the request.
+            CloudGlueError: If there is an error retrieving the transcribe job or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
-            response = self.api.get_describe(job_id=job_id)
+            response = self.api.get_transcribe(job_id=job_id, response_format=response_format)
             return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+        
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        status: Optional[str] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
+        response_format: Optional[str] = None,
+
+    ):
+        """List transcribe jobs.
+
+        Args:
+            limit: Maximum number of jobs to return.
+            offset: Number of jobs to skip.
+            status: Filter by job status.
+            created_before: Filter by jobs created before a specific date, YYYY-MM-DD format in UTC.
+            created_after: Filter by jobs created after a specific date, YYYY-MM-DD format in UTC.
+            response_format: The format of the response, one of 'json' or 'markdown' (json by default)
+
+        Returns:
+            A list of transcribe jobs.
+
+        Raises:
+            CloudGlueError: If there is an error listing the transcribe jobs or processing the request.
+        """
+        try:
+            return self.api.list_transcribes(
+                limit=limit,
+                offset=offset,
+                status=status,
+                created_before=created_before,
+                created_after=created_after,
+                response_format=response_format,
+            )
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
@@ -666,30 +747,34 @@ class Describe:
         url: str,
         poll_interval: int = 5,
         timeout: int = 600,
+        enable_summary: bool = True,
         enable_speech: bool = True,
-        enable_scene_text: bool = True,
-        enable_visual_scene_description: bool = True,
+        enable_scene_text: bool = False,
+        enable_visual_scene_description: bool = False,
+        response_format: Optional[str] = None,
     ):
-        """Create a describe job and wait for it to complete.
+        """Create a transcribe job and wait for it to complete.
 
         Args:
             url: Input video URL. Can be YouTube URLs or URIs of uploaded files.
             poll_interval: Seconds between status checks.
             timeout: Total seconds to wait before giving up.
+            enable_summary: Whether to generate a summary of the video.
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text.
             enable_visual_scene_description: Whether to generate visual scene description.
-
+            response_format: The format of the response, one of 'json' or 'markdown' (json by default)
         Returns:
-            The completed typed Describe job object.
+            The completed typed Transcribe job object.
 
         Raises:
-            CloudGlueError: If there is an error creating or processing the describe job.
+            CloudGlueError: If there is an error creating or processing the transcribe job.
         """
         try:
             # Create the job
             job = self.create(
                 url=url,
+                enable_summary=enable_summary,
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
@@ -700,7 +785,7 @@ class Describe:
             # Poll for completion
             elapsed = 0
             while elapsed < timeout:
-                status = self.get(job_id=job_id)
+                status = self.get(job_id=job_id, response_format=response_format)
 
                 if status.status in ["completed", "failed"]:
                     return status
@@ -709,7 +794,7 @@ class Describe:
                 elapsed += poll_interval
 
             raise TimeoutError(
-                f"Describe job did not complete within {timeout} seconds"
+                f"Transcribe job did not complete within {timeout} seconds"
             )
 
         except ApiException as e:
@@ -793,6 +878,8 @@ class Files:
     def list(
         self,
         status: Optional[str] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         order: Optional[str] = None,
@@ -802,6 +889,8 @@ class Files:
 
         Args:
             status: Optional filter by file status ('processing', 'ready', 'failed').
+            created_before: Optional filter by files created before a specific date, YYYY-MM-DD format in UTC
+            created_after: Optional filter by files created after a specific date, YYYY-MM-DD format in UTC
             limit: Optional maximum number of files to return (default 50, max 100).
             offset: Optional number of files to skip.
             order: Optional field to sort by ('created_at', 'filename'). Defaults to 'created_at'.
@@ -815,7 +904,13 @@ class Files:
         """
         try:
             return self.api.list_files(
-                status=status, limit=limit, offset=offset, order=order, sort=sort
+                status=status,
+                created_before=created_before,
+                created_after=created_after,
+                limit=limit,
+                offset=offset,
+                order=order,
+                sort=sort,
             )
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
