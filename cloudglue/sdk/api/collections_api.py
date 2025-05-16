@@ -27,6 +27,8 @@ from cloudglue.sdk.models.collection_delete import CollectionDelete
 from cloudglue.sdk.models.collection_file import CollectionFile
 from cloudglue.sdk.models.collection_file_delete import CollectionFileDelete
 from cloudglue.sdk.models.collection_file_list import CollectionFileList
+# TODO: Remove this once we have the new abstractions for transcription/description
+from cloudglue.sdk.models.file_description import FileDescription
 from cloudglue.sdk.models.collection_list import CollectionList
 from cloudglue.sdk.models.file_entities import FileEntities
 from cloudglue.sdk.models.new_collection import NewCollection
