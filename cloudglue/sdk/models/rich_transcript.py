@@ -25,17 +25,19 @@ from cloudglue.sdk.models.transcribe_data_visual_scene_description_inner import 
 from typing import Optional, Set
 from typing_extensions import Self
 
-class TranscribeData(BaseModel):
+class RichTranscript(BaseModel):
     """
-    TranscribeData
+    RichTranscript
     """ # noqa: E501
+    collection_id: StrictStr = Field(description="The ID of the collection")
+    file_id: StrictStr = Field(description="The ID of the file")
     content: Optional[StrictStr] = Field(default=None, description="Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested")
-    title: Optional[StrictStr] = Field(default=None, description="Generated title of the video; for YouTube videos, this is the title of the video as it appears on YouTube")
-    summary: Optional[StrictStr] = Field(default=None, description="Generated video level summary; for YouTube videos, this is the summary of the video as it appears on YouTube")
+    title: Optional[StrictStr] = Field(default=None, description="Generated title of the video")
+    summary: Optional[StrictStr] = Field(default=None, description="Generated video level summary")
     speech: Optional[List[TranscribeDataSpeechInner]] = Field(default=None, description="Array of speech transcriptions")
     visual_scene_description: Optional[List[TranscribeDataVisualSceneDescriptionInner]] = Field(default=None, description="Array of visual descriptions")
     scene_text: Optional[List[TranscribeDataSceneTextInner]] = Field(default=None, description="Array of scene text extractions")
-    __properties: ClassVar[List[str]] = ["content", "title", "summary", "speech", "visual_scene_description", "scene_text"]
+    __properties: ClassVar[List[str]] = ["collection_id", "file_id", "content", "title", "summary", "speech", "visual_scene_description", "scene_text"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -55,7 +57,7 @@ class TranscribeData(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of TranscribeData from a JSON string"""
+        """Create an instance of RichTranscript from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -101,7 +103,7 @@ class TranscribeData(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of TranscribeData from a dict"""
+        """Create an instance of RichTranscript from a dict"""
         if obj is None:
             return None
 
@@ -109,6 +111,8 @@ class TranscribeData(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "collection_id": obj.get("collection_id"),
+            "file_id": obj.get("file_id"),
             "content": obj.get("content"),
             "title": obj.get("title"),
             "summary": obj.get("summary"),
