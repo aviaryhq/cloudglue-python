@@ -102,9 +102,11 @@ class Collections:
 
     def create(
         self,
+        collection_type: str,
         name: str,
         description: Optional[str] = None,
         extract_config: Optional[Dict[str, Any]] = None,
+        transcribe_config: Optional[Dict[str, Any]] = None,
     ):
         """Create a new collection.
 
@@ -125,9 +127,11 @@ class Collections:
                 description = ""
 
             request = NewCollection(
+                collection_type=collection_type,
                 name=name,
                 description=description,
                 extract_config=extract_config,
+                transcribe_config=transcribe_config,
             )
             # Use the standard method to get a properly typed object
             response = self.api.create_collection(new_collection=request)
@@ -143,6 +147,7 @@ class Collections:
         offset: Optional[int] = None,
         order: Optional[str] = None,
         sort: Optional[str] = None,
+        collection_type: Optional[str] = None,
     ):
         """List collections.
 
@@ -151,6 +156,7 @@ class Collections:
             offset: Number of collections to skip
             order: Field to sort by ('created_at'). Defaults to 'created_at'
             sort: Sort direction ('asc', 'desc'). Defaults to 'desc'
+            collection_type: Filter by collection type ('video', 'audio', 'image', 'text')
 
         Returns:
             The typed CollectionList object with collections and metadata
@@ -161,7 +167,7 @@ class Collections:
         try:
             # Use the standard method to get a properly typed object
             response = self.api.list_collections(
-                limit=limit, offset=offset, order=order, sort=sort
+                limit=limit, offset=offset, order=order, sort=sort, collection_type=collection_type
             )
             return response
         except ApiException as e:
@@ -425,31 +431,29 @@ class Collections:
         except Exception as e:
             raise CloudGlueError(str(e))
 
-    def get_video_description(
+    def get_rich_transcripts(
         self,
         collection_id: str,
         file_id: str,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
+        response_format: Optional[str] = None,
     ):
-        """Get the description of a video in a collection.
+        """Get the rich transcript of a video in a collection.
 
         Args:
             collection_id: The ID of the collection
-            file_id: The ID of the file to retrieve the description for
-            limit: Maximum number of segments to return
-            offset: Number of segments to skip
+            file_id: The ID of the file to retrieve the rich transcript for
+            response_format: The format of the response, one of 'json' or 'markdown' (json by default)
 
         Returns:
-            The typed Description object with video description data
+            The typed RichTranscript object with video rich transcript data
 
         Raises:
-            CloudGlueError: If there is an error retrieving the description or processing the request.
+            CloudGlueError: If there is an error retrieving the rich transcript or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
-            response = self.api.get_description(
-                collection_id=collection_id, file_id=file_id, limit=limit, offset=offset
+            response = self.api.get_transcripts(
+                collection_id=collection_id, file_id=file_id, response_format=response_format
             )
             return response
         except ApiException as e:
@@ -555,6 +559,7 @@ class Extract:
         status: Optional[str] = None,
         created_before: Optional[str] = None,
         created_after: Optional[str] = None,
+        url: Optional[str] = None,
     ):
         """List extraction jobs.
 
@@ -564,7 +569,7 @@ class Extract:
             status: Filter by job status.
             created_before: Filter by jobs created before a specific date, YYYY-MM-DD format in UTC.
             created_after: Filter by jobs created after a specific date, YYYY-MM-DD format in UTC.
-
+            url: Filter by jobs with a specific URL.
         Returns:
             A list of extraction jobs.
 
@@ -578,6 +583,7 @@ class Extract:
                 status=status,
                 created_before=created_before,
                 created_after=created_after,
+                url=url,
             )
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -710,7 +716,7 @@ class Transcribe:
         created_before: Optional[str] = None,
         created_after: Optional[str] = None,
         response_format: Optional[str] = None,
-
+        url: Optional[str] = None,
     ):
         """List transcribe jobs.
 
@@ -721,6 +727,7 @@ class Transcribe:
             created_before: Filter by jobs created before a specific date, YYYY-MM-DD format in UTC.
             created_after: Filter by jobs created after a specific date, YYYY-MM-DD format in UTC.
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
+            url: Filter by jobs with a specific URL.
 
         Returns:
             A list of transcribe jobs.
@@ -736,6 +743,7 @@ class Transcribe:
                 created_before=created_before,
                 created_after=created_after,
                 response_format=response_format,
+                url=url,
             )
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
