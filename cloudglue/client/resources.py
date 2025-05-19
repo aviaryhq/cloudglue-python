@@ -743,6 +743,7 @@ class Transcribe:
                 created_before=created_before,
                 created_after=created_after,
                 response_format=response_format,
+                url=url,
             )
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
