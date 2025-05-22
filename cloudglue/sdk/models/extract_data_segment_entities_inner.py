@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt
 from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing import Optional, Set
 from typing_extensions import Self
@@ -26,11 +26,10 @@ class ExtractDataSegmentEntitiesInner(BaseModel):
     """
     ExtractDataSegmentEntitiesInner
     """ # noqa: E501
-    segment_id: Optional[StrictStr] = Field(default=None, description="Unique identifier for the segment")
     start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start time of the segment in seconds")
     end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="End time of the segment in seconds")
     entities: Optional[Dict[str, Any]] = Field(default=None, description="Entities extracted from the segment")
-    __properties: ClassVar[List[str]] = ["segment_id", "start_time", "end_time", "entities"]
+    __properties: ClassVar[List[str]] = ["start_time", "end_time", "entities"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -83,7 +82,6 @@ class ExtractDataSegmentEntitiesInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "segment_id": obj.get("segment_id"),
             "start_time": obj.get("start_time"),
             "end_time": obj.get("end_time"),
             "entities": obj.get("entities")
