@@ -17,31 +17,24 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.extract_data import ExtractData
-from cloudglue.sdk.models.extract_extract_config import ExtractExtractConfig
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 
-class Extract(BaseModel):
+class WebhookDeleteResponse(BaseModel):
     """
-    Extract
+    WebhookDeleteResponse
     """ # noqa: E501
-    job_id: StrictStr
-    status: StrictStr
-    url: Optional[StrictStr] = None
-    created_at: Optional[StrictInt] = Field(default=None, description="Unix timestamp of when the job was created")
-    extract_config: Optional[ExtractExtractConfig] = None
-    data: Optional[ExtractData] = None
-    error: Optional[StrictStr] = Field(default=None, description="Error message if status is 'failed'")
-    __properties: ClassVar[List[str]] = ["job_id", "status", "url", "created_at", "extract_config", "data", "error"]
+    id: StrictStr = Field(description="Unique identifier for the webhook")
+    object: StrictStr = Field(description="Object type, always 'webhook'")
+    __properties: ClassVar[List[str]] = ["id", "object"]
 
-    @field_validator('status')
-    def status_validate_enum(cls, value):
+    @field_validator('object')
+    def object_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
-            raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
+        if value not in set(['webhook']):
+            raise ValueError("must be one of enum values ('webhook')")
         return value
 
     model_config = ConfigDict(
@@ -62,7 +55,7 @@ class Extract(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of Extract from a JSON string"""
+        """Create an instance of WebhookDeleteResponse from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -83,17 +76,11 @@ class Extract(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of extract_config
-        if self.extract_config:
-            _dict['extract_config'] = self.extract_config.to_dict()
-        # override the default output from pydantic by calling `to_dict()` of data
-        if self.data:
-            _dict['data'] = self.data.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of Extract from a dict"""
+        """Create an instance of WebhookDeleteResponse from a dict"""
         if obj is None:
             return None
 
@@ -101,13 +88,8 @@ class Extract(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "job_id": obj.get("job_id"),
-            "status": obj.get("status"),
-            "url": obj.get("url"),
-            "created_at": obj.get("created_at"),
-            "extract_config": ExtractExtractConfig.from_dict(obj["extract_config"]) if obj.get("extract_config") is not None else None,
-            "data": ExtractData.from_dict(obj["data"]) if obj.get("data") is not None else None,
-            "error": obj.get("error")
+            "id": obj.get("id"),
+            "object": obj.get("object")
         })
         return _obj
 
