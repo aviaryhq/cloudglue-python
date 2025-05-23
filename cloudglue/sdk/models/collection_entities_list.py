@@ -17,19 +17,29 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List
+from cloudglue.sdk.models.collection_entities_list_data_inner import CollectionEntitiesListDataInner
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
+class CollectionEntitiesList(BaseModel):
     """
-    ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner
+    CollectionEntitiesList
     """ # noqa: E501
-    text: Optional[StrictStr] = Field(default=None, description="Text detected on screen")
-    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start time of the text in seconds")
-    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="End time of the text in seconds")
-    __properties: ClassVar[List[str]] = ["text", "start_time", "end_time"]
+    object: StrictStr = Field(description="Object type, always 'list'")
+    data: List[CollectionEntitiesListDataInner] = Field(description="Array of file entities")
+    total: StrictInt = Field(description="Total number of files with entities matching the query")
+    limit: StrictInt = Field(description="Number of items returned in this response")
+    offset: StrictInt = Field(description="Offset from the start of the list")
+    __properties: ClassVar[List[str]] = ["object", "data", "total", "limit", "offset"]
+
+    @field_validator('object')
+    def object_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in set(['list']):
+            raise ValueError("must be one of enum values ('list')")
+        return value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +59,7 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner from a JSON string"""
+        """Create an instance of CollectionEntitiesList from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -70,11 +80,18 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
+        _items = []
+        if self.data:
+            for _item_data in self.data:
+                if _item_data:
+                    _items.append(_item_data.to_dict())
+            _dict['data'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner from a dict"""
+        """Create an instance of CollectionEntitiesList from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +99,11 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "text": obj.get("text"),
-            "start_time": obj.get("start_time"),
-            "end_time": obj.get("end_time")
+            "object": obj.get("object"),
+            "data": [CollectionEntitiesListDataInner.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None,
+            "total": obj.get("total"),
+            "limit": obj.get("limit"),
+            "offset": obj.get("offset")
         })
         return _obj
 
