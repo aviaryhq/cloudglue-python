@@ -17,19 +17,19 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from typing import Any, ClassVar, Dict, List
+from cloudglue.sdk.models.collection_entities_list_data_inner_data import CollectionEntitiesListDataInnerData
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
+class CollectionEntitiesListDataInner(BaseModel):
     """
-    ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner
+    CollectionEntitiesListDataInner
     """ # noqa: E501
-    text: Optional[StrictStr] = Field(default=None, description="Text detected on screen")
-    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start time of the text in seconds")
-    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="End time of the text in seconds")
-    __properties: ClassVar[List[str]] = ["text", "start_time", "end_time"]
+    file_id: StrictStr = Field(description="ID of the file")
+    data: CollectionEntitiesListDataInnerData
+    __properties: ClassVar[List[str]] = ["file_id", "data"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +49,7 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner from a JSON string"""
+        """Create an instance of CollectionEntitiesListDataInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -70,11 +70,14 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of data
+        if self.data:
+            _dict['data'] = self.data.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner from a dict"""
+        """Create an instance of CollectionEntitiesListDataInner from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +85,8 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "text": obj.get("text"),
-            "start_time": obj.get("start_time"),
-            "end_time": obj.get("end_time")
+            "file_id": obj.get("file_id"),
+            "data": CollectionEntitiesListDataInnerData.from_dict(obj["data"]) if obj.get("data") is not None else None
         })
         return _obj
 

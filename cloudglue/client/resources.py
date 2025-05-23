@@ -486,6 +486,103 @@ class Collections:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def list_entities(
+        self,
+        collection_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        order: Optional[str] = None,
+        sort: Optional[str] = None,
+        added_before: Optional[str] = None,
+        added_after: Optional[str] = None,
+    ):
+        """List all extracted entities for files in a collection.
+
+        This API is only available when a collection is created with collection_type 'entities'.
+
+        Args:
+            collection_id: The ID of the collection
+            limit: Maximum number of files to return
+            offset: Number of files to skip
+            order: Order the files by a specific field
+            sort: Sort the files in ascending or descending order
+            added_before: Filter files added before a specific date (YYYY-MM-DD format), in UTC timezone
+            added_after: Filter files added after a specific date (YYYY-MM-DD format), in UTC timezone
+
+        Returns:
+            Collection entities list response
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.list_collection_entities(
+                collection_id=collection_id,
+                limit=limit,
+                offset=offset,
+                order=order,
+                sort=sort,
+                added_before=added_before,
+                added_after=added_after,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(
+                f"Failed to list entities in collection {collection_id}: {str(e)}"
+            )
+
+    def list_rich_transcripts(
+        self,
+        collection_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        order: Optional[str] = None,
+        sort: Optional[str] = None,
+        added_before: Optional[str] = None,
+        added_after: Optional[str] = None,
+        response_format: Optional[str] = None,
+    ):
+        """List all rich transcription data for files in a collection.
+
+        This API is only available when a collection is created with collection_type 'rich-transcripts'.
+
+        Args:
+            collection_id: The ID of the collection
+            limit: Maximum number of files to return
+            offset: Number of files to skip
+            order: Order the files by a specific field
+            sort: Sort the files in ascending or descending order
+            added_before: Filter files added before a specific date (YYYY-MM-DD format), in UTC timezone
+            added_after: Filter files added after a specific date (YYYY-MM-DD format), in UTC timezone
+            response_format: Format for the response
+
+        Returns:
+            Collection rich transcripts list response
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.list_collection_rich_transcripts(
+                collection_id=collection_id,
+                limit=limit,
+                offset=offset,
+                order=order,
+                sort=sort,
+                added_before=added_before,
+                added_after=added_after,
+                response_format=response_format,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(
+                f"Failed to list rich transcripts in collection {collection_id}: {str(e)}"
+            )
+
 
 class Extract:
     """Client for the CloudGlue Extract API."""

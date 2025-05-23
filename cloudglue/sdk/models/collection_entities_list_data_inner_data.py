@@ -17,19 +17,19 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Any, ClassVar, Dict, List, Optional
+from cloudglue.sdk.models.extract_data_segment_entities_inner import ExtractDataSegmentEntitiesInner
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
+class CollectionEntitiesListDataInnerData(BaseModel):
     """
-    ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner
+    CollectionEntitiesListDataInnerData
     """ # noqa: E501
-    text: Optional[StrictStr] = Field(default=None, description="Text detected on screen")
-    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start time of the text in seconds")
-    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="End time of the text in seconds")
-    __properties: ClassVar[List[str]] = ["text", "start_time", "end_time"]
+    entities: Dict[str, Any] = Field(description="Entities extracted from the file at the video level")
+    segment_entities: Optional[List[ExtractDataSegmentEntitiesInner]] = Field(default=None, description="Array of video entities extracted from individual time segments")
+    __properties: ClassVar[List[str]] = ["entities", "segment_entities"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +49,7 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner from a JSON string"""
+        """Create an instance of CollectionEntitiesListDataInnerData from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -70,11 +70,18 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in segment_entities (list)
+        _items = []
+        if self.segment_entities:
+            for _item_segment_entities in self.segment_entities:
+                if _item_segment_entities:
+                    _items.append(_item_segment_entities.to_dict())
+            _dict['segment_entities'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner from a dict"""
+        """Create an instance of CollectionEntitiesListDataInnerData from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +89,8 @@ class ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "text": obj.get("text"),
-            "start_time": obj.get("start_time"),
-            "end_time": obj.get("end_time")
+            "entities": obj.get("entities"),
+            "segment_entities": [ExtractDataSegmentEntitiesInner.from_dict(_item) for _item in obj["segment_entities"]] if obj.get("segment_entities") is not None else None
         })
         return _obj
 
