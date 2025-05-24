@@ -600,6 +600,8 @@ class Extract:
         url: str,
         prompt: Optional[str] = None,
         schema: Optional[Dict[str, Any]] = None,
+        enable_video_level_entities: Optional[bool] = None,
+        enable_segment_level_entities: Optional[bool] = None,
     ):
         """Create a new extraction job.
 
@@ -607,6 +609,8 @@ class Extract:
             url: The URL of the video to extract data from. Can be a YouTube URL or a cloudglue file URI.
             prompt: A natural language description of what to extract. Required if schema is not provided.
             schema: A JSON schema defining the structure of the data to extract. Required if prompt is not provided.
+            enable_video_level_entities: Whether to extract entities at the video level
+            enable_segment_level_entities: Whether to extract entities at the segment level
 
         Returns:
             Extract: A typed Extract object containing job_id, status, and other fields.
@@ -619,7 +623,13 @@ class Extract:
                 raise ValueError("Either prompt or schema must be provided")
 
             # Set up the request object
-            request = NewExtract(url=url, prompt=prompt, var_schema=schema)
+            request = NewExtract(
+                url=url,
+                prompt=prompt,
+                var_schema=schema,
+                enable_video_level_entities=enable_video_level_entities,
+                enable_segment_level_entities=enable_segment_level_entities,
+            )
 
             # Use the standard method to get a properly typed Extract object
             response = self.api.create_extract(new_extract=request)
@@ -692,6 +702,8 @@ class Extract:
         url: str,
         prompt: Optional[str] = None,
         schema: Optional[Dict[str, Any]] = None,
+        enable_video_level_entities: Optional[bool] = None,
+        enable_segment_level_entities: Optional[bool] = None,
         poll_interval: int = 5,
         timeout: int = 600,
     ):
@@ -701,6 +713,8 @@ class Extract:
             url: The URL of the video to extract data from. Can be a YouTube URL or a cloudglue file URI.
             prompt: A natural language description of what to extract. Required if schema is not provided.
             schema: A JSON schema defining the structure of the data to extract. Required if prompt is not provided.
+            enable_video_level_entities: Whether to extract entities at the video level
+            enable_segment_level_entities: Whether to extract entities at the segment level
             poll_interval: How often to check the job status (in seconds).
             timeout: Maximum time to wait for the job to complete (in seconds).
 
@@ -712,7 +726,13 @@ class Extract:
         """
         try:
             # Create the extraction job
-            job = self.create(url=url, prompt=prompt, schema=schema)
+            job = self.create(
+                url=url,
+                prompt=prompt,
+                schema=schema,
+                enable_video_level_entities=enable_video_level_entities,
+                enable_segment_level_entities=enable_segment_level_entities,
+            )
             job_id = job.job_id
 
             # Poll for completion
