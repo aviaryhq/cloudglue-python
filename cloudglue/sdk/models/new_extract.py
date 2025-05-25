@@ -29,7 +29,7 @@ class NewExtract(BaseModel):
     url: StrictStr = Field(description="Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.  Note that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.")
     prompt: Optional[StrictStr] = Field(default=None, description="A natural language prompt describing the data you want to extract. Required if no schema is provided.")
     var_schema: Optional[Dict[str, Any]] = Field(default=None, description="A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided.", alias="schema")
-    enable_video_level_entities: Optional[StrictBool] = Field(default=True, description="Whether to extract entities at the video level")
+    enable_video_level_entities: Optional[StrictBool] = Field(default=False, description="Whether to extract entities at the video level")
     enable_segment_level_entities: Optional[StrictBool] = Field(default=True, description="Whether to extract entities at the segment level")
     __properties: ClassVar[List[str]] = ["url", "prompt", "schema", "enable_video_level_entities", "enable_segment_level_entities"]
 
@@ -87,7 +87,7 @@ class NewExtract(BaseModel):
             "url": obj.get("url"),
             "prompt": obj.get("prompt"),
             "schema": obj.get("schema"),
-            "enable_video_level_entities": obj.get("enable_video_level_entities") if obj.get("enable_video_level_entities") is not None else True,
+            "enable_video_level_entities": obj.get("enable_video_level_entities") if obj.get("enable_video_level_entities") is not None else False,
             "enable_segment_level_entities": obj.get("enable_segment_level_entities") if obj.get("enable_segment_level_entities") is not None else True
         })
         return _obj

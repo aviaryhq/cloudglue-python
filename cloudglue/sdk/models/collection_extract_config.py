@@ -28,7 +28,7 @@ class CollectionExtractConfig(BaseModel):
     """ # noqa: E501
     prompt: Optional[StrictStr] = Field(default=None, description="A natural language prompt describing the data to extract. Required if no schema is provided.")
     var_schema: Optional[Dict[str, Any]] = Field(default=None, description="A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided.", alias="schema")
-    enable_video_level_entities: Optional[StrictBool] = Field(default=True, description="Whether to extract entities at the video level")
+    enable_video_level_entities: Optional[StrictBool] = Field(default=False, description="Whether to extract entities at the video level")
     enable_segment_level_entities: Optional[StrictBool] = Field(default=True, description="Whether to extract entities at the segment level")
     __properties: ClassVar[List[str]] = ["prompt", "schema", "enable_video_level_entities", "enable_segment_level_entities"]
 
@@ -85,7 +85,7 @@ class CollectionExtractConfig(BaseModel):
         _obj = cls.model_validate({
             "prompt": obj.get("prompt"),
             "schema": obj.get("schema"),
-            "enable_video_level_entities": obj.get("enable_video_level_entities") if obj.get("enable_video_level_entities") is not None else True,
+            "enable_video_level_entities": obj.get("enable_video_level_entities") if obj.get("enable_video_level_entities") is not None else False,
             "enable_segment_level_entities": obj.get("enable_segment_level_entities") if obj.get("enable_segment_level_entities") is not None else True
         })
         return _obj
