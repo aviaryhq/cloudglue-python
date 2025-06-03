@@ -22,11 +22,11 @@ from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ChatCompletionRequestFilterMetadataInner(BaseModel):
+class ChatCompletionRequestFilterVideoInfoInner(BaseModel):
     """
-    ChatCompletionRequestFilterMetadataInner
+    ChatCompletionRequestFilterVideoInfoInner
     """ # noqa: E501
-    path: StrictStr = Field(description="JSON path on metadata object (e.g. 'my_custom_field', 'category.subcategory')")
+    path: StrictStr = Field(description="JSON path on video_info object (e.g. 'has_audio', 'duration_seconds')")
     operator: StrictStr = Field(description="Comparison operator to apply")
     value_text: Optional[StrictStr] = Field(default=None, description="Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, In)", alias="valueText")
     value_text_array: Optional[List[StrictStr]] = Field(default=None, description="Array of values for array comparisons (used with ContainsAny, ContainsAll)", alias="valueTextArray")
@@ -57,7 +57,7 @@ class ChatCompletionRequestFilterMetadataInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ChatCompletionRequestFilterMetadataInner from a JSON string"""
+        """Create an instance of ChatCompletionRequestFilterVideoInfoInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -82,7 +82,7 @@ class ChatCompletionRequestFilterMetadataInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ChatCompletionRequestFilterMetadataInner from a dict"""
+        """Create an instance of ChatCompletionRequestFilterVideoInfoInner from a dict"""
         if obj is None:
             return None
 

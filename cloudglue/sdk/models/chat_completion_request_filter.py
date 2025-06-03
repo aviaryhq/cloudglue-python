@@ -19,7 +19,9 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Any, ClassVar, Dict, List, Optional
+from cloudglue.sdk.models.chat_completion_request_filter_file_inner import ChatCompletionRequestFilterFileInner
 from cloudglue.sdk.models.chat_completion_request_filter_metadata_inner import ChatCompletionRequestFilterMetadataInner
+from cloudglue.sdk.models.chat_completion_request_filter_video_info_inner import ChatCompletionRequestFilterVideoInfoInner
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -28,7 +30,9 @@ class ChatCompletionRequestFilter(BaseModel):
     Filter criteria to constrain search results used in chat
     """ # noqa: E501
     metadata: Optional[List[ChatCompletionRequestFilterMetadataInner]] = Field(default=None, description="Filter by file metadata using JSON path expressions")
-    __properties: ClassVar[List[str]] = ["metadata"]
+    video_info: Optional[List[ChatCompletionRequestFilterVideoInfoInner]] = Field(default=None, description="Filter by video information using JSON path expressions")
+    file: Optional[List[ChatCompletionRequestFilterFileInner]] = Field(default=None, description="Filter by file properties using JSON path expressions")
+    __properties: ClassVar[List[str]] = ["metadata", "video_info", "file"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -76,6 +80,20 @@ class ChatCompletionRequestFilter(BaseModel):
                 if _item_metadata:
                     _items.append(_item_metadata.to_dict())
             _dict['metadata'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in video_info (list)
+        _items = []
+        if self.video_info:
+            for _item_video_info in self.video_info:
+                if _item_video_info:
+                    _items.append(_item_video_info.to_dict())
+            _dict['video_info'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in file (list)
+        _items = []
+        if self.file:
+            for _item_file in self.file:
+                if _item_file:
+                    _items.append(_item_file.to_dict())
+            _dict['file'] = _items
         return _dict
 
     @classmethod
@@ -88,7 +106,9 @@ class ChatCompletionRequestFilter(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "metadata": [ChatCompletionRequestFilterMetadataInner.from_dict(_item) for _item in obj["metadata"]] if obj.get("metadata") is not None else None
+            "metadata": [ChatCompletionRequestFilterMetadataInner.from_dict(_item) for _item in obj["metadata"]] if obj.get("metadata") is not None else None,
+            "video_info": [ChatCompletionRequestFilterVideoInfoInner.from_dict(_item) for _item in obj["video_info"]] if obj.get("video_info") is not None else None,
+            "file": [ChatCompletionRequestFilterFileInner.from_dict(_item) for _item in obj["file"]] if obj.get("file") is not None else None
         })
         return _obj
 
