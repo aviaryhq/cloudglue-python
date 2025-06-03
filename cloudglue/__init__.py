@@ -13,7 +13,7 @@ from cloudglue.sdk.models.chat_completion_request_filter_video_info_inner import
 from cloudglue.sdk.models.chat_completion_request_filter_file_inner import ChatCompletionRequestFilterFileInner
 
 # Define version
-__version__ = "0.0.9"
+__version__ = "0.1.1"
 
 # Export key classes at the module level for clean imports
 __all__ = [
