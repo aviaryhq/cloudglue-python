@@ -114,6 +114,7 @@ Class | Method | HTTP request | Description
 *FilesApi* | [**delete_file**](docs/FilesApi.md#delete_file) | **DELETE** /files/{file_id} | Delete a file
 *FilesApi* | [**get_file**](docs/FilesApi.md#get_file) | **GET** /files/{file_id} | Retrieve details about a specific file
 *FilesApi* | [**list_files**](docs/FilesApi.md#list_files) | **GET** /files | List files that have been uploaded to Cloudglue
+*FilesApi* | [**update_file**](docs/FilesApi.md#update_file) | **PUT** /files/{file_id} | Update a file
 *FilesApi* | [**upload_file**](docs/FilesApi.md#upload_file) | **POST** /files | Upload a video file that can be used with Cloudglue services
 *TranscribeApi* | [**create_transcribe**](docs/TranscribeApi.md#create_transcribe) | **POST** /transcribe | Create a new transcription job
 *TranscribeApi* | [**get_transcribe**](docs/TranscribeApi.md#get_transcribe) | **GET** /transcribe/{job_id} | Retrieve the current state of a transcription job
@@ -169,6 +170,7 @@ Class | Method | HTTP request | Description
  - [FileDelete](docs/FileDelete.md)
  - [FileEntities](docs/FileEntities.md)
  - [FileList](docs/FileList.md)
+ - [FileUpdate](docs/FileUpdate.md)
  - [FileVideoInfo](docs/FileVideoInfo.md)
  - [NewCollection](docs/NewCollection.md)
  - [NewExtract](docs/NewExtract.md)

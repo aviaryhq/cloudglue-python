@@ -11,9 +11,10 @@ from cloudglue.sdk.models.chat_completion_request_filter import ChatCompletionRe
 from cloudglue.sdk.models.chat_completion_request_filter_metadata_inner import ChatCompletionRequestFilterMetadataInner
 from cloudglue.sdk.models.chat_completion_request_filter_video_info_inner import ChatCompletionRequestFilterVideoInfoInner
 from cloudglue.sdk.models.chat_completion_request_filter_file_inner import ChatCompletionRequestFilterFileInner
+from cloudglue.sdk.models.file_update import FileUpdate
 
 # Define version
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 # Export key classes at the module level for clean imports
 __all__ = [
@@ -24,5 +25,6 @@ __all__ = [
     "ChatCompletionRequestFilterMetadataInner",
     "ChatCompletionRequestFilterVideoInfoInner",
     "ChatCompletionRequestFilterFileInner",
+    "FileUpdate",
     "CloudGlueError",
 ]

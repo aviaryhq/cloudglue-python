@@ -14,6 +14,7 @@ from cloudglue.sdk.models.new_extract import NewExtract
 from cloudglue.sdk.models.new_collection import NewCollection
 from cloudglue.sdk.models.add_collection_file import AddCollectionFile
 from cloudglue.sdk.models.add_you_tube_collection_file import AddYouTubeCollectionFile
+from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.rest import ApiException
 
 
@@ -1249,6 +1250,38 @@ class Files:
         """
         try:
             return self.api.delete_file(file_id=file_id)
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def update(
+        self,
+        file_id: str,
+        filename: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ):
+        """Update a file's filename and/or metadata.
+
+        Args:
+            file_id: The ID of the file to update.
+            filename: Optional new filename for the file.
+            metadata: Optional user-provided metadata about the file.
+
+        Returns:
+            The updated file object.
+
+        Raises:
+            CloudGlueError: If there is an error updating the file or processing the request.
+        """
+        try:
+            # Create the update request object
+            file_update = FileUpdate(
+                filename=filename,
+                metadata=metadata,
+            )
+            
+            return self.api.update_file(file_id=file_id, file_update=file_update)
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
