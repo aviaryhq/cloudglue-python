@@ -56,6 +56,7 @@ from cloudglue.sdk.models.file import File
 from cloudglue.sdk.models.file_delete import FileDelete
 from cloudglue.sdk.models.file_entities import FileEntities
 from cloudglue.sdk.models.file_list import FileList
+from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.file_video_info import FileVideoInfo
 from cloudglue.sdk.models.new_collection import NewCollection
 from cloudglue.sdk.models.new_extract import NewExtract
