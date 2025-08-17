@@ -14,6 +14,9 @@ from cloudglue.sdk.api_client import ApiClient
 # Import resource classes
 from cloudglue.client.resources import Chat, Files, Transcribe, Extract, Collections
 
+# SDK client constants
+SDK_CLIENT_NAME = "cloudglue-python"
+
 
 class CloudGlue:
     """Main client for interacting with the CloudGlue API."""
@@ -36,6 +39,20 @@ class CloudGlue:
         # Set up configuration
         self.configuration = Configuration(host=host, access_token=self.api_key)
         self.api_client = ApiClient(self.configuration)
+        
+        # Set custom SDK headers
+        self.api_client.set_default_header('x-sdk-client', SDK_CLIENT_NAME)
+        
+        # Get version dynamically to avoid circular import
+        try:
+            # Import here to avoid circular import since cloudglue/__init__.py imports this module
+            import cloudglue
+            sdk_version = cloudglue.__version__
+        except (ImportError, AttributeError):
+            # Fallback version if import fails
+            sdk_version = "0.1.2"
+        
+        self.api_client.set_default_header('x-sdk-version', sdk_version)
 
         # Initialize the specific API clients
         self.chat_api = ChatApi(self.api_client)
