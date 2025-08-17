@@ -17,21 +17,28 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
-class AddCollectionFile(BaseModel):
+class CollectionFileSegmentation(BaseModel):
     """
-    AddCollectionFile
+    Segmentation information for this file in the collection. Only present when the file has been segmented.
     """ # noqa: E501
-    segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
-    segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Configuration for video segmentation. Cannot be provided together with segmentation_id.")
-    file_id: StrictStr = Field(description="The ID of the file to add to the collection")
-    url: StrictStr = Field(description="The URL of the file to add to the collection")
-    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "file_id", "url"]
+    id: StrictStr = Field(description="Unique identifier for the segmentation")
+    status: StrictStr = Field(description="Status of the segmentation job")
+    file_id: StrictStr = Field(description="ID of the file that was segmented")
+    segmentation_config: SegmentationConfig = Field(description="Configuration used for this segmentation")
+    __properties: ClassVar[List[str]] = ["id", "status", "file_id", "segmentation_config"]
+
+    @field_validator('status')
+    def status_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
+            raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
+        return value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +58,7 @@ class AddCollectionFile(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a JSON string"""
+        """Create an instance of CollectionFileSegmentation from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -79,7 +86,7 @@ class AddCollectionFile(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a dict"""
+        """Create an instance of CollectionFileSegmentation from a dict"""
         if obj is None:
             return None
 
@@ -87,10 +94,10 @@ class AddCollectionFile(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "segmentation_id": obj.get("segmentation_id"),
-            "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None,
+            "id": obj.get("id"),
+            "status": obj.get("status"),
             "file_id": obj.get("file_id"),
-            "url": obj.get("url")
+            "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None
         })
         return _obj
 

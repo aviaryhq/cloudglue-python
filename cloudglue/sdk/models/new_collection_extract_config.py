@@ -17,21 +17,20 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
-class AddCollectionFile(BaseModel):
+class NewCollectionExtractConfig(BaseModel):
     """
-    AddCollectionFile
+    🎯 **Use ONLY when collection_type = 'entities'**  Configuration for automatic entity extraction from videos. Required for entities collections. This config will be ignored for other collection types.
     """ # noqa: E501
-    segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
-    segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Configuration for video segmentation. Cannot be provided together with segmentation_id.")
-    file_id: StrictStr = Field(description="The ID of the file to add to the collection")
-    url: StrictStr = Field(description="The URL of the file to add to the collection")
-    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "file_id", "url"]
+    prompt: Optional[StrictStr] = Field(default=None, description="A natural language prompt describing the data to extract. Required if no schema is provided.")
+    var_schema: Optional[Dict[str, Any]] = Field(default=None, description="A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided.", alias="schema")
+    enable_video_level_entities: Optional[StrictBool] = Field(default=False, description="Whether to extract entities at the video level")
+    enable_segment_level_entities: Optional[StrictBool] = Field(default=True, description="Whether to extract entities at the segment level")
+    __properties: ClassVar[List[str]] = ["prompt", "schema", "enable_video_level_entities", "enable_segment_level_entities"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +50,7 @@ class AddCollectionFile(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a JSON string"""
+        """Create an instance of NewCollectionExtractConfig from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -72,14 +71,11 @@ class AddCollectionFile(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of segmentation_config
-        if self.segmentation_config:
-            _dict['segmentation_config'] = self.segmentation_config.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a dict"""
+        """Create an instance of NewCollectionExtractConfig from a dict"""
         if obj is None:
             return None
 
@@ -87,10 +83,10 @@ class AddCollectionFile(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "segmentation_id": obj.get("segmentation_id"),
-            "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None,
-            "file_id": obj.get("file_id"),
-            "url": obj.get("url")
+            "prompt": obj.get("prompt"),
+            "schema": obj.get("schema"),
+            "enable_video_level_entities": obj.get("enable_video_level_entities") if obj.get("enable_video_level_entities") is not None else False,
+            "enable_segment_level_entities": obj.get("enable_segment_level_entities") if obj.get("enable_segment_level_entities") is not None else True
         })
         return _obj
 

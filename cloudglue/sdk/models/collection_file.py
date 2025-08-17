@@ -19,6 +19,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
+from cloudglue.sdk.models.collection_file_segmentation import CollectionFileSegmentation
 from cloudglue.sdk.models.file import File
 from typing import Optional, Set
 from typing_extensions import Self
@@ -32,10 +33,9 @@ class CollectionFile(BaseModel):
     object: StrictStr = Field(description="Object type, always 'collection_file'")
     added_at: StrictInt = Field(description="Unix timestamp of when the file was added to the collection")
     status: StrictStr = Field(description="Overall processing status of the file in this collection")
-    extract_status: Optional[StrictStr] = Field(default=None, description="Status of the entity extraction processing")
-    searchable_status: Optional[StrictStr] = Field(default=None, description="Status of the searchable index processing")
     file: Optional[File] = Field(default=None, description="The file object")
-    __properties: ClassVar[List[str]] = ["collection_id", "file_id", "object", "added_at", "status", "extract_status", "searchable_status", "file"]
+    segmentation: Optional[CollectionFileSegmentation] = None
+    __properties: ClassVar[List[str]] = ["collection_id", "file_id", "object", "added_at", "status", "file", "segmentation"]
 
     @field_validator('object')
     def object_validate_enum(cls, value):
@@ -47,26 +47,6 @@ class CollectionFile(BaseModel):
     @field_validator('status')
     def status_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
-            raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
-        return value
-
-    @field_validator('extract_status')
-    def extract_status_validate_enum(cls, value):
-        """Validates the enum"""
-        if value is None:
-            return value
-
-        if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
-            raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
-        return value
-
-    @field_validator('searchable_status')
-    def searchable_status_validate_enum(cls, value):
-        """Validates the enum"""
-        if value is None:
-            return value
-
         if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
             raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
         return value
@@ -113,6 +93,9 @@ class CollectionFile(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of file
         if self.file:
             _dict['file'] = self.file.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of segmentation
+        if self.segmentation:
+            _dict['segmentation'] = self.segmentation.to_dict()
         return _dict
 
     @classmethod
@@ -130,9 +113,8 @@ class CollectionFile(BaseModel):
             "object": obj.get("object"),
             "added_at": obj.get("added_at"),
             "status": obj.get("status"),
-            "extract_status": obj.get("extract_status"),
-            "searchable_status": obj.get("searchable_status"),
-            "file": File.from_dict(obj["file"]) if obj.get("file") is not None else None
+            "file": File.from_dict(obj["file"]) if obj.get("file") is not None else None,
+            "segmentation": CollectionFileSegmentation.from_dict(obj["segmentation"]) if obj.get("segmentation") is not None else None
         })
         return _obj
 

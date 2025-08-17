@@ -15,6 +15,9 @@ from cloudglue.sdk.models.new_collection import NewCollection
 from cloudglue.sdk.models.add_collection_file import AddCollectionFile
 from cloudglue.sdk.models.add_you_tube_collection_file import AddYouTubeCollectionFile
 from cloudglue.sdk.models.file_update import FileUpdate
+from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
+from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
 from cloudglue.sdk.rest import ApiException
 
 
@@ -282,13 +285,17 @@ class Collections:
         description: Optional[str] = None,
         extract_config: Optional[Dict[str, Any]] = None,
         transcribe_config: Optional[Dict[str, Any]] = None,
+        default_segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
     ):
         """Create a new collection.
 
         Args:
+            collection_type: Type of collection ('entities', 'rich-transcripts')
             name: Name of the collection (must be unique)
             description: Optional description of the collection
             extract_config: Optional configuration for extraction processing
+            transcribe_config: Optional configuration for transcription processing
+            default_segmentation_config: Default segmentation configuration for files in this collection
 
         Returns:
             The typed Collection object with all properties
@@ -301,12 +308,17 @@ class Collections:
             if description is None:  # TODO(kdr): temporary fix for API
                 description = ""
 
+            # Handle default_segmentation_config parameter
+            if isinstance(default_segmentation_config, dict):
+                default_segmentation_config = SegmentationConfig.from_dict(default_segmentation_config)
+
             request = NewCollection(
                 collection_type=collection_type,
                 name=name,
                 description=description,
                 extract_config=extract_config,
                 transcribe_config=transcribe_config,
+                default_segmentation_config=default_segmentation_config,
             )
             # Use the standard method to get a properly typed object
             response = self.api.create_collection(new_collection=request)
@@ -396,6 +408,9 @@ class Collections:
         self,
         collection_id: str,
         file_id: str,
+        url: Optional[str] = None,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         wait_until_finish: bool = False,
         poll_interval: int = 5,
         timeout: int = 600,
@@ -405,6 +420,9 @@ class Collections:
         Args:
             collection_id: The ID of the collection
             file_id: The ID of the file to add to the collection
+            url: The URL of the file to add to the collection (optional, derived from file_id if not provided)
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             wait_until_finish: Whether to wait for the video processing to complete
             poll_interval: How often to check the video status (in seconds) if waiting
             timeout: Maximum time to wait for processing (in seconds) if waiting
@@ -417,8 +435,20 @@ class Collections:
             CloudGlueError: If there is an error adding the video or processing the request.
         """
         try:
+            if segmentation_id and segmentation_config:
+                raise ValueError("Cannot provide both segmentation_id and segmentation_config")
+
+            # Handle segmentation_config parameter
+            if isinstance(segmentation_config, dict):
+                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
+
             # Create request object using the SDK model
-            request = AddCollectionFile(file_id=file_id)
+            request = AddCollectionFile(
+                file_id=file_id,
+                url=url or f"cloudglue://files/{file_id}",  # Default URL format if not provided
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
+            )
 
             # Use the standard method to get a properly typed object
             response = self.api.add_video(
@@ -456,6 +486,8 @@ class Collections:
         collection_id: str,
         url: str,
         metadata: Optional[Dict[str, Any]] = None,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         wait_until_finish: bool = False,
         poll_interval: int = 5,
         timeout: int = 600,
@@ -466,6 +498,8 @@ class Collections:
             collection_id: The ID of the collection
             url: The URL of the YouTube video to add
             metadata: Optional user-provided metadata about the YouTube video
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             wait_until_finish: Whether to wait for the video processing to complete
             poll_interval: How often to check the video status (in seconds) if waiting
             timeout: Maximum time to wait for processing (in seconds) if waiting
@@ -478,8 +512,20 @@ class Collections:
             CloudGlueError: If there is an error adding the video or processing the request.
         """
         try:
+            if segmentation_id and segmentation_config:
+                raise ValueError("Cannot provide both segmentation_id and segmentation_config")
+
+            # Handle segmentation_config parameter
+            if isinstance(segmentation_config, dict):
+                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
+
             # Create request object using the SDK model
-            request = AddYouTubeCollectionFile(url=url, metadata=metadata)
+            request = AddYouTubeCollectionFile(
+                url=url,
+                metadata=metadata,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
+            )
 
             # Use the standard method to get a properly typed object
             response = self.api.add_you_tube_video(
@@ -777,6 +823,8 @@ class Extract:
         schema: Optional[Dict[str, Any]] = None,
         enable_video_level_entities: Optional[bool] = None,
         enable_segment_level_entities: Optional[bool] = None,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
     ):
         """Create a new extraction job.
 
@@ -786,6 +834,8 @@ class Extract:
             schema: A JSON schema defining the structure of the data to extract. Required if prompt is not provided.
             enable_video_level_entities: Whether to extract entities at the video level
             enable_segment_level_entities: Whether to extract entities at the segment level
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
 
         Returns:
             Extract: A typed Extract object containing job_id, status, and other fields.
@@ -797,6 +847,13 @@ class Extract:
             if not prompt and not schema:
                 raise ValueError("Either prompt or schema must be provided")
 
+            if segmentation_id and segmentation_config:
+                raise ValueError("Cannot provide both segmentation_id and segmentation_config")
+
+            # Handle segmentation_config parameter
+            if isinstance(segmentation_config, dict):
+                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
+
             # Set up the request object
             request = NewExtract(
                 url=url,
@@ -804,6 +861,8 @@ class Extract:
                 var_schema=schema,
                 enable_video_level_entities=enable_video_level_entities,
                 enable_segment_level_entities=enable_segment_level_entities,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
             )
 
             # Use the standard method to get a properly typed Extract object
@@ -879,6 +938,8 @@ class Extract:
         schema: Optional[Dict[str, Any]] = None,
         enable_video_level_entities: Optional[bool] = None,
         enable_segment_level_entities: Optional[bool] = None,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         poll_interval: int = 5,
         timeout: int = 600,
     ):
@@ -890,6 +951,8 @@ class Extract:
             schema: A JSON schema defining the structure of the data to extract. Required if prompt is not provided.
             enable_video_level_entities: Whether to extract entities at the video level
             enable_segment_level_entities: Whether to extract entities at the segment level
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             poll_interval: How often to check the job status (in seconds).
             timeout: Maximum time to wait for the job to complete (in seconds).
 
@@ -907,6 +970,8 @@ class Extract:
                 schema=schema,
                 enable_video_level_entities=enable_video_level_entities,
                 enable_segment_level_entities=enable_segment_level_entities,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
             )
             job_id = job.job_id
 
@@ -944,6 +1009,8 @@ class Transcribe:
         enable_speech: bool = True,
         enable_scene_text: bool = False,
         enable_visual_scene_description: bool = False,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
     ):
         """Create a new transcribe job for a video.
 
@@ -953,6 +1020,8 @@ class Transcribe:
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text.
             enable_visual_scene_description: Whether to generate visual scene description.
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
 
         Returns:
             The typed Transcribe job object with job_id and status.
@@ -961,12 +1030,21 @@ class Transcribe:
             CloudGlueError: If there is an error creating the transcribe job or processing the request.
         """
         try:
+            if segmentation_id and segmentation_config:
+                raise ValueError("Cannot provide both segmentation_id and segmentation_config")
+
+            # Handle segmentation_config parameter
+            if isinstance(segmentation_config, dict):
+                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
+
             request = NewTranscribe(
                 url=url,
                 enable_summary=enable_summary,
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
             )
 
             # Use the regular SDK method to create the job
@@ -1051,6 +1129,8 @@ class Transcribe:
         enable_speech: bool = True,
         enable_scene_text: bool = False,
         enable_visual_scene_description: bool = False,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         response_format: Optional[str] = None,
     ):
         """Create a transcribe job and wait for it to complete.
@@ -1063,6 +1143,8 @@ class Transcribe:
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text.
             enable_visual_scene_description: Whether to generate visual scene description.
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
         Returns:
             The completed typed Transcribe job object.
@@ -1078,6 +1160,8 @@ class Transcribe:
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
             )
 
             job_id = job.job_id
@@ -1282,6 +1366,282 @@ class Files:
             )
             
             return self.api.update_file(file_id=file_id, file_update=file_update)
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def create_segmentation(
+        self,
+        file_id: str,
+        segmentation_config: Union[SegmentationConfig, Dict[str, Any]],
+        wait_until_finish: bool = False,
+        poll_interval: int = 5,
+        timeout: int = 600,
+    ):
+        """Create a new segmentation for a file.
+
+        Args:
+            file_id: The ID of the file to segment
+            segmentation_config: Segmentation configuration (SegmentationConfig object or dictionary)
+            wait_until_finish: Whether to wait for the segmentation to complete
+            poll_interval: How often to check the segmentation status (in seconds) if waiting
+            timeout: Maximum time to wait for processing (in seconds) if waiting
+
+        Returns:
+            The created Segmentation object. If wait_until_finish is True, waits for processing
+            to complete and returns the final segmentation state.
+
+        Raises:
+            CloudGlueError: If there is an error creating the segmentation or processing the request.
+
+        Example:
+            # Create uniform segmentation
+            config = client.segmentations.create_uniform_config(window_seconds=20)
+            segmentation = client.files.create_segmentation(
+                file_id="file_123",
+                segmentation_config=config,
+                wait_until_finish=True
+            )
+        """
+        try:
+            # Handle segmentation_config parameter
+            if isinstance(segmentation_config, dict):
+                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
+            elif not isinstance(segmentation_config, SegmentationConfig):
+                raise ValueError("segmentation_config must be a SegmentationConfig object or dictionary")
+
+            response = self.api.create_file_segmentation(
+                file_id=file_id,
+                segmentation_config=segmentation_config,
+            )
+
+            # If not waiting for completion, return immediately
+            if not wait_until_finish:
+                return response
+
+            # Otherwise poll until completion or timeout
+            segmentation_id = response.segmentation_id
+            elapsed = 0
+            terminal_states = ["completed", "failed", "not_applicable"]
+
+            # Import SegmentationsApi here to avoid circular imports
+            from cloudglue.sdk.api.segmentations_api import SegmentationsApi
+            segmentations_api = SegmentationsApi(self.api.api_client)
+
+            while elapsed < timeout:
+                status = segmentations_api.get_segmentation(segmentation_id=segmentation_id)
+
+                if status.status in terminal_states:
+                    return status
+
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+
+            raise TimeoutError(
+                f"Segmentation processing did not complete within {timeout} seconds"
+            )
+
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def list_segmentations(
+        self,
+        file_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        status: Optional[str] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
+        order: Optional[str] = None,
+        sort: Optional[str] = None,
+    ):
+        """List segmentations for a specific file.
+
+        Args:
+            file_id: The ID of the file to list segmentations for
+            limit: Maximum number of segmentations to return (max 100)
+            offset: Number of segmentations to skip
+            status: Filter by segmentation status ('pending', 'processing', 'completed', 'failed', 'not_applicable')
+            created_before: Filter by segmentations created before a specific date, YYYY-MM-DD format in UTC
+            created_after: Filter by segmentations created after a specific date, YYYY-MM-DD format in UTC
+            order: Field to sort by ('created_at'). Defaults to 'created_at'
+            sort: Sort direction ('asc', 'desc'). Defaults to 'desc'
+
+        Returns:
+            A list of segmentation objects for the file
+
+        Raises:
+            CloudGlueError: If there is an error listing the segmentations or processing the request.
+        """
+        try:
+            response = self.api.list_file_segmentations(
+                file_id=file_id,
+                limit=limit,
+                offset=offset,
+                status=status,
+                created_before=created_before,
+                created_after=created_after,
+                order=order,
+                sort=sort,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+
+class Segmentations:
+    """Client for the CloudGlue Segmentations API."""
+
+    def __init__(self, api):
+        """Initialize the Segmentations client.
+
+        Args:
+            api: The SegmentationsApi instance.
+        """
+        self.api = api
+
+    @staticmethod
+    def create_uniform_config(
+        window_seconds: Union[int, float],
+        hop_seconds: Optional[Union[int, float]] = None,
+        start_time_seconds: Optional[Union[int, float]] = None,
+        end_time_seconds: Optional[Union[int, float]] = None,
+    ) -> SegmentationConfig:
+        """Create a uniform segmentation configuration.
+
+        Args:
+            window_seconds: The duration of each segment in seconds (2-60)
+            hop_seconds: The offset between the start of new windows. Defaults to window_seconds if not provided
+            start_time_seconds: Optional start time of the video in seconds to start segmenting from
+            end_time_seconds: Optional end time of the video in seconds to stop segmenting at
+
+        Returns:
+            SegmentationConfig configured for uniform segmentation
+
+        Example:
+            # 20-second segments with no overlap
+            config = client.segmentations.create_uniform_config(window_seconds=20)
+            
+            # 30-second segments with 15-second overlap
+            config = client.segmentations.create_uniform_config(
+                window_seconds=30, 
+                hop_seconds=15
+            )
+        """
+        uniform_config = SegmentationUniformConfig(
+            window_seconds=window_seconds,
+            hop_seconds=hop_seconds,
+        )
+        
+        return SegmentationConfig(
+            strategy="uniform",
+            uniform_config=uniform_config,
+            start_time_seconds=start_time_seconds,
+            end_time_seconds=end_time_seconds,
+        )
+
+    @staticmethod
+    def create_shot_detector_config(
+        detector: str,
+        threshold: Optional[Union[int, float]] = None,
+        min_seconds: Optional[Union[int, float]] = None,
+        max_seconds: Optional[Union[int, float]] = None,
+        start_time_seconds: Optional[Union[int, float]] = None,
+        end_time_seconds: Optional[Union[int, float]] = None,
+    ) -> SegmentationConfig:
+        """Create a shot detector segmentation configuration.
+
+        Args:
+            detector: The detector strategy ('adaptive' for dynamic footage, 'content' for controlled footage)
+            threshold: Detection sensitivity threshold (lower values create more segments)
+            min_seconds: The minimum length of a shot in seconds (2-60)
+            max_seconds: The maximum length of a shot in seconds (2-60)
+            start_time_seconds: Optional start time of the video in seconds to start segmenting from
+            end_time_seconds: Optional end time of the video in seconds to stop segmenting at
+
+        Returns:
+            SegmentationConfig configured for shot detection
+
+        Example:
+            # Adaptive detector for dynamic content
+            config = client.segmentations.create_shot_detector_config(
+                detector="adaptive",
+                threshold=3.0,
+                min_seconds=5,
+                max_seconds=30
+            )
+            
+            # Content detector for controlled footage
+            config = client.segmentations.create_shot_detector_config(
+                detector="content",
+                threshold=27.0
+            )
+        """
+        shot_detector_config = SegmentationShotDetectorConfig(
+            detector=detector,
+            threshold=threshold,
+            min_seconds=min_seconds,
+            max_seconds=max_seconds,
+        )
+        
+        return SegmentationConfig(
+            strategy="shot-detector",
+            shot_detector_config=shot_detector_config,
+            start_time_seconds=start_time_seconds,
+            end_time_seconds=end_time_seconds,
+        )
+
+    def get(
+        self,
+        segmentation_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """Get a specific segmentation including its segments.
+
+        Args:
+            segmentation_id: The ID of the segmentation to retrieve
+            limit: Number of segments to return (max 100)
+            offset: Offset from the start of the segments list
+
+        Returns:
+            The typed Segmentation object with segments and metadata
+
+        Raises:
+            CloudGlueError: If there is an error retrieving the segmentation or processing the request.
+        """
+        try:
+            response = self.api.get_segmentation(
+                segmentation_id=segmentation_id,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def delete(self, segmentation_id: str):
+        """Delete a segmentation.
+
+        Args:
+            segmentation_id: The ID of the segmentation to delete
+
+        Returns:
+            The deletion confirmation
+
+        Raises:
+            CloudGlueError: If there is an error deleting the segmentation or processing the request.
+        """
+        try:
+            response = self.api.delete_segmentation(segmentation_id=segmentation_id)
+            return response
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
