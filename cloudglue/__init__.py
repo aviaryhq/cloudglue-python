@@ -1,5 +1,7 @@
 # cloudglue/__init__.py
 
+from cloudglue._version import __version__
+
 # Import and re-export the client
 from cloudglue.client.main import CloudGlue
 from cloudglue.client.resources import CloudGlueError
@@ -12,9 +14,6 @@ from cloudglue.sdk.models.chat_completion_request_filter_metadata_inner import C
 from cloudglue.sdk.models.chat_completion_request_filter_video_info_inner import ChatCompletionRequestFilterVideoInfoInner
 from cloudglue.sdk.models.chat_completion_request_filter_file_inner import ChatCompletionRequestFilterFileInner
 from cloudglue.sdk.models.file_update import FileUpdate
-
-# Define version
-__version__ = "0.1.2"
 
 # Export key classes at the module level for clean imports
 __all__ = [
