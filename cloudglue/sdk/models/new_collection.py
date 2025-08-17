@@ -19,8 +19,9 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.collection_extract_config import CollectionExtractConfig
-from cloudglue.sdk.models.collection_transcribe_config import CollectionTranscribeConfig
+from cloudglue.sdk.models.new_collection_extract_config import NewCollectionExtractConfig
+from cloudglue.sdk.models.new_collection_transcribe_config import NewCollectionTranscribeConfig
+from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -28,12 +29,13 @@ class NewCollection(BaseModel):
     """
     NewCollection
     """ # noqa: E501
-    collection_type: StrictStr = Field(description="Type of collection, determines how videos are processed and what data is extracted.  - **entities** is intended for entity extraction. - **rich-transcripts** is intended for rich transcription of videos and use in chat completion..")
+    collection_type: StrictStr = Field(description="Type of collection, determines how videos are processed and what data is extracted.  **Collection Types:** - **entities**: Extract structured data/entities from videos (requires `extract_config`) - **rich-transcripts**: Generate rich transcriptions with speech and visual descriptions (use `transcribe_config`)  ⚠️ **Important**: Only provide the config that matches your collection_type. Other configs will be ignored.")
     name: StrictStr = Field(description="Name of the collection (must be unique within an organization)")
     description: Optional[StrictStr] = Field(default=None, description="Description of the collection's purpose or contents")
-    extract_config: Optional[CollectionExtractConfig] = None
-    transcribe_config: Optional[CollectionTranscribeConfig] = None
-    __properties: ClassVar[List[str]] = ["collection_type", "name", "description", "extract_config", "transcribe_config"]
+    extract_config: Optional[NewCollectionExtractConfig] = None
+    transcribe_config: Optional[NewCollectionTranscribeConfig] = None
+    default_segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Default segmentation configuration to use for files added to this collection. If not provided, a default uniform segmentation will be used.")
+    __properties: ClassVar[List[str]] = ["collection_type", "name", "description", "extract_config", "transcribe_config", "default_segmentation_config"]
 
     @field_validator('collection_type')
     def collection_type_validate_enum(cls, value):
@@ -87,6 +89,9 @@ class NewCollection(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of transcribe_config
         if self.transcribe_config:
             _dict['transcribe_config'] = self.transcribe_config.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of default_segmentation_config
+        if self.default_segmentation_config:
+            _dict['default_segmentation_config'] = self.default_segmentation_config.to_dict()
         # set to None if description (nullable) is None
         # and model_fields_set contains the field
         if self.description is None and "description" in self.model_fields_set:
@@ -107,8 +112,9 @@ class NewCollection(BaseModel):
             "collection_type": obj.get("collection_type"),
             "name": obj.get("name"),
             "description": obj.get("description"),
-            "extract_config": CollectionExtractConfig.from_dict(obj["extract_config"]) if obj.get("extract_config") is not None else None,
-            "transcribe_config": CollectionTranscribeConfig.from_dict(obj["transcribe_config"]) if obj.get("transcribe_config") is not None else None
+            "extract_config": NewCollectionExtractConfig.from_dict(obj["extract_config"]) if obj.get("extract_config") is not None else None,
+            "transcribe_config": NewCollectionTranscribeConfig.from_dict(obj["transcribe_config"]) if obj.get("transcribe_config") is not None else None,
+            "default_segmentation_config": SegmentationConfig.from_dict(obj["default_segmentation_config"]) if obj.get("default_segmentation_config") is not None else None
         })
         return _obj
 

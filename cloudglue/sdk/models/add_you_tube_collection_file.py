@@ -19,6 +19,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
+from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -26,9 +27,11 @@ class AddYouTubeCollectionFile(BaseModel):
     """
     AddYouTubeCollectionFile
     """ # noqa: E501
+    segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
+    segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Configuration for video segmentation. Cannot be provided together with segmentation_id.")
     url: StrictStr = Field(description="The URL of the YouTube video to add to the collection.  Note that YouTube videos are currently limited to speech and metadata level understanding, for fully fledge multimodal video understanding please upload a file instead to the Files API and use that object instead as input.")
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="User-provided metadata about the YouTube video")
-    __properties: ClassVar[List[str]] = ["url", "metadata"]
+    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "url", "metadata"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -69,6 +72,9 @@ class AddYouTubeCollectionFile(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of segmentation_config
+        if self.segmentation_config:
+            _dict['segmentation_config'] = self.segmentation_config.to_dict()
         return _dict
 
     @classmethod
@@ -81,6 +87,8 @@ class AddYouTubeCollectionFile(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "segmentation_id": obj.get("segmentation_id"),
+            "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None,
             "url": obj.get("url"),
             "metadata": obj.get("metadata")
         })

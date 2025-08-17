@@ -111,11 +111,15 @@ Class | Method | HTTP request | Description
 *ExtractApi* | [**create_extract**](docs/ExtractApi.md#create_extract) | **POST** /extract | Create a new extract job
 *ExtractApi* | [**get_extract**](docs/ExtractApi.md#get_extract) | **GET** /extract/{job_id} | Retrieve the current state of an extraction job
 *ExtractApi* | [**list_extracts**](docs/ExtractApi.md#list_extracts) | **GET** /extract | List all extract jobs
+*FilesApi* | [**create_file_segmentation**](docs/FilesApi.md#create_file_segmentation) | **POST** /files/{file_id}/segmentations | Create a new segmentation for a file
 *FilesApi* | [**delete_file**](docs/FilesApi.md#delete_file) | **DELETE** /files/{file_id} | Delete a file
 *FilesApi* | [**get_file**](docs/FilesApi.md#get_file) | **GET** /files/{file_id} | Retrieve details about a specific file
+*FilesApi* | [**list_file_segmentations**](docs/FilesApi.md#list_file_segmentations) | **GET** /files/{file_id}/segmentations | List segmentations for a file
 *FilesApi* | [**list_files**](docs/FilesApi.md#list_files) | **GET** /files | List files that have been uploaded to Cloudglue
 *FilesApi* | [**update_file**](docs/FilesApi.md#update_file) | **PUT** /files/{file_id} | Update a file
 *FilesApi* | [**upload_file**](docs/FilesApi.md#upload_file) | **POST** /files | Upload a video file that can be used with Cloudglue services
+*SegmentationsApi* | [**delete_segmentation**](docs/SegmentationsApi.md#delete_segmentation) | **DELETE** /segmentations/{segmentation_id} | Delete a segmentation
+*SegmentationsApi* | [**get_segmentation**](docs/SegmentationsApi.md#get_segmentation) | **GET** /segmentations/{segmentation_id} | Get a specific segmentation
 *TranscribeApi* | [**create_transcribe**](docs/TranscribeApi.md#create_transcribe) | **POST** /transcribe | Create a new transcription job
 *TranscribeApi* | [**get_transcribe**](docs/TranscribeApi.md#get_transcribe) | **GET** /transcribe/{job_id} | Retrieve the current state of a transcription job
 *TranscribeApi* | [**list_transcribes**](docs/TranscribeApi.md#list_transcribes) | **GET** /transcribe | List all transcription jobs
@@ -155,11 +159,13 @@ Class | Method | HTTP request | Description
  - [CollectionFile](docs/CollectionFile.md)
  - [CollectionFileDelete](docs/CollectionFileDelete.md)
  - [CollectionFileList](docs/CollectionFileList.md)
+ - [CollectionFileSegmentation](docs/CollectionFileSegmentation.md)
  - [CollectionList](docs/CollectionList.md)
  - [CollectionRichTranscriptsList](docs/CollectionRichTranscriptsList.md)
  - [CollectionRichTranscriptsListDataInner](docs/CollectionRichTranscriptsListDataInner.md)
  - [CollectionRichTranscriptsListDataInnerData](docs/CollectionRichTranscriptsListDataInnerData.md)
  - [CollectionTranscribeConfig](docs/CollectionTranscribeConfig.md)
+ - [DeleteSegmentation200Response](docs/DeleteSegmentation200Response.md)
  - [Error](docs/Error.md)
  - [Extract](docs/Extract.md)
  - [ExtractData](docs/ExtractData.md)
@@ -170,12 +176,22 @@ Class | Method | HTTP request | Description
  - [FileDelete](docs/FileDelete.md)
  - [FileEntities](docs/FileEntities.md)
  - [FileList](docs/FileList.md)
+ - [FileSegmentationConfig](docs/FileSegmentationConfig.md)
  - [FileUpdate](docs/FileUpdate.md)
  - [FileVideoInfo](docs/FileVideoInfo.md)
  - [NewCollection](docs/NewCollection.md)
+ - [NewCollectionExtractConfig](docs/NewCollectionExtractConfig.md)
+ - [NewCollectionTranscribeConfig](docs/NewCollectionTranscribeConfig.md)
  - [NewExtract](docs/NewExtract.md)
  - [NewTranscribe](docs/NewTranscribe.md)
  - [RichTranscript](docs/RichTranscript.md)
+ - [Segmentation](docs/Segmentation.md)
+ - [SegmentationConfig](docs/SegmentationConfig.md)
+ - [SegmentationData](docs/SegmentationData.md)
+ - [SegmentationDataSegmentsInner](docs/SegmentationDataSegmentsInner.md)
+ - [SegmentationList](docs/SegmentationList.md)
+ - [SegmentationShotDetectorConfig](docs/SegmentationShotDetectorConfig.md)
+ - [SegmentationUniformConfig](docs/SegmentationUniformConfig.md)
  - [Transcribe](docs/Transcribe.md)
  - [TranscribeData](docs/TranscribeData.md)
  - [TranscribeDataSceneTextInner](docs/TranscribeDataSceneTextInner.md)

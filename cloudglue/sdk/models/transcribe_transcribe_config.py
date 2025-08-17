@@ -26,11 +26,11 @@ class TranscribeTranscribeConfig(BaseModel):
     """
     Configuration for rich transcription from videos
     """ # noqa: E501
-    enable_summary_: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate a video level summary and title", alias="enable_summary ")
+    enable_summary: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate a video level summary and title")
     enable_speech: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate speech transcript")
     enable_visual_scene_description: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate visual scene description")
     enable_scene_text: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate scene text")
-    __properties: ClassVar[List[str]] = ["enable_summary ", "enable_speech", "enable_visual_scene_description", "enable_scene_text"]
+    __properties: ClassVar[List[str]] = ["enable_summary", "enable_speech", "enable_visual_scene_description", "enable_scene_text"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -83,7 +83,7 @@ class TranscribeTranscribeConfig(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "enable_summary ": obj.get("enable_summary "),
+            "enable_summary": obj.get("enable_summary"),
             "enable_speech": obj.get("enable_speech"),
             "enable_visual_scene_description": obj.get("enable_visual_scene_description"),
             "enable_scene_text": obj.get("enable_scene_text")

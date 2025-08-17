@@ -21,6 +21,7 @@ from cloudglue.sdk.api.chat_api import ChatApi
 from cloudglue.sdk.api.collections_api import CollectionsApi
 from cloudglue.sdk.api.extract_api import ExtractApi
 from cloudglue.sdk.api.files_api import FilesApi
+from cloudglue.sdk.api.segmentations_api import SegmentationsApi
 from cloudglue.sdk.api.transcribe_api import TranscribeApi
 from cloudglue.sdk.api.webhooks_api import WebhooksApi
 
@@ -63,11 +64,13 @@ from cloudglue.sdk.models.collection_extract_config import CollectionExtractConf
 from cloudglue.sdk.models.collection_file import CollectionFile
 from cloudglue.sdk.models.collection_file_delete import CollectionFileDelete
 from cloudglue.sdk.models.collection_file_list import CollectionFileList
+from cloudglue.sdk.models.collection_file_segmentation import CollectionFileSegmentation
 from cloudglue.sdk.models.collection_list import CollectionList
 from cloudglue.sdk.models.collection_rich_transcripts_list import CollectionRichTranscriptsList
 from cloudglue.sdk.models.collection_rich_transcripts_list_data_inner import CollectionRichTranscriptsListDataInner
 from cloudglue.sdk.models.collection_rich_transcripts_list_data_inner_data import CollectionRichTranscriptsListDataInnerData
 from cloudglue.sdk.models.collection_transcribe_config import CollectionTranscribeConfig
+from cloudglue.sdk.models.delete_segmentation200_response import DeleteSegmentation200Response
 from cloudglue.sdk.models.error import Error
 from cloudglue.sdk.models.extract import Extract
 from cloudglue.sdk.models.extract_data import ExtractData
@@ -78,12 +81,22 @@ from cloudglue.sdk.models.file import File
 from cloudglue.sdk.models.file_delete import FileDelete
 from cloudglue.sdk.models.file_entities import FileEntities
 from cloudglue.sdk.models.file_list import FileList
+from cloudglue.sdk.models.file_segmentation_config import FileSegmentationConfig
 from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.file_video_info import FileVideoInfo
 from cloudglue.sdk.models.new_collection import NewCollection
+from cloudglue.sdk.models.new_collection_extract_config import NewCollectionExtractConfig
+from cloudglue.sdk.models.new_collection_transcribe_config import NewCollectionTranscribeConfig
 from cloudglue.sdk.models.new_extract import NewExtract
 from cloudglue.sdk.models.new_transcribe import NewTranscribe
 from cloudglue.sdk.models.rich_transcript import RichTranscript
+from cloudglue.sdk.models.segmentation import Segmentation
+from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from cloudglue.sdk.models.segmentation_data import SegmentationData
+from cloudglue.sdk.models.segmentation_data_segments_inner import SegmentationDataSegmentsInner
+from cloudglue.sdk.models.segmentation_list import SegmentationList
+from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
+from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
 from cloudglue.sdk.models.transcribe import Transcribe
 from cloudglue.sdk.models.transcribe_data import TranscribeData
 from cloudglue.sdk.models.transcribe_data_scene_text_inner import TranscribeDataSceneTextInner

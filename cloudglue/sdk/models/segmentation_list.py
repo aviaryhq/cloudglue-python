@@ -17,21 +17,29 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List
+from cloudglue.sdk.models.segmentation import Segmentation
 from typing import Optional, Set
 from typing_extensions import Self
 
-class AddCollectionFile(BaseModel):
+class SegmentationList(BaseModel):
     """
-    AddCollectionFile
+    SegmentationList
     """ # noqa: E501
-    segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
-    segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Configuration for video segmentation. Cannot be provided together with segmentation_id.")
-    file_id: StrictStr = Field(description="The ID of the file to add to the collection")
-    url: StrictStr = Field(description="The URL of the file to add to the collection")
-    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "file_id", "url"]
+    object: StrictStr = Field(description="Object type, always 'list'")
+    data: List[Segmentation] = Field(description="Array of segmentation objects")
+    total: StrictInt = Field(description="Total number of segmentations matching the query")
+    limit: StrictInt = Field(description="Number of items returned in this response")
+    offset: StrictInt = Field(description="Offset from the start of the list")
+    __properties: ClassVar[List[str]] = ["object", "data", "total", "limit", "offset"]
+
+    @field_validator('object')
+    def object_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in set(['list']):
+            raise ValueError("must be one of enum values ('list')")
+        return value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +59,7 @@ class AddCollectionFile(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a JSON string"""
+        """Create an instance of SegmentationList from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -72,14 +80,18 @@ class AddCollectionFile(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of segmentation_config
-        if self.segmentation_config:
-            _dict['segmentation_config'] = self.segmentation_config.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
+        _items = []
+        if self.data:
+            for _item_data in self.data:
+                if _item_data:
+                    _items.append(_item_data.to_dict())
+            _dict['data'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a dict"""
+        """Create an instance of SegmentationList from a dict"""
         if obj is None:
             return None
 
@@ -87,10 +99,11 @@ class AddCollectionFile(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "segmentation_id": obj.get("segmentation_id"),
-            "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None,
-            "file_id": obj.get("file_id"),
-            "url": obj.get("url")
+            "object": obj.get("object"),
+            "data": [Segmentation.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None,
+            "total": obj.get("total"),
+            "limit": obj.get("limit"),
+            "offset": obj.get("offset")
         })
         return _obj
 

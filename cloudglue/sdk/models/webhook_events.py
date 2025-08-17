@@ -26,9 +26,9 @@ class WebhookEvents(str, Enum):
     """
     allowed enum values
     """
-    TRANSCRIBE_DOT_JOB_DOT_PROCESSING = 'transcribe.job.processing'
-    TRANSCRIBE_DOT_JOB_DOT_COMPLETED = 'transcribe.job.completed'
-    TRANSCRIBE_DOT_JOB_DOT_FAILED = 'transcribe.job.failed'
+    DESCRIBE_DOT_JOB_DOT_PROCESSING = 'describe.job.processing'
+    DESCRIBE_DOT_JOB_DOT_COMPLETED = 'describe.job.completed'
+    DESCRIBE_DOT_JOB_DOT_FAILED = 'describe.job.failed'
     EXTRACT_DOT_JOB_DOT_PROCESSING = 'extract.job.processing'
     EXTRACT_DOT_JOB_DOT_COMPLETED = 'extract.job.completed'
     EXTRACT_DOT_JOB_DOT_FAILED = 'extract.job.failed'

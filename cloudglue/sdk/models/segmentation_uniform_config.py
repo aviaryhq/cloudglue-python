@@ -17,21 +17,19 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
-class AddCollectionFile(BaseModel):
+class SegmentationUniformConfig(BaseModel):
     """
-    AddCollectionFile
+    SegmentationUniformConfig
     """ # noqa: E501
-    segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
-    segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Configuration for video segmentation. Cannot be provided together with segmentation_id.")
-    file_id: StrictStr = Field(description="The ID of the file to add to the collection")
-    url: StrictStr = Field(description="The URL of the file to add to the collection")
-    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "file_id", "url"]
+    window_seconds: Union[Annotated[float, Field(le=60, strict=True, ge=2)], Annotated[int, Field(le=60, strict=True, ge=2)]] = Field(description="The duration of each segment in seconds")
+    hop_seconds: Optional[Union[Annotated[float, Field(le=60, strict=True, ge=1)], Annotated[int, Field(le=60, strict=True, ge=1)]]] = Field(default=None, description="The offset between the start of new windows. This means there can be overlap between segments. If not provided, defaults to window_seconds.")
+    __properties: ClassVar[List[str]] = ["window_seconds", "hop_seconds"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +49,7 @@ class AddCollectionFile(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a JSON string"""
+        """Create an instance of SegmentationUniformConfig from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -72,14 +70,11 @@ class AddCollectionFile(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of segmentation_config
-        if self.segmentation_config:
-            _dict['segmentation_config'] = self.segmentation_config.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of AddCollectionFile from a dict"""
+        """Create an instance of SegmentationUniformConfig from a dict"""
         if obj is None:
             return None
 
@@ -87,10 +82,8 @@ class AddCollectionFile(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "segmentation_id": obj.get("segmentation_id"),
-            "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None,
-            "file_id": obj.get("file_id"),
-            "url": obj.get("url")
+            "window_seconds": obj.get("window_seconds"),
+            "hop_seconds": obj.get("hop_seconds")
         })
         return _obj
 
