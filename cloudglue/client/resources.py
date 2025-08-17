@@ -1452,11 +1452,6 @@ class Files:
         file_id: str,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        status: Optional[str] = None,
-        created_before: Optional[str] = None,
-        created_after: Optional[str] = None,
-        order: Optional[str] = None,
-        sort: Optional[str] = None,
     ):
         """List segmentations for a specific file.
 
@@ -1464,14 +1459,9 @@ class Files:
             file_id: The ID of the file to list segmentations for
             limit: Maximum number of segmentations to return (max 100)
             offset: Number of segmentations to skip
-            status: Filter by segmentation status ('pending', 'processing', 'completed', 'failed', 'not_applicable')
-            created_before: Filter by segmentations created before a specific date, YYYY-MM-DD format in UTC
-            created_after: Filter by segmentations created after a specific date, YYYY-MM-DD format in UTC
-            order: Field to sort by ('created_at'). Defaults to 'created_at'
-            sort: Sort direction ('asc', 'desc'). Defaults to 'desc'
 
         Returns:
-            A list of segmentation objects for the file
+            A SegmentationList object containing segmentation objects for the file
 
         Raises:
             CloudGlueError: If there is an error listing the segmentations or processing the request.
@@ -1481,11 +1471,6 @@ class Files:
                 file_id=file_id,
                 limit=limit,
                 offset=offset,
-                status=status,
-                created_before=created_before,
-                created_after=created_after,
-                order=order,
-                sort=sort,
             )
             return response
         except ApiException as e:
