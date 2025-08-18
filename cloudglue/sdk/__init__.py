@@ -21,6 +21,7 @@ from cloudglue.sdk.api.chat_api import ChatApi
 from cloudglue.sdk.api.collections_api import CollectionsApi
 from cloudglue.sdk.api.extract_api import ExtractApi
 from cloudglue.sdk.api.files_api import FilesApi
+from cloudglue.sdk.api.search_api import SearchApi
 from cloudglue.sdk.api.segmentations_api import SegmentationsApi
 from cloudglue.sdk.api.transcribe_api import TranscribeApi
 from cloudglue.sdk.api.webhooks_api import WebhooksApi
@@ -81,6 +82,7 @@ from cloudglue.sdk.models.file import File
 from cloudglue.sdk.models.file_delete import FileDelete
 from cloudglue.sdk.models.file_entities import FileEntities
 from cloudglue.sdk.models.file_list import FileList
+from cloudglue.sdk.models.file_search_result import FileSearchResult
 from cloudglue.sdk.models.file_segmentation_config import FileSegmentationConfig
 from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.file_video_info import FileVideoInfo
@@ -90,6 +92,15 @@ from cloudglue.sdk.models.new_collection_transcribe_config import NewCollectionT
 from cloudglue.sdk.models.new_extract import NewExtract
 from cloudglue.sdk.models.new_transcribe import NewTranscribe
 from cloudglue.sdk.models.rich_transcript import RichTranscript
+from cloudglue.sdk.models.search_filter import SearchFilter
+from cloudglue.sdk.models.search_filter_criteria import SearchFilterCriteria
+from cloudglue.sdk.models.search_filter_file_inner import SearchFilterFileInner
+from cloudglue.sdk.models.search_filter_video_info_inner import SearchFilterVideoInfoInner
+from cloudglue.sdk.models.search_request import SearchRequest
+from cloudglue.sdk.models.search_response import SearchResponse
+from cloudglue.sdk.models.search_response_results_inner import SearchResponseResultsInner
+from cloudglue.sdk.models.segment_search_result import SegmentSearchResult
+from cloudglue.sdk.models.segment_search_result_visual_description_inner import SegmentSearchResultVisualDescriptionInner
 from cloudglue.sdk.models.segmentation import Segmentation
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.segmentation_data import SegmentationData

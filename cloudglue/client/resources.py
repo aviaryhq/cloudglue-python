@@ -18,6 +18,11 @@ from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
 from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
+from cloudglue.sdk.models.search_request import SearchRequest
+from cloudglue.sdk.models.search_filter import SearchFilter
+from cloudglue.sdk.models.search_filter_criteria import SearchFilterCriteria
+from cloudglue.sdk.models.search_filter_file_inner import SearchFilterFileInner
+from cloudglue.sdk.models.search_filter_video_info_inner import SearchFilterVideoInfoInner
 from cloudglue.sdk.rest import ApiException
 
 
@@ -1627,6 +1632,228 @@ class Segmentations:
         try:
             response = self.api.delete_segmentation(segmentation_id=segmentation_id)
             return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+
+class Search:
+    """Client for the CloudGlue Search API."""
+
+    def __init__(self, api):
+        """Initialize the Search client.
+
+        Args:
+            api: The SearchApi instance.
+        """
+        self.api = api
+
+    @staticmethod
+    def _create_metadata_filter(
+        path: str,
+        operator: str,
+        value_text: Optional[str] = None,
+        value_text_array: Optional[List[str]] = None,
+    ) -> SearchFilterCriteria:
+        """Create a metadata filter for search.
+        
+        Args:
+            path: JSON path on metadata object (e.g. 'my_custom_field', 'category.subcategory')
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)
+            value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            
+        Returns:
+            SearchFilterCriteria object
+        """
+        return SearchFilterCriteria(
+            path=path,
+            operator=operator,
+            value_text=value_text,
+            value_text_array=value_text_array,
+        )
+
+    @staticmethod
+    def _create_video_info_filter(
+        path: str,
+        operator: str,
+        value_text: Optional[str] = None,
+        value_text_array: Optional[List[str]] = None,
+    ) -> SearchFilterVideoInfoInner:
+        """Create a video info filter for search.
+        
+        Args:
+            path: Video info field ('duration_seconds', 'has_audio')
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)
+            value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            
+        Returns:
+            SearchFilterVideoInfoInner object
+        """
+        return SearchFilterVideoInfoInner(
+            path=path,
+            operator=operator,
+            value_text=value_text,
+            value_text_array=value_text_array,
+        )
+
+    @staticmethod
+    def _create_file_filter(
+        path: str,
+        operator: str,
+        value_text: Optional[str] = None,
+        value_text_array: Optional[List[str]] = None,
+    ) -> SearchFilterFileInner:
+        """Create a file filter for search.
+        
+        Args:
+            path: File field ('bytes', 'filename', 'uri', 'created_at', 'id')
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)
+            value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            
+        Returns:
+            SearchFilterFileInner object
+        """
+        return SearchFilterFileInner(
+            path=path,
+            operator=operator,
+            value_text=value_text,
+            value_text_array=value_text_array,
+        )
+
+    @staticmethod
+    def create_filter(
+        metadata_filters: Optional[List[Dict[str, Any]]] = None,
+        video_info_filters: Optional[List[Dict[str, Any]]] = None,
+        file_filters: Optional[List[Dict[str, Any]]] = None,
+    ) -> SearchFilter:
+        """Create a search filter using simple dictionaries.
+        
+        This is the main method for creating search filters. It allows you to create filters 
+        using simple dictionaries instead of working with the underlying filter objects.
+        
+        Args:
+            metadata_filters: List of metadata filter dictionaries. Each dict should have:
+                - 'path': JSON path on metadata object
+                - 'operator': Comparison operator
+                - 'value_text': (optional) Text value for scalar comparison  
+                - 'value_text_array': (optional) Array of values for array comparisons
+            video_info_filters: List of video info filter dictionaries (same structure)
+            file_filters: List of file filter dictionaries (same structure)
+            
+        Returns:
+            SearchFilter object
+            
+        Example:
+            filter = client.search.create_filter(
+                metadata_filters=[
+                    {'path': 'category', 'operator': 'Equal', 'value_text': 'tutorial'},
+                    {'path': 'tags', 'operator': 'ContainsAny', 'value_text_array': ['python', 'programming']}
+                ],
+                video_info_filters=[
+                    {'path': 'duration_seconds', 'operator': 'LessThan', 'value_text': '600'}
+                ]
+            )
+        """
+        metadata_objs = None
+        if metadata_filters:
+            metadata_objs = [
+                SearchFilterCriteria(**f) for f in metadata_filters
+            ]
+            
+        video_info_objs = None
+        if video_info_filters:
+            video_info_objs = [
+                SearchFilterVideoInfoInner(**f) for f in video_info_filters
+            ]
+            
+        file_objs = None
+        if file_filters:
+            file_objs = [
+                SearchFilterFileInner(**f) for f in file_filters
+            ]
+            
+        return SearchFilter(
+            metadata=metadata_objs,
+            video_info=video_info_objs,
+            file=file_objs,
+        )
+
+    def search(
+        self,
+        scope: str,
+        collections: List[str],
+        query: str,
+        limit: Optional[int] = None,
+        filter: Optional[Union[SearchFilter, Dict[str, Any]]] = None,
+        **kwargs,
+    ):
+        """Search across video files and segments to find relevant content.
+
+        Args:
+            scope: Search scope - 'file' searches at file level (requires collections with enable_summary=true), 
+                   'segment' searches at segment level
+            collections: List of collection IDs to search within. Must be rich-transcript collections 
+                        (collection_type='rich-transcripts'). For file-level search, collections must have 
+                        'enable_summary: true' in transcribe_config.
+            query: Text search query to find relevant content
+            limit: Maximum number of search results to return (1-100, default 10)
+            filter: Filter criteria to constrain search results. Can be a SearchFilter object
+                   or a dictionary with 'metadata', 'video_info', and/or 'file' keys.
+            **kwargs: Additional parameters for the request.
+
+        Returns:
+            SearchResponse: The API response with search results.
+
+        Raises:
+            CloudGlueError: If there is an error making the API request or processing the response.
+
+        Example:
+            # Search for content in collections
+            results = client.search.search(
+                scope="segment",
+                collections=["collection_123"],
+                query="machine learning tutorial",
+                limit=20
+            )
+            
+            # Search with filters
+            search_filter = client.search.create_filter(
+                metadata_filters=[
+                    {'path': 'category', 'operator': 'Equal', 'value_text': 'tutorial'}
+                ]
+            )
+            results = client.search.search(
+                scope="file",
+                collections=["collection_123"],
+                query="python programming",
+                filter=search_filter
+            )
+        """
+        try:
+            # Handle filter parameter
+            if filter is not None:
+                if isinstance(filter, dict):
+                    # Convert dictionary to SearchFilter
+                    filter = SearchFilter.from_dict(filter)
+                elif isinstance(filter, SearchFilter):
+                    # Already the correct type, no conversion needed
+                    pass
+                else:
+                    raise ValueError("filter must be a SearchFilter object or dictionary")
+            
+            request = SearchRequest(
+                scope=scope,
+                collections=collections,
+                query=query,
+                limit=limit,
+                filter=filter,
+                **kwargs,
+            )
+            return self.api.search_content(search_request=request)
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
