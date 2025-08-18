@@ -118,6 +118,7 @@ Class | Method | HTTP request | Description
 *FilesApi* | [**list_files**](docs/FilesApi.md#list_files) | **GET** /files | List files that have been uploaded to Cloudglue
 *FilesApi* | [**update_file**](docs/FilesApi.md#update_file) | **PUT** /files/{file_id} | Update a file
 *FilesApi* | [**upload_file**](docs/FilesApi.md#upload_file) | **POST** /files | Upload a video file that can be used with Cloudglue services
+*SearchApi* | [**search_content**](docs/SearchApi.md#search_content) | **POST** /search | Search across video files and segments to find relevant content
 *SegmentationsApi* | [**delete_segmentation**](docs/SegmentationsApi.md#delete_segmentation) | **DELETE** /segmentations/{segmentation_id} | Delete a segmentation
 *SegmentationsApi* | [**get_segmentation**](docs/SegmentationsApi.md#get_segmentation) | **GET** /segmentations/{segmentation_id} | Get a specific segmentation
 *TranscribeApi* | [**create_transcribe**](docs/TranscribeApi.md#create_transcribe) | **POST** /transcribe | Create a new transcription job
@@ -176,6 +177,7 @@ Class | Method | HTTP request | Description
  - [FileDelete](docs/FileDelete.md)
  - [FileEntities](docs/FileEntities.md)
  - [FileList](docs/FileList.md)
+ - [FileSearchResult](docs/FileSearchResult.md)
  - [FileSegmentationConfig](docs/FileSegmentationConfig.md)
  - [FileUpdate](docs/FileUpdate.md)
  - [FileVideoInfo](docs/FileVideoInfo.md)
@@ -185,6 +187,15 @@ Class | Method | HTTP request | Description
  - [NewExtract](docs/NewExtract.md)
  - [NewTranscribe](docs/NewTranscribe.md)
  - [RichTranscript](docs/RichTranscript.md)
+ - [SearchFilter](docs/SearchFilter.md)
+ - [SearchFilterCriteria](docs/SearchFilterCriteria.md)
+ - [SearchFilterFileInner](docs/SearchFilterFileInner.md)
+ - [SearchFilterVideoInfoInner](docs/SearchFilterVideoInfoInner.md)
+ - [SearchRequest](docs/SearchRequest.md)
+ - [SearchResponse](docs/SearchResponse.md)
+ - [SearchResponseResultsInner](docs/SearchResponseResultsInner.md)
+ - [SegmentSearchResult](docs/SegmentSearchResult.md)
+ - [SegmentSearchResultVisualDescriptionInner](docs/SegmentSearchResultVisualDescriptionInner.md)
  - [Segmentation](docs/Segmentation.md)
  - [SegmentationConfig](docs/SegmentationConfig.md)
  - [SegmentationData](docs/SegmentationData.md)
