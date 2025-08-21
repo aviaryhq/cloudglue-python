@@ -17,20 +17,20 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
+from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing import Optional, Set
 from typing_extensions import Self
 
-class NewCollectionTranscribeConfig(BaseModel):
+class TranscribeDataSegmentSummaryInner(BaseModel):
     """
-    🎯 **Use ONLY when collection_type = 'rich-transcripts'**  Configuration for rich transcription from videos. Optional - if not provided, default values will be used. This config will be ignored for other collection types.
+    TranscribeDataSegmentSummaryInner
     """ # noqa: E501
-    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate video-level and segment-level (moment-level) summaries and titles")
-    enable_speech: Optional[StrictBool] = Field(default=True, description="Whether to generate speech transcript")
-    enable_scene_text: Optional[StrictBool] = Field(default=False, description="Whether to generate scene text extraction")
-    enable_visual_scene_description: Optional[StrictBool] = Field(default=False, description="Whether to generate visual scene description")
-    __properties: ClassVar[List[str]] = ["enable_summary", "enable_speech", "enable_scene_text", "enable_visual_scene_description"]
+    title: Optional[StrictStr] = Field(default=None, description="Generated segment-level title")
+    summary: Optional[StrictStr] = Field(default=None, description="Generated segment-level summary")
+    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start time of segment in seconds")
+    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="End time of segment in seconds")
+    __properties: ClassVar[List[str]] = ["title", "summary", "start_time", "end_time"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -50,7 +50,7 @@ class NewCollectionTranscribeConfig(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of NewCollectionTranscribeConfig from a JSON string"""
+        """Create an instance of TranscribeDataSegmentSummaryInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -75,7 +75,7 @@ class NewCollectionTranscribeConfig(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of NewCollectionTranscribeConfig from a dict"""
+        """Create an instance of TranscribeDataSegmentSummaryInner from a dict"""
         if obj is None:
             return None
 
@@ -83,10 +83,10 @@ class NewCollectionTranscribeConfig(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "enable_summary": obj.get("enable_summary") if obj.get("enable_summary") is not None else True,
-            "enable_speech": obj.get("enable_speech") if obj.get("enable_speech") is not None else True,
-            "enable_scene_text": obj.get("enable_scene_text") if obj.get("enable_scene_text") is not None else False,
-            "enable_visual_scene_description": obj.get("enable_visual_scene_description") if obj.get("enable_visual_scene_description") is not None else False
+            "title": obj.get("title"),
+            "summary": obj.get("summary"),
+            "start_time": obj.get("start_time"),
+            "end_time": obj.get("end_time")
         })
         return _obj
 

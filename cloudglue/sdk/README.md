@@ -206,6 +206,7 @@ Class | Method | HTTP request | Description
  - [Transcribe](docs/Transcribe.md)
  - [TranscribeData](docs/TranscribeData.md)
  - [TranscribeDataSceneTextInner](docs/TranscribeDataSceneTextInner.md)
+ - [TranscribeDataSegmentSummaryInner](docs/TranscribeDataSegmentSummaryInner.md)
  - [TranscribeDataSpeechInner](docs/TranscribeDataSpeechInner.md)
  - [TranscribeDataVisualSceneDescriptionInner](docs/TranscribeDataVisualSceneDescriptionInner.md)
  - [TranscribeList](docs/TranscribeList.md)
