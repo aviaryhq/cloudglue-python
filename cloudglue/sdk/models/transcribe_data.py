@@ -20,6 +20,7 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from cloudglue.sdk.models.transcribe_data_scene_text_inner import TranscribeDataSceneTextInner
+from cloudglue.sdk.models.transcribe_data_segment_summary_inner import TranscribeDataSegmentSummaryInner
 from cloudglue.sdk.models.transcribe_data_speech_inner import TranscribeDataSpeechInner
 from cloudglue.sdk.models.transcribe_data_visual_scene_description_inner import TranscribeDataVisualSceneDescriptionInner
 from typing import Optional, Set
@@ -35,7 +36,8 @@ class TranscribeData(BaseModel):
     speech: Optional[List[TranscribeDataSpeechInner]] = Field(default=None, description="Array of speech transcriptions")
     visual_scene_description: Optional[List[TranscribeDataVisualSceneDescriptionInner]] = Field(default=None, description="Array of visual descriptions")
     scene_text: Optional[List[TranscribeDataSceneTextInner]] = Field(default=None, description="Array of scene text extractions")
-    __properties: ClassVar[List[str]] = ["content", "title", "summary", "speech", "visual_scene_description", "scene_text"]
+    segment_summary: Optional[List[TranscribeDataSegmentSummaryInner]] = Field(default=None, description="Array of summary information for each segment of the video. Only available when enable_summary is set to true in the transcribe configuration.")
+    __properties: ClassVar[List[str]] = ["content", "title", "summary", "speech", "visual_scene_description", "scene_text", "segment_summary"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -97,6 +99,13 @@ class TranscribeData(BaseModel):
                 if _item_scene_text:
                     _items.append(_item_scene_text.to_dict())
             _dict['scene_text'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in segment_summary (list)
+        _items = []
+        if self.segment_summary:
+            for _item_segment_summary in self.segment_summary:
+                if _item_segment_summary:
+                    _items.append(_item_segment_summary.to_dict())
+            _dict['segment_summary'] = _items
         return _dict
 
     @classmethod
@@ -114,7 +123,8 @@ class TranscribeData(BaseModel):
             "summary": obj.get("summary"),
             "speech": [TranscribeDataSpeechInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
             "visual_scene_description": [TranscribeDataVisualSceneDescriptionInner.from_dict(_item) for _item in obj["visual_scene_description"]] if obj.get("visual_scene_description") is not None else None,
-            "scene_text": [TranscribeDataSceneTextInner.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None
+            "scene_text": [TranscribeDataSceneTextInner.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None,
+            "segment_summary": [TranscribeDataSegmentSummaryInner.from_dict(_item) for _item in obj["segment_summary"]] if obj.get("segment_summary") is not None else None
         })
         return _obj
 

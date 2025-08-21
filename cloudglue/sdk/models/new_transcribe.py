@@ -30,7 +30,7 @@ class NewTranscribe(BaseModel):
     segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
     segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Configuration for video segmentation. Cannot be provided together with segmentation_id.")
     url: StrictStr = Field(description="Input video URL. Supports YouTube videos and URIs of files uploaded to Cloudglue Files endpoint.  Note that YouTube videos are currently limited to speech level understanding only.")
-    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate a video level summary and title")
+    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate video-level and segment-level (moment-level) summaries and titles")
     enable_speech: Optional[StrictBool] = Field(default=True, description="Whether to generate speech transcript")
     enable_visual_scene_description: Optional[StrictBool] = Field(default=False, description="Whether to generate visual scene description")
     enable_scene_text: Optional[StrictBool] = Field(default=False, description="Whether to generate scene text extraction")

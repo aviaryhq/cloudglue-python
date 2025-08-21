@@ -26,7 +26,7 @@ class CollectionTranscribeConfig(BaseModel):
     """
     Configuration for rich transcription from videos. Used when collection_type is 'rich-transcripts'. If not provided, default values will be used.
     """ # noqa: E501
-    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate a video level summary and title")
+    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate video-level and segment-level (moment-level) summaries and titles")
     enable_speech: Optional[StrictBool] = Field(default=True, description="Whether to generate speech transcript")
     enable_scene_text: Optional[StrictBool] = Field(default=False, description="Whether to generate scene text extraction")
     enable_visual_scene_description: Optional[StrictBool] = Field(default=False, description="Whether to generate visual scene description")

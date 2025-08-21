@@ -26,7 +26,7 @@ class TranscribeTranscribeConfig(BaseModel):
     """
     Configuration for rich transcription from videos
     """ # noqa: E501
-    enable_summary: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate a video level summary and title")
+    enable_summary: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate video-level and segment-level (moment-level) summaries and titles")
     enable_speech: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate speech transcript")
     enable_visual_scene_description: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate visual scene description")
     enable_scene_text: Optional[StrictBool] = Field(default=None, description="Whether the user requested to generate scene text")

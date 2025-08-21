@@ -87,6 +87,7 @@ from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniform
 from cloudglue.sdk.models.transcribe import Transcribe
 from cloudglue.sdk.models.transcribe_data import TranscribeData
 from cloudglue.sdk.models.transcribe_data_scene_text_inner import TranscribeDataSceneTextInner
+from cloudglue.sdk.models.transcribe_data_segment_summary_inner import TranscribeDataSegmentSummaryInner
 from cloudglue.sdk.models.transcribe_data_speech_inner import TranscribeDataSpeechInner
 from cloudglue.sdk.models.transcribe_data_visual_scene_description_inner import TranscribeDataVisualSceneDescriptionInner
 from cloudglue.sdk.models.transcribe_list import TranscribeList
