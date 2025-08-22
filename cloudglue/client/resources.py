@@ -2011,7 +2011,7 @@ class Thumbnails:
             ThumbnailList response
         """
         try:
-            response = self.api.thumbnails_api.get_thumbnails(
+            response = self.api.get_thumbnails(
                 file_id=file_id,
                 is_default=is_default,
                 segmentation_id=segmentation_id,
@@ -2050,7 +2050,7 @@ class Thumbnails:
             ThumbnailList response
         """
         try:
-            response = self.api.thumbnails_api.get_segmentation_thumbnails(
+            response = self.api.get_segmentation_thumbnails(
                 segmentation_id=segmentation_id,
                 segment_ids=segment_ids,
                 limit=limit,
