@@ -20,6 +20,7 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -34,7 +35,8 @@ class NewTranscribe(BaseModel):
     enable_speech: Optional[StrictBool] = Field(default=True, description="Whether to generate speech transcript")
     enable_visual_scene_description: Optional[StrictBool] = Field(default=False, description="Whether to generate visual scene description")
     enable_scene_text: Optional[StrictBool] = Field(default=False, description="Whether to generate scene text extraction")
-    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "url", "enable_summary", "enable_speech", "enable_visual_scene_description", "enable_scene_text"]
+    thumbnails_config: Optional[ThumbnailsConfig] = None
+    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "url", "enable_summary", "enable_speech", "enable_visual_scene_description", "enable_scene_text", "thumbnails_config"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -78,6 +80,9 @@ class NewTranscribe(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of segmentation_config
         if self.segmentation_config:
             _dict['segmentation_config'] = self.segmentation_config.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of thumbnails_config
+        if self.thumbnails_config:
+            _dict['thumbnails_config'] = self.thumbnails_config.to_dict()
         return _dict
 
     @classmethod
@@ -96,7 +101,8 @@ class NewTranscribe(BaseModel):
             "enable_summary": obj.get("enable_summary") if obj.get("enable_summary") is not None else True,
             "enable_speech": obj.get("enable_speech") if obj.get("enable_speech") is not None else True,
             "enable_visual_scene_description": obj.get("enable_visual_scene_description") if obj.get("enable_visual_scene_description") is not None else False,
-            "enable_scene_text": obj.get("enable_scene_text") if obj.get("enable_scene_text") is not None else False
+            "enable_scene_text": obj.get("enable_scene_text") if obj.get("enable_scene_text") is not None else False,
+            "thumbnails_config": ThumbnailsConfig.from_dict(obj["thumbnails_config"]) if obj.get("thumbnails_config") is not None else None
         })
         return _obj
 

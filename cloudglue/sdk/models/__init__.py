@@ -47,6 +47,7 @@ from cloudglue.sdk.models.collection_rich_transcripts_list import CollectionRich
 from cloudglue.sdk.models.collection_rich_transcripts_list_data_inner import CollectionRichTranscriptsListDataInner
 from cloudglue.sdk.models.collection_rich_transcripts_list_data_inner_data import CollectionRichTranscriptsListDataInnerData
 from cloudglue.sdk.models.collection_transcribe_config import CollectionTranscribeConfig
+from cloudglue.sdk.models.create_file_segmentation_request import CreateFileSegmentationRequest
 from cloudglue.sdk.models.delete_segmentation200_response import DeleteSegmentation200Response
 from cloudglue.sdk.models.error import Error
 from cloudglue.sdk.models.extract import Extract
@@ -84,6 +85,9 @@ from cloudglue.sdk.models.segmentation_data_segments_inner import SegmentationDa
 from cloudglue.sdk.models.segmentation_list import SegmentationList
 from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
 from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
+from cloudglue.sdk.models.thumbnail import Thumbnail
+from cloudglue.sdk.models.thumbnail_list import ThumbnailList
+from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from cloudglue.sdk.models.transcribe import Transcribe
 from cloudglue.sdk.models.transcribe_data import TranscribeData
 from cloudglue.sdk.models.transcribe_data_scene_text_inner import TranscribeDataSceneTextInner

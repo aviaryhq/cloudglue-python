@@ -18,7 +18,7 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Union
+from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -29,7 +29,8 @@ class SegmentationDataSegmentsInner(BaseModel):
     id: StrictStr = Field(description="Unique identifier for the segment")
     start_time: Union[StrictFloat, StrictInt] = Field(description="Start time of the segment in seconds")
     end_time: Union[StrictFloat, StrictInt] = Field(description="End time of the segment in seconds")
-    __properties: ClassVar[List[str]] = ["id", "start_time", "end_time"]
+    thumbnail_url: Optional[StrictStr] = Field(default=None, description="URL of the thumbnail for the segment if it exists")
+    __properties: ClassVar[List[str]] = ["id", "start_time", "end_time", "thumbnail_url"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -84,7 +85,8 @@ class SegmentationDataSegmentsInner(BaseModel):
         _obj = cls.model_validate({
             "id": obj.get("id"),
             "start_time": obj.get("start_time"),
-            "end_time": obj.get("end_time")
+            "end_time": obj.get("end_time"),
+            "thumbnail_url": obj.get("thumbnail_url")
         })
         return _obj
 

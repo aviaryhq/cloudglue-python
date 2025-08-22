@@ -830,6 +830,7 @@ class Extract:
         enable_segment_level_entities: Optional[bool] = None,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
     ):
         """Create a new extraction job.
 
@@ -841,6 +842,7 @@ class Extract:
             enable_segment_level_entities: Whether to extract entities at the segment level
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
+            thumbnails_config: Optional configuration for segment thumbnails
 
         Returns:
             Extract: A typed Extract object containing job_id, status, and other fields.
@@ -859,6 +861,15 @@ class Extract:
             if isinstance(segmentation_config, dict):
                 segmentation_config = SegmentationConfig.from_dict(segmentation_config)
 
+            # Handle thumbnails_config parameter
+            from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
+            thumbnails_config_obj = None
+            if thumbnails_config is not None:
+                if isinstance(thumbnails_config, dict):
+                    thumbnails_config_obj = ThumbnailsConfig.from_dict(thumbnails_config)
+                else:
+                    thumbnails_config_obj = thumbnails_config
+
             # Set up the request object
             request = NewExtract(
                 url=url,
@@ -868,6 +879,7 @@ class Extract:
                 enable_segment_level_entities=enable_segment_level_entities,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
+                thumbnails_config=thumbnails_config_obj,
             )
 
             # Use the standard method to get a properly typed Extract object
@@ -945,6 +957,7 @@ class Extract:
         enable_segment_level_entities: Optional[bool] = None,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
         poll_interval: int = 5,
         timeout: int = 600,
     ):
@@ -958,6 +971,7 @@ class Extract:
             enable_segment_level_entities: Whether to extract entities at the segment level
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
+            thumbnails_config: Optional configuration for segment thumbnails
             poll_interval: How often to check the job status (in seconds).
             timeout: Maximum time to wait for the job to complete (in seconds).
 
@@ -977,6 +991,7 @@ class Extract:
                 enable_segment_level_entities=enable_segment_level_entities,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
+                thumbnails_config=thumbnails_config,
             )
             job_id = job.job_id
 
@@ -1016,6 +1031,7 @@ class Transcribe:
         enable_visual_scene_description: bool = False,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
     ):
         """Create a new transcribe job for a video.
 
@@ -1027,6 +1043,7 @@ class Transcribe:
             enable_visual_scene_description: Whether to generate visual scene description.
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
+            thumbnails_config: Optional configuration for segment thumbnails
 
         Returns:
             The typed Transcribe job object with job_id and status.
@@ -1042,6 +1059,15 @@ class Transcribe:
             if isinstance(segmentation_config, dict):
                 segmentation_config = SegmentationConfig.from_dict(segmentation_config)
 
+            # Handle thumbnails_config parameter
+            from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
+            thumbnails_config_obj = None
+            if thumbnails_config is not None:
+                if isinstance(thumbnails_config, dict):
+                    thumbnails_config_obj = ThumbnailsConfig.from_dict(thumbnails_config)
+                else:
+                    thumbnails_config_obj = thumbnails_config
+
             request = NewTranscribe(
                 url=url,
                 enable_summary=enable_summary,
@@ -1050,6 +1076,7 @@ class Transcribe:
                 enable_visual_scene_description=enable_visual_scene_description,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
+                thumbnails_config=thumbnails_config_obj,
             )
 
             # Use the regular SDK method to create the job
@@ -1136,6 +1163,7 @@ class Transcribe:
         enable_visual_scene_description: bool = False,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
         response_format: Optional[str] = None,
     ):
         """Create a transcribe job and wait for it to complete.
@@ -1150,6 +1178,7 @@ class Transcribe:
             enable_visual_scene_description: Whether to generate visual scene description.
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
+            thumbnails_config: Optional configuration for segment thumbnails
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
         Returns:
             The completed typed Transcribe job object.
@@ -1167,6 +1196,7 @@ class Transcribe:
                 enable_visual_scene_description=enable_visual_scene_description,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
+                thumbnails_config=thumbnails_config,
             )
 
             job_id = job.job_id
@@ -1203,6 +1233,7 @@ class Files:
         self,
         file_path: str,
         metadata: Optional[Dict[str, Any]] = None,
+        enable_segment_thumbnails: Optional[bool] = None,
         wait_until_finish: bool = False,
         poll_interval: int = 5,
         timeout: int = 600,
@@ -1212,6 +1243,7 @@ class Files:
         Args:
             file_path: Path to the local file to upload.
             metadata: Optional user-provided metadata about the file.
+            enable_segment_thumbnails: Whether to generate thumbnails for each segment.
             wait_until_finish: Whether to wait for the file processing to complete.
             poll_interval: How often to check the file status (in seconds) if waiting.
             timeout: Maximum time to wait for processing (in seconds) if waiting.
@@ -1235,7 +1267,11 @@ class Files:
             filename = os.path.basename(file_path)
             file_tuple = (filename, file_bytes)
 
-            response = self.api.upload_file(file=file_tuple, metadata=metadata)
+            response = self.api.upload_file(
+                file=file_tuple, 
+                metadata=metadata,
+                enable_segment_thumbnails=enable_segment_thumbnails
+            )
 
             # If not waiting for completion, return immediately
             if not wait_until_finish:
@@ -1380,6 +1416,7 @@ class Files:
         self,
         file_id: str,
         segmentation_config: Union[SegmentationConfig, Dict[str, Any]],
+        thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
         wait_until_finish: bool = False,
         poll_interval: int = 5,
         timeout: int = 600,
@@ -1389,6 +1426,7 @@ class Files:
         Args:
             file_id: The ID of the file to segment
             segmentation_config: Segmentation configuration (SegmentationConfig object or dictionary)
+            thumbnails_config: Optional configuration for segment thumbnails
             wait_until_finish: Whether to wait for the segmentation to complete
             poll_interval: How often to check the segmentation status (in seconds) if waiting
             timeout: Maximum time to wait for processing (in seconds) if waiting
@@ -1410,15 +1448,37 @@ class Files:
             )
         """
         try:
+            # Import the required model
+            from cloudglue.sdk.models.create_file_segmentation_request import CreateFileSegmentationRequest
+            from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
+            
             # Handle segmentation_config parameter
             if isinstance(segmentation_config, dict):
                 segmentation_config = SegmentationConfig.from_dict(segmentation_config)
             elif not isinstance(segmentation_config, SegmentationConfig):
                 raise ValueError("segmentation_config must be a SegmentationConfig object or dictionary")
 
+            # Handle thumbnails_config parameter
+            thumbnails_config_obj = None
+            if thumbnails_config is not None:
+                if isinstance(thumbnails_config, dict):
+                    thumbnails_config_obj = ThumbnailsConfig.from_dict(thumbnails_config)
+                else:
+                    thumbnails_config_obj = thumbnails_config
+
+            # Create the request object
+            request = CreateFileSegmentationRequest(
+                strategy=segmentation_config.strategy,
+                uniform_config=segmentation_config.uniform_config,
+                shot_detector_config=segmentation_config.shot_detector_config,
+                start_time_seconds=segmentation_config.start_time_seconds,
+                end_time_seconds=segmentation_config.end_time_seconds,
+                thumbnails_config=thumbnails_config_obj,
+            )
+
             response = self.api.create_file_segmentation(
                 file_id=file_id,
-                segmentation_config=segmentation_config,
+                create_file_segmentation_request=request,
             )
 
             # If not waiting for completion, return immediately
@@ -1474,6 +1534,41 @@ class Files:
         try:
             response = self.api.list_file_segmentations(
                 file_id=file_id,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def get_thumbnails(
+        self,
+        file_id: str,
+        is_default: Optional[bool] = None,
+        segmentation_id: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """
+        Get thumbnails for a file.
+        
+        Args:
+            file_id: The ID of the file
+            is_default: Filter thumbnails by default status. If true, will only return the default thumbnail for the file
+            segmentation_id: Filter thumbnails by segmentation ID
+            limit: Number of thumbnails to return
+            offset: Offset from the start of the list
+            
+        Returns:
+            ThumbnailList response
+        """
+        try:
+            response = self.api.get_thumbnails(
+                file_id=file_id,
+                is_default=is_default,
+                segmentation_id=segmentation_id,
                 limit=limit,
                 offset=offset,
             )
@@ -1631,6 +1726,38 @@ class Segmentations:
         """
         try:
             response = self.api.delete_segmentation(segmentation_id=segmentation_id)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def get_thumbnails(
+        self,
+        segmentation_id: str,
+        segment_ids: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """
+        Get thumbnails for a segmentation.
+        
+        Args:
+            segmentation_id: The ID of the segmentation to retrieve thumbnails for
+            segment_ids: Filter thumbnails by segment IDs. If provided, will only return thumbnails for the specified segments. Comma separated list of segment IDs.
+            limit: Number of thumbnails to return
+            offset: Offset from the start of the list
+            
+        Returns:
+            ThumbnailList response
+        """
+        try:
+            response = self.api.get_segmentation_thumbnails(
+                segmentation_id=segmentation_id,
+                segment_ids=segment_ids,
+                limit=limit,
+                offset=offset,
+            )
             return response
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -1858,6 +1985,109 @@ class Search:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
             raise CloudGlueError(str(e))
+
+
+class Thumbnails:
+    """Thumbnails API client"""
+
+    def __init__(self, api):
+        self.api = api
+
+    def get_thumbnails(
+        self,
+        file_id: str,
+        is_default: Optional[bool] = None,
+        segmentation_id: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """
+        Get thumbnails for a file.
+        
+        Args:
+            file_id: The ID of the file
+            is_default: Filter thumbnails by default status. If true, will only return the default thumbnail for the file
+            segmentation_id: Filter thumbnails by segmentation ID
+            limit: Number of thumbnails to return
+            offset: Offset from the start of the list
+            
+        Returns:
+            ThumbnailList response
+        """
+        try:
+            response = self.api.thumbnails_api.get_thumbnails(
+                file_id=file_id,
+                is_default=is_default,
+                segmentation_id=segmentation_id,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except Exception as e:
+            if hasattr(e, 'status') and hasattr(e, 'data'):
+                raise CloudGlueError(
+                    message=str(e),
+                    status_code=e.status,
+                    data=e.data,
+                    headers=getattr(e, 'headers', None),
+                    reason=getattr(e, 'reason', None),
+                )
+            raise e
+
+    def get_segmentation_thumbnails(
+        self,
+        segmentation_id: str,
+        segment_ids: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """
+        Get thumbnails for a segmentation.
+        
+        Args:
+            segmentation_id: The ID of the segmentation to retrieve thumbnails for
+            segment_ids: Filter thumbnails by segment IDs. If provided, will only return thumbnails for the specified segments. Comma separated list of segment IDs.
+            limit: Number of thumbnails to return
+            offset: Offset from the start of the list
+            
+        Returns:
+            ThumbnailList response
+        """
+        try:
+            response = self.api.thumbnails_api.get_segmentation_thumbnails(
+                segmentation_id=segmentation_id,
+                segment_ids=segment_ids,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except Exception as e:
+            if hasattr(e, 'status') and hasattr(e, 'data'):
+                raise CloudGlueError(
+                    message=str(e),
+                    status_code=e.status,
+                    data=e.data,
+                    headers=getattr(e, 'headers', None),
+                    reason=getattr(e, 'reason', None),
+                )
+            raise e
+
+    @staticmethod
+    def create_thumbnails_config(enable_segment_thumbnails: bool = True):
+        """
+        Create a thumbnails configuration object.
+        
+        Args:
+            enable_segment_thumbnails: Whether to enable segment thumbnails
+            
+        Returns:
+            ThumbnailsConfig object
+        """
+        from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
+        
+        return ThumbnailsConfig(
+            enable_segment_thumbnails=enable_segment_thumbnails
+        )
 
 
 class Chat:

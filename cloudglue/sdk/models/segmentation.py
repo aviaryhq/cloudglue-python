@@ -22,6 +22,7 @@ from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing_extensions import Annotated
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.segmentation_data import SegmentationData
+from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -34,9 +35,10 @@ class Segmentation(BaseModel):
     created_at: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]] = Field(description="Unix timestamp of when the segmentation was created")
     file_id: StrictStr = Field(description="ID of the file this segmentation belongs to")
     segmentation_config: SegmentationConfig
+    thumbnails_config: ThumbnailsConfig
     total_segments: Optional[Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]]] = Field(default=None, description="Total number of segments in this segmentation (only present when status is completed)")
     data: Optional[SegmentationData] = None
-    __properties: ClassVar[List[str]] = ["segmentation_id", "status", "created_at", "file_id", "segmentation_config", "total_segments", "data"]
+    __properties: ClassVar[List[str]] = ["segmentation_id", "status", "created_at", "file_id", "segmentation_config", "thumbnails_config", "total_segments", "data"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
@@ -87,6 +89,9 @@ class Segmentation(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of segmentation_config
         if self.segmentation_config:
             _dict['segmentation_config'] = self.segmentation_config.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of thumbnails_config
+        if self.thumbnails_config:
+            _dict['thumbnails_config'] = self.thumbnails_config.to_dict()
         # override the default output from pydantic by calling `to_dict()` of data
         if self.data:
             _dict['data'] = self.data.to_dict()
@@ -107,6 +112,7 @@ class Segmentation(BaseModel):
             "created_at": obj.get("created_at"),
             "file_id": obj.get("file_id"),
             "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None,
+            "thumbnails_config": ThumbnailsConfig.from_dict(obj["thumbnails_config"]) if obj.get("thumbnails_config") is not None else None,
             "total_segments": obj.get("total_segments"),
             "data": SegmentationData.from_dict(obj["data"]) if obj.get("data") is not None else None
         })

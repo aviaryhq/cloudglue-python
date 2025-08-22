@@ -18,21 +18,21 @@ import re  # noqa: F401
 import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.segmentation_data_segments_inner import SegmentationDataSegmentsInner
+from typing import Any, ClassVar, Dict, List
+from cloudglue.sdk.models.thumbnail import Thumbnail
 from typing import Optional, Set
 from typing_extensions import Self
 
-class SegmentationData(BaseModel):
+class ThumbnailList(BaseModel):
     """
-    Segment data with pagination (only present when status is completed and segments exist)
+    ThumbnailList
     """ # noqa: E501
     object: StrictStr = Field(description="Object type, always 'list'")
-    segments: Optional[List[SegmentationDataSegmentsInner]] = None
-    total: StrictInt = Field(description="Total number of segments")
-    limit: StrictInt = Field(description="Number of segments returned in this response")
-    offset: StrictInt = Field(description="Offset from the start of the segments list")
-    __properties: ClassVar[List[str]] = ["object", "segments", "total", "limit", "offset"]
+    total: StrictInt = Field(description="Total number of segmentations matching the query")
+    limit: StrictInt = Field(description="Number of items returned in this response")
+    offset: StrictInt = Field(description="Offset from the start of the list")
+    data: List[Thumbnail]
+    __properties: ClassVar[List[str]] = ["object", "total", "limit", "offset", "data"]
 
     @field_validator('object')
     def object_validate_enum(cls, value):
@@ -59,7 +59,7 @@ class SegmentationData(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of SegmentationData from a JSON string"""
+        """Create an instance of ThumbnailList from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -80,18 +80,18 @@ class SegmentationData(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in segments (list)
+        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
         _items = []
-        if self.segments:
-            for _item_segments in self.segments:
-                if _item_segments:
-                    _items.append(_item_segments.to_dict())
-            _dict['segments'] = _items
+        if self.data:
+            for _item_data in self.data:
+                if _item_data:
+                    _items.append(_item_data.to_dict())
+            _dict['data'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of SegmentationData from a dict"""
+        """Create an instance of ThumbnailList from a dict"""
         if obj is None:
             return None
 
@@ -100,10 +100,10 @@ class SegmentationData(BaseModel):
 
         _obj = cls.model_validate({
             "object": obj.get("object"),
-            "segments": [SegmentationDataSegmentsInner.from_dict(_item) for _item in obj["segments"]] if obj.get("segments") is not None else None,
             "total": obj.get("total"),
             "limit": obj.get("limit"),
-            "offset": obj.get("offset")
+            "offset": obj.get("offset"),
+            "data": [Thumbnail.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None
         })
         return _obj
 
