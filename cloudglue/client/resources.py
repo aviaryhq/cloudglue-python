@@ -24,6 +24,9 @@ from cloudglue.sdk.models.search_filter_criteria import SearchFilterCriteria
 from cloudglue.sdk.models.search_filter_file_inner import SearchFilterFileInner
 from cloudglue.sdk.models.search_filter_video_info_inner import SearchFilterVideoInfoInner
 from cloudglue.sdk.rest import ApiException
+from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
+from cloudglue.sdk.api.segmentations_api import SegmentationsApi
+from cloudglue.sdk.models.create_file_segmentation_request import CreateFileSegmentationRequest
 
 
 class CloudGlueError(Exception):
@@ -862,7 +865,6 @@ class Extract:
                 segmentation_config = SegmentationConfig.from_dict(segmentation_config)
 
             # Handle thumbnails_config parameter
-            from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
             thumbnails_config_obj = None
             if thumbnails_config is not None:
                 if isinstance(thumbnails_config, dict):
@@ -1060,7 +1062,6 @@ class Transcribe:
                 segmentation_config = SegmentationConfig.from_dict(segmentation_config)
 
             # Handle thumbnails_config parameter
-            from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
             thumbnails_config_obj = None
             if thumbnails_config is not None:
                 if isinstance(thumbnails_config, dict):
@@ -1447,11 +1448,7 @@ class Files:
                 wait_until_finish=True
             )
         """
-        try:
-            # Import the required model
-            from cloudglue.sdk.models.create_file_segmentation_request import CreateFileSegmentationRequest
-            from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
-            
+        try:            
             # Handle segmentation_config parameter
             if isinstance(segmentation_config, dict):
                 segmentation_config = SegmentationConfig.from_dict(segmentation_config)
@@ -1490,8 +1487,7 @@ class Files:
             elapsed = 0
             terminal_states = ["completed", "failed", "not_applicable"]
 
-            # Import SegmentationsApi here to avoid circular imports
-            from cloudglue.sdk.api.segmentations_api import SegmentationsApi
+            # Import SegmentationsApi here to avoid circular imports            
             segmentations_api = SegmentationsApi(self.api.api_client)
 
             while elapsed < timeout:
@@ -2082,9 +2078,7 @@ class Thumbnails:
             
         Returns:
             ThumbnailsConfig object
-        """
-        from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
-        
+        """                
         return ThumbnailsConfig(
             enable_segment_thumbnails=enable_segment_thumbnails
         )
