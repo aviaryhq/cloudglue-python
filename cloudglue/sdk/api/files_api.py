@@ -17,16 +17,17 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
 
 from datetime import date
-from pydantic import Field, StrictBytes, StrictInt, StrictStr, field_validator
+from pydantic import Field, StrictBool, StrictBytes, StrictInt, StrictStr, field_validator
 from typing import Any, Dict, Optional, Tuple, Union
 from typing_extensions import Annotated
+from cloudglue.sdk.models.create_file_segmentation_request import CreateFileSegmentationRequest
 from cloudglue.sdk.models.file import File
 from cloudglue.sdk.models.file_delete import FileDelete
 from cloudglue.sdk.models.file_list import FileList
 from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.segmentation import Segmentation
-from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.segmentation_list import SegmentationList
+from cloudglue.sdk.models.thumbnail_list import ThumbnailList
 
 from cloudglue.sdk.api_client import ApiClient, RequestSerialized
 from cloudglue.sdk.api_response import ApiResponse
@@ -50,7 +51,7 @@ class FilesApi:
     def create_file_segmentation(
         self,
         file_id: Annotated[StrictStr, Field(description="The ID of the file to segment")],
-        segmentation_config: Annotated[SegmentationConfig, Field(description="Segmentation configuration")],
+        create_file_segmentation_request: Annotated[CreateFileSegmentationRequest, Field(description="Segmentation configuration")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -70,8 +71,8 @@ class FilesApi:
 
         :param file_id: The ID of the file to segment (required)
         :type file_id: str
-        :param segmentation_config: Segmentation configuration (required)
-        :type segmentation_config: SegmentationConfig
+        :param create_file_segmentation_request: Segmentation configuration (required)
+        :type create_file_segmentation_request: CreateFileSegmentationRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -96,7 +97,7 @@ class FilesApi:
 
         _param = self._create_file_segmentation_serialize(
             file_id=file_id,
-            segmentation_config=segmentation_config,
+            create_file_segmentation_request=create_file_segmentation_request,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -124,7 +125,7 @@ class FilesApi:
     def create_file_segmentation_with_http_info(
         self,
         file_id: Annotated[StrictStr, Field(description="The ID of the file to segment")],
-        segmentation_config: Annotated[SegmentationConfig, Field(description="Segmentation configuration")],
+        create_file_segmentation_request: Annotated[CreateFileSegmentationRequest, Field(description="Segmentation configuration")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -144,8 +145,8 @@ class FilesApi:
 
         :param file_id: The ID of the file to segment (required)
         :type file_id: str
-        :param segmentation_config: Segmentation configuration (required)
-        :type segmentation_config: SegmentationConfig
+        :param create_file_segmentation_request: Segmentation configuration (required)
+        :type create_file_segmentation_request: CreateFileSegmentationRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -170,7 +171,7 @@ class FilesApi:
 
         _param = self._create_file_segmentation_serialize(
             file_id=file_id,
-            segmentation_config=segmentation_config,
+            create_file_segmentation_request=create_file_segmentation_request,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -198,7 +199,7 @@ class FilesApi:
     def create_file_segmentation_without_preload_content(
         self,
         file_id: Annotated[StrictStr, Field(description="The ID of the file to segment")],
-        segmentation_config: Annotated[SegmentationConfig, Field(description="Segmentation configuration")],
+        create_file_segmentation_request: Annotated[CreateFileSegmentationRequest, Field(description="Segmentation configuration")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -218,8 +219,8 @@ class FilesApi:
 
         :param file_id: The ID of the file to segment (required)
         :type file_id: str
-        :param segmentation_config: Segmentation configuration (required)
-        :type segmentation_config: SegmentationConfig
+        :param create_file_segmentation_request: Segmentation configuration (required)
+        :type create_file_segmentation_request: CreateFileSegmentationRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -244,7 +245,7 @@ class FilesApi:
 
         _param = self._create_file_segmentation_serialize(
             file_id=file_id,
-            segmentation_config=segmentation_config,
+            create_file_segmentation_request=create_file_segmentation_request,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -267,7 +268,7 @@ class FilesApi:
     def _create_file_segmentation_serialize(
         self,
         file_id,
-        segmentation_config,
+        create_file_segmentation_request,
         _request_auth,
         _content_type,
         _headers,
@@ -295,8 +296,8 @@ class FilesApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if segmentation_config is not None:
-            _body_params = segmentation_config
+        if create_file_segmentation_request is not None:
+            _body_params = create_file_segmentation_request
 
 
         # set the HTTP header `Accept`
@@ -863,6 +864,341 @@ class FilesApi:
         return self.api_client.param_serialize(
             method='GET',
             resource_path='/files/{file_id}',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def get_thumbnails(
+        self,
+        file_id: Annotated[StrictStr, Field(description="The ID of the file")],
+        is_default: Annotated[Optional[StrictBool], Field(description="Filter thumbnails by default status. If true, will only return the default thumbnail for the file")] = None,
+        segmentation_id: Annotated[Optional[StrictStr], Field(description="Filter thumbnails by segmentation ID")] = None,
+        limit: Annotated[Optional[Annotated[int, Field(le=100, strict=True, ge=1)]], Field(description="Number of thumbnails to return")] = None,
+        offset: Annotated[Optional[Annotated[int, Field(strict=True, ge=0)]], Field(description="Offset from the start of the list")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ThumbnailList:
+        """Get thumbnails for a file
+
+        Get all thumbnails for a file
+
+        :param file_id: The ID of the file (required)
+        :type file_id: str
+        :param is_default: Filter thumbnails by default status. If true, will only return the default thumbnail for the file
+        :type is_default: bool
+        :param segmentation_id: Filter thumbnails by segmentation ID
+        :type segmentation_id: str
+        :param limit: Number of thumbnails to return
+        :type limit: int
+        :param offset: Offset from the start of the list
+        :type offset: int
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._get_thumbnails_serialize(
+            file_id=file_id,
+            is_default=is_default,
+            segmentation_id=segmentation_id,
+            limit=limit,
+            offset=offset,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ThumbnailList",
+            '404': "Error",
+            '500': "Error",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def get_thumbnails_with_http_info(
+        self,
+        file_id: Annotated[StrictStr, Field(description="The ID of the file")],
+        is_default: Annotated[Optional[StrictBool], Field(description="Filter thumbnails by default status. If true, will only return the default thumbnail for the file")] = None,
+        segmentation_id: Annotated[Optional[StrictStr], Field(description="Filter thumbnails by segmentation ID")] = None,
+        limit: Annotated[Optional[Annotated[int, Field(le=100, strict=True, ge=1)]], Field(description="Number of thumbnails to return")] = None,
+        offset: Annotated[Optional[Annotated[int, Field(strict=True, ge=0)]], Field(description="Offset from the start of the list")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ThumbnailList]:
+        """Get thumbnails for a file
+
+        Get all thumbnails for a file
+
+        :param file_id: The ID of the file (required)
+        :type file_id: str
+        :param is_default: Filter thumbnails by default status. If true, will only return the default thumbnail for the file
+        :type is_default: bool
+        :param segmentation_id: Filter thumbnails by segmentation ID
+        :type segmentation_id: str
+        :param limit: Number of thumbnails to return
+        :type limit: int
+        :param offset: Offset from the start of the list
+        :type offset: int
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._get_thumbnails_serialize(
+            file_id=file_id,
+            is_default=is_default,
+            segmentation_id=segmentation_id,
+            limit=limit,
+            offset=offset,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ThumbnailList",
+            '404': "Error",
+            '500': "Error",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def get_thumbnails_without_preload_content(
+        self,
+        file_id: Annotated[StrictStr, Field(description="The ID of the file")],
+        is_default: Annotated[Optional[StrictBool], Field(description="Filter thumbnails by default status. If true, will only return the default thumbnail for the file")] = None,
+        segmentation_id: Annotated[Optional[StrictStr], Field(description="Filter thumbnails by segmentation ID")] = None,
+        limit: Annotated[Optional[Annotated[int, Field(le=100, strict=True, ge=1)]], Field(description="Number of thumbnails to return")] = None,
+        offset: Annotated[Optional[Annotated[int, Field(strict=True, ge=0)]], Field(description="Offset from the start of the list")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Get thumbnails for a file
+
+        Get all thumbnails for a file
+
+        :param file_id: The ID of the file (required)
+        :type file_id: str
+        :param is_default: Filter thumbnails by default status. If true, will only return the default thumbnail for the file
+        :type is_default: bool
+        :param segmentation_id: Filter thumbnails by segmentation ID
+        :type segmentation_id: str
+        :param limit: Number of thumbnails to return
+        :type limit: int
+        :param offset: Offset from the start of the list
+        :type offset: int
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._get_thumbnails_serialize(
+            file_id=file_id,
+            is_default=is_default,
+            segmentation_id=segmentation_id,
+            limit=limit,
+            offset=offset,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ThumbnailList",
+            '404': "Error",
+            '500': "Error",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _get_thumbnails_serialize(
+        self,
+        file_id,
+        is_default,
+        segmentation_id,
+        limit,
+        offset,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if file_id is not None:
+            _path_params['file_id'] = file_id
+        # process the query parameters
+        if is_default is not None:
+            
+            _query_params.append(('is_default', is_default))
+            
+        if segmentation_id is not None:
+            
+            _query_params.append(('segmentation_id', segmentation_id))
+            
+        if limit is not None:
+            
+            _query_params.append(('limit', limit))
+            
+        if offset is not None:
+            
+            _query_params.append(('offset', offset))
+            
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'bearerAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='GET',
+            resource_path='/files/{file_id}/thumbnails',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,
@@ -1862,6 +2198,7 @@ class FilesApi:
         self,
         file: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The video file to be uploaded")],
         metadata: Annotated[Optional[Dict[str, Any]], Field(description="User-provided metadata about the file")] = None,
+        enable_segment_thumbnails: Annotated[Optional[StrictBool], Field(description="Whether to generate thumbnails for each segment")] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1883,6 +2220,8 @@ class FilesApi:
         :type file: bytearray
         :param metadata: User-provided metadata about the file
         :type metadata: object
+        :param enable_segment_thumbnails: Whether to generate thumbnails for each segment
+        :type enable_segment_thumbnails: bool
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1908,6 +2247,7 @@ class FilesApi:
         _param = self._upload_file_serialize(
             file=file,
             metadata=metadata,
+            enable_segment_thumbnails=enable_segment_thumbnails,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -1937,6 +2277,7 @@ class FilesApi:
         self,
         file: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The video file to be uploaded")],
         metadata: Annotated[Optional[Dict[str, Any]], Field(description="User-provided metadata about the file")] = None,
+        enable_segment_thumbnails: Annotated[Optional[StrictBool], Field(description="Whether to generate thumbnails for each segment")] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1958,6 +2299,8 @@ class FilesApi:
         :type file: bytearray
         :param metadata: User-provided metadata about the file
         :type metadata: object
+        :param enable_segment_thumbnails: Whether to generate thumbnails for each segment
+        :type enable_segment_thumbnails: bool
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1983,6 +2326,7 @@ class FilesApi:
         _param = self._upload_file_serialize(
             file=file,
             metadata=metadata,
+            enable_segment_thumbnails=enable_segment_thumbnails,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -2012,6 +2356,7 @@ class FilesApi:
         self,
         file: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The video file to be uploaded")],
         metadata: Annotated[Optional[Dict[str, Any]], Field(description="User-provided metadata about the file")] = None,
+        enable_segment_thumbnails: Annotated[Optional[StrictBool], Field(description="Whether to generate thumbnails for each segment")] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2033,6 +2378,8 @@ class FilesApi:
         :type file: bytearray
         :param metadata: User-provided metadata about the file
         :type metadata: object
+        :param enable_segment_thumbnails: Whether to generate thumbnails for each segment
+        :type enable_segment_thumbnails: bool
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2058,6 +2405,7 @@ class FilesApi:
         _param = self._upload_file_serialize(
             file=file,
             metadata=metadata,
+            enable_segment_thumbnails=enable_segment_thumbnails,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -2082,6 +2430,7 @@ class FilesApi:
         self,
         file,
         metadata,
+        enable_segment_thumbnails,
         _request_auth,
         _content_type,
         _headers,
@@ -2110,6 +2459,8 @@ class FilesApi:
             _files['file'] = file
         if metadata is not None:
             _form_params.append(('metadata', metadata))
+        if enable_segment_thumbnails is not None:
+            _form_params.append(('enable_segment_thumbnails', enable_segment_thumbnails))
         # process the body parameter
 
 

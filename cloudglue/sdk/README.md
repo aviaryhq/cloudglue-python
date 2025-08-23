@@ -114,6 +114,7 @@ Class | Method | HTTP request | Description
 *FilesApi* | [**create_file_segmentation**](docs/FilesApi.md#create_file_segmentation) | **POST** /files/{file_id}/segmentations | Create a new segmentation for a file
 *FilesApi* | [**delete_file**](docs/FilesApi.md#delete_file) | **DELETE** /files/{file_id} | Delete a file
 *FilesApi* | [**get_file**](docs/FilesApi.md#get_file) | **GET** /files/{file_id} | Retrieve details about a specific file
+*FilesApi* | [**get_thumbnails**](docs/FilesApi.md#get_thumbnails) | **GET** /files/{file_id}/thumbnails | Get thumbnails for a file
 *FilesApi* | [**list_file_segmentations**](docs/FilesApi.md#list_file_segmentations) | **GET** /files/{file_id}/segmentations | List segmentations for a file
 *FilesApi* | [**list_files**](docs/FilesApi.md#list_files) | **GET** /files | List files that have been uploaded to Cloudglue
 *FilesApi* | [**update_file**](docs/FilesApi.md#update_file) | **PUT** /files/{file_id} | Update a file
@@ -121,6 +122,9 @@ Class | Method | HTTP request | Description
 *SearchApi* | [**search_content**](docs/SearchApi.md#search_content) | **POST** /search | Search across video files and segments to find relevant content
 *SegmentationsApi* | [**delete_segmentation**](docs/SegmentationsApi.md#delete_segmentation) | **DELETE** /segmentations/{segmentation_id} | Delete a segmentation
 *SegmentationsApi* | [**get_segmentation**](docs/SegmentationsApi.md#get_segmentation) | **GET** /segmentations/{segmentation_id} | Get a specific segmentation
+*SegmentationsApi* | [**get_segmentation_thumbnails**](docs/SegmentationsApi.md#get_segmentation_thumbnails) | **GET** /segmentations/{segmentation_id}/thumbnails | Get thumbnails for a segmentation
+*ThumbnailsApi* | [**get_segmentation_thumbnails**](docs/ThumbnailsApi.md#get_segmentation_thumbnails) | **GET** /segmentations/{segmentation_id}/thumbnails | Get thumbnails for a segmentation
+*ThumbnailsApi* | [**get_thumbnails**](docs/ThumbnailsApi.md#get_thumbnails) | **GET** /files/{file_id}/thumbnails | Get thumbnails for a file
 *TranscribeApi* | [**create_transcribe**](docs/TranscribeApi.md#create_transcribe) | **POST** /transcribe | Create a new transcription job
 *TranscribeApi* | [**get_transcribe**](docs/TranscribeApi.md#get_transcribe) | **GET** /transcribe/{job_id} | Retrieve the current state of a transcription job
 *TranscribeApi* | [**list_transcribes**](docs/TranscribeApi.md#list_transcribes) | **GET** /transcribe | List all transcription jobs
@@ -166,6 +170,7 @@ Class | Method | HTTP request | Description
  - [CollectionRichTranscriptsListDataInner](docs/CollectionRichTranscriptsListDataInner.md)
  - [CollectionRichTranscriptsListDataInnerData](docs/CollectionRichTranscriptsListDataInnerData.md)
  - [CollectionTranscribeConfig](docs/CollectionTranscribeConfig.md)
+ - [CreateFileSegmentationRequest](docs/CreateFileSegmentationRequest.md)
  - [DeleteSegmentation200Response](docs/DeleteSegmentation200Response.md)
  - [Error](docs/Error.md)
  - [Extract](docs/Extract.md)
@@ -203,6 +208,9 @@ Class | Method | HTTP request | Description
  - [SegmentationList](docs/SegmentationList.md)
  - [SegmentationShotDetectorConfig](docs/SegmentationShotDetectorConfig.md)
  - [SegmentationUniformConfig](docs/SegmentationUniformConfig.md)
+ - [Thumbnail](docs/Thumbnail.md)
+ - [ThumbnailList](docs/ThumbnailList.md)
+ - [ThumbnailsConfig](docs/ThumbnailsConfig.md)
  - [Transcribe](docs/Transcribe.md)
  - [TranscribeData](docs/TranscribeData.md)
  - [TranscribeDataSceneTextInner](docs/TranscribeDataSceneTextInner.md)

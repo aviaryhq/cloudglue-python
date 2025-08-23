@@ -20,6 +20,7 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -34,7 +35,8 @@ class NewExtract(BaseModel):
     var_schema: Optional[Dict[str, Any]] = Field(default=None, description="A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided.", alias="schema")
     enable_video_level_entities: Optional[StrictBool] = Field(default=False, description="Whether to extract entities at the video level")
     enable_segment_level_entities: Optional[StrictBool] = Field(default=True, description="Whether to extract entities at the segment level")
-    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "url", "prompt", "schema", "enable_video_level_entities", "enable_segment_level_entities"]
+    thumbnails_config: Optional[ThumbnailsConfig] = None
+    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "url", "prompt", "schema", "enable_video_level_entities", "enable_segment_level_entities", "thumbnails_config"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -78,6 +80,9 @@ class NewExtract(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of segmentation_config
         if self.segmentation_config:
             _dict['segmentation_config'] = self.segmentation_config.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of thumbnails_config
+        if self.thumbnails_config:
+            _dict['thumbnails_config'] = self.thumbnails_config.to_dict()
         return _dict
 
     @classmethod
@@ -96,7 +101,8 @@ class NewExtract(BaseModel):
             "prompt": obj.get("prompt"),
             "schema": obj.get("schema"),
             "enable_video_level_entities": obj.get("enable_video_level_entities") if obj.get("enable_video_level_entities") is not None else False,
-            "enable_segment_level_entities": obj.get("enable_segment_level_entities") if obj.get("enable_segment_level_entities") is not None else True
+            "enable_segment_level_entities": obj.get("enable_segment_level_entities") if obj.get("enable_segment_level_entities") is not None else True,
+            "thumbnails_config": ThumbnailsConfig.from_dict(obj["thumbnails_config"]) if obj.get("thumbnails_config") is not None else None
         })
         return _obj
 

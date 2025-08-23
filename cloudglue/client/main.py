@@ -10,11 +10,12 @@ from cloudglue.sdk.api.extract_api import ExtractApi
 from cloudglue.sdk.api.files_api import FilesApi
 from cloudglue.sdk.api.segmentations_api import SegmentationsApi
 from cloudglue.sdk.api.search_api import SearchApi
+from cloudglue.sdk.api.thumbnails_api import ThumbnailsApi
 from cloudglue.sdk.configuration import Configuration
 from cloudglue.sdk.api_client import ApiClient
 
 # Import resource classes
-from cloudglue.client.resources import Chat, Files, Transcribe, Extract, Collections, Segmentations, Search
+from cloudglue.client.resources import Chat, Files, Transcribe, Extract, Collections, Segmentations, Search, Thumbnails
 from cloudglue._version import __version__
 
 # SDK client constants
@@ -55,6 +56,7 @@ class CloudGlue:
         self.files_api = FilesApi(self.api_client)
         self.segmentations_api = SegmentationsApi(self.api_client)
         self.search_api = SearchApi(self.api_client)
+        self.thumbnails_api = ThumbnailsApi(self.api_client)
 
         # Set up resources with their respective API clients
         self.chat = Chat(self.chat_api)
@@ -64,6 +66,7 @@ class CloudGlue:
         self.collections = Collections(self.collections_api)
         self.segmentations = Segmentations(self.segmentations_api)
         self.search = Search(self.search_api)
+        self.thumbnails = Thumbnails(self.thumbnails_api)
 
     def close(self):
         """Close the API client."""

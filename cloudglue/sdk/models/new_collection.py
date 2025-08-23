@@ -22,6 +22,7 @@ from typing import Any, ClassVar, Dict, List, Optional
 from cloudglue.sdk.models.new_collection_extract_config import NewCollectionExtractConfig
 from cloudglue.sdk.models.new_collection_transcribe_config import NewCollectionTranscribeConfig
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -35,7 +36,8 @@ class NewCollection(BaseModel):
     extract_config: Optional[NewCollectionExtractConfig] = None
     transcribe_config: Optional[NewCollectionTranscribeConfig] = None
     default_segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Default segmentation configuration to use for files added to this collection. If not provided, a default uniform segmentation will be used.")
-    __properties: ClassVar[List[str]] = ["collection_type", "name", "description", "extract_config", "transcribe_config", "default_segmentation_config"]
+    default_thumbnails_config: Optional[ThumbnailsConfig] = Field(default=None, description="Default thumbnails configuration to use for files added to this collection. If not provided, a default thumbnails configuration will be used.")
+    __properties: ClassVar[List[str]] = ["collection_type", "name", "description", "extract_config", "transcribe_config", "default_segmentation_config", "default_thumbnails_config"]
 
     @field_validator('collection_type')
     def collection_type_validate_enum(cls, value):
@@ -92,6 +94,9 @@ class NewCollection(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of default_segmentation_config
         if self.default_segmentation_config:
             _dict['default_segmentation_config'] = self.default_segmentation_config.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of default_thumbnails_config
+        if self.default_thumbnails_config:
+            _dict['default_thumbnails_config'] = self.default_thumbnails_config.to_dict()
         # set to None if description (nullable) is None
         # and model_fields_set contains the field
         if self.description is None and "description" in self.model_fields_set:
@@ -114,7 +119,8 @@ class NewCollection(BaseModel):
             "description": obj.get("description"),
             "extract_config": NewCollectionExtractConfig.from_dict(obj["extract_config"]) if obj.get("extract_config") is not None else None,
             "transcribe_config": NewCollectionTranscribeConfig.from_dict(obj["transcribe_config"]) if obj.get("transcribe_config") is not None else None,
-            "default_segmentation_config": SegmentationConfig.from_dict(obj["default_segmentation_config"]) if obj.get("default_segmentation_config") is not None else None
+            "default_segmentation_config": SegmentationConfig.from_dict(obj["default_segmentation_config"]) if obj.get("default_segmentation_config") is not None else None,
+            "default_thumbnails_config": ThumbnailsConfig.from_dict(obj["default_thumbnails_config"]) if obj.get("default_thumbnails_config") is not None else None
         })
         return _obj
 
