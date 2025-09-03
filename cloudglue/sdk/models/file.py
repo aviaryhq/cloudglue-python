@@ -36,13 +36,24 @@ class File(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="User-provided metadata about the file")
     video_info: Optional[FileVideoInfo] = None
     thumbnail_url: Optional[StrictStr] = Field(default=None, description="URL of the thumbnail for the file")
-    __properties: ClassVar[List[str]] = ["id", "status", "bytes", "created_at", "filename", "uri", "metadata", "video_info", "thumbnail_url"]
+    source: Optional[StrictStr] = Field(default=None, description="Source of the file")
+    __properties: ClassVar[List[str]] = ["id", "status", "bytes", "created_at", "filename", "uri", "metadata", "video_info", "thumbnail_url", "source"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
         """Validates the enum"""
         if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
             raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
+        return value
+
+    @field_validator('source')
+    def source_validate_enum(cls, value):
+        """Validates the enum"""
+        if value is None:
+            return value
+
+        if value not in set(['video', 'youtube', 's3', 'dropbox', 'http', 'upload']):
+            raise ValueError("must be one of enum values ('video', 'youtube', 's3', 'dropbox', 'http', 'upload')")
         return value
 
     model_config = ConfigDict(
@@ -117,7 +128,8 @@ class File(BaseModel):
             "uri": obj.get("uri"),
             "metadata": obj.get("metadata"),
             "video_info": FileVideoInfo.from_dict(obj["video_info"]) if obj.get("video_info") is not None else None,
-            "thumbnail_url": obj.get("thumbnail_url")
+            "thumbnail_url": obj.get("thumbnail_url"),
+            "source": obj.get("source")
         })
         return _obj
 
