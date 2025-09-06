@@ -17,9 +17,12 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.media_description_data import MediaDescriptionData
+from cloudglue.sdk.models.describe_data_scene_text_inner import DescribeDataSceneTextInner
+from cloudglue.sdk.models.transcribe_data_segment_summary_inner import TranscribeDataSegmentSummaryInner
+from cloudglue.sdk.models.transcribe_data_speech_inner import TranscribeDataSpeechInner
+from cloudglue.sdk.models.transcribe_data_visual_scene_description_inner import TranscribeDataVisualSceneDescriptionInner
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -27,21 +30,16 @@ class MediaDescription(BaseModel):
     """
     MediaDescription
     """ # noqa: E501
-    object: Optional[StrictStr] = Field(default=None, description="Object type, always 'collection_file'")
+    collection_id: StrictStr = Field(description="Unique identifier for the collection")
     file_id: StrictStr = Field(description="Unique identifier for the file")
-    added_at: Optional[StrictInt] = Field(default=None, description="Unix timestamp of when the file was added to the collection")
-    data: Optional[MediaDescriptionData] = None
-    __properties: ClassVar[List[str]] = ["object", "file_id", "added_at", "data"]
-
-    @field_validator('object')
-    def object_validate_enum(cls, value):
-        """Validates the enum"""
-        if value is None:
-            return value
-
-        if value not in set(['collection_file']):
-            raise ValueError("must be one of enum values ('collection_file')")
-        return value
+    content: Optional[StrictStr] = Field(default=None, description="Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested")
+    title: Optional[StrictStr] = Field(default=None, description="Generated title of the video")
+    summary: Optional[StrictStr] = Field(default=None, description="Generated video level summary")
+    speech: Optional[List[TranscribeDataSpeechInner]] = Field(default=None, description="Array of speech transcriptions")
+    visual_scene_description: Optional[List[TranscribeDataVisualSceneDescriptionInner]] = Field(default=None, description="Array of visual descriptions")
+    scene_text: Optional[List[DescribeDataSceneTextInner]] = Field(default=None, description="Array of scene text extractions")
+    segment_summary: Optional[List[TranscribeDataSegmentSummaryInner]] = Field(default=None, description="Array of summary information for each segment of the video")
+    __properties: ClassVar[List[str]] = ["collection_id", "file_id", "content", "title", "summary", "speech", "visual_scene_description", "scene_text", "segment_summary"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -82,9 +80,34 @@ class MediaDescription(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of data
-        if self.data:
-            _dict['data'] = self.data.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of each item in speech (list)
+        _items = []
+        if self.speech:
+            for _item_speech in self.speech:
+                if _item_speech:
+                    _items.append(_item_speech.to_dict())
+            _dict['speech'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in visual_scene_description (list)
+        _items = []
+        if self.visual_scene_description:
+            for _item_visual_scene_description in self.visual_scene_description:
+                if _item_visual_scene_description:
+                    _items.append(_item_visual_scene_description.to_dict())
+            _dict['visual_scene_description'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in scene_text (list)
+        _items = []
+        if self.scene_text:
+            for _item_scene_text in self.scene_text:
+                if _item_scene_text:
+                    _items.append(_item_scene_text.to_dict())
+            _dict['scene_text'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in segment_summary (list)
+        _items = []
+        if self.segment_summary:
+            for _item_segment_summary in self.segment_summary:
+                if _item_segment_summary:
+                    _items.append(_item_segment_summary.to_dict())
+            _dict['segment_summary'] = _items
         return _dict
 
     @classmethod
@@ -97,10 +120,15 @@ class MediaDescription(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "object": obj.get("object"),
+            "collection_id": obj.get("collection_id"),
             "file_id": obj.get("file_id"),
-            "added_at": obj.get("added_at"),
-            "data": MediaDescriptionData.from_dict(obj["data"]) if obj.get("data") is not None else None
+            "content": obj.get("content"),
+            "title": obj.get("title"),
+            "summary": obj.get("summary"),
+            "speech": [TranscribeDataSpeechInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
+            "visual_scene_description": [TranscribeDataVisualSceneDescriptionInner.from_dict(_item) for _item in obj["visual_scene_description"]] if obj.get("visual_scene_description") is not None else None,
+            "scene_text": [DescribeDataSceneTextInner.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None,
+            "segment_summary": [TranscribeDataSegmentSummaryInner.from_dict(_item) for _item in obj["segment_summary"]] if obj.get("segment_summary") is not None else None
         })
         return _obj
 

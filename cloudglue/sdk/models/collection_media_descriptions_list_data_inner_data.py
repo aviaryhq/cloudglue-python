@@ -36,7 +36,7 @@ class CollectionMediaDescriptionsListDataInnerData(BaseModel):
     speech: Optional[List[TranscribeDataSpeechInner]] = Field(default=None, description="Array of speech transcriptions")
     visual_scene_description: Optional[List[TranscribeDataVisualSceneDescriptionInner]] = Field(default=None, description="Array of visual descriptions")
     scene_text: Optional[List[TranscribeDataSceneTextInner]] = Field(default=None, description="Array of scene text extractions")
-    segment_summary: Optional[List[TranscribeDataSegmentSummaryInner]] = Field(default=None, description="Array of summary information for each segment of the video. Only available when enable_summary is set to true in the describe configuration.")
+    segment_summary: Optional[List[TranscribeDataSegmentSummaryInner]] = Field(default=None, description="Array of summary information for each segment of the video")
     __properties: ClassVar[List[str]] = ["content", "title", "summary", "speech", "visual_scene_description", "scene_text", "segment_summary"]
 
     model_config = ConfigDict(

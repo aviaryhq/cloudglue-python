@@ -202,7 +202,6 @@ Class | Method | HTTP request | Description
  - [FileUpdate](docs/FileUpdate.md)
  - [FileVideoInfo](docs/FileVideoInfo.md)
  - [MediaDescription](docs/MediaDescription.md)
- - [MediaDescriptionData](docs/MediaDescriptionData.md)
  - [NewCollection](docs/NewCollection.md)
  - [NewCollectionDescribeConfig](docs/NewCollectionDescribeConfig.md)
  - [NewCollectionExtractConfig](docs/NewCollectionExtractConfig.md)

@@ -27,7 +27,7 @@ class CollectionMediaDescriptionsListDataInner(BaseModel):
     """
     CollectionMediaDescriptionsListDataInner
     """ # noqa: E501
-    file_id: StrictStr = Field(description="ID of the file")
+    file_id: StrictStr = Field(description="Unique identifier for the file")
     added_at: StrictInt = Field(description="Unix timestamp of when the file was added to the collection")
     object: StrictStr = Field(description="Object type, always 'collection_file'")
     data: CollectionMediaDescriptionsListDataInnerData

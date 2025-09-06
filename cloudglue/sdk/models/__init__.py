@@ -74,7 +74,6 @@ from cloudglue.sdk.models.file_segmentation_config import FileSegmentationConfig
 from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.file_video_info import FileVideoInfo
 from cloudglue.sdk.models.media_description import MediaDescription
-from cloudglue.sdk.models.media_description_data import MediaDescriptionData
 from cloudglue.sdk.models.new_collection import NewCollection
 from cloudglue.sdk.models.new_collection_describe_config import NewCollectionDescribeConfig
 from cloudglue.sdk.models.new_collection_extract_config import NewCollectionExtractConfig
