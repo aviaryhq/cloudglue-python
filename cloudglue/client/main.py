@@ -6,6 +6,7 @@ import os
 from cloudglue.sdk.api.chat_api import ChatApi
 from cloudglue.sdk.api.collections_api import CollectionsApi
 from cloudglue.sdk.api.transcribe_api import TranscribeApi
+from cloudglue.sdk.api.describe_api import DescribeApi
 from cloudglue.sdk.api.extract_api import ExtractApi
 from cloudglue.sdk.api.files_api import FilesApi
 from cloudglue.sdk.api.segmentations_api import SegmentationsApi
@@ -15,7 +16,7 @@ from cloudglue.sdk.configuration import Configuration
 from cloudglue.sdk.api_client import ApiClient
 
 # Import resource classes
-from cloudglue.client.resources import Chat, Files, Transcribe, Extract, Collections, Segmentations, Search, Thumbnails
+from cloudglue.client.resources import Chat, Files, Transcribe, Describe, Extract, Collections, Segmentations, Search, Thumbnails
 from cloudglue._version import __version__
 
 # SDK client constants
@@ -52,6 +53,7 @@ class CloudGlue:
         self.chat_api = ChatApi(self.api_client)
         self.collections_api = CollectionsApi(self.api_client)
         self.transcribe_api = TranscribeApi(self.api_client)
+        self.describe_api = DescribeApi(self.api_client)
         self.extract_api = ExtractApi(self.api_client)
         self.files_api = FilesApi(self.api_client)
         self.segmentations_api = SegmentationsApi(self.api_client)
@@ -62,6 +64,7 @@ class CloudGlue:
         self.chat = Chat(self.chat_api)
         self.files = Files(self.files_api)
         self.transcribe = Transcribe(self.transcribe_api)
+        self.describe = Describe(self.describe_api)
         self.extract = Extract(self.extract_api)
         self.collections = Collections(self.collections_api)
         self.segmentations = Segmentations(self.segmentations_api)
