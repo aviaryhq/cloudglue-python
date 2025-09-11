@@ -29,7 +29,7 @@ class SearchRequest(BaseModel):
     SearchRequest
     """ # noqa: E501
     scope: StrictStr = Field(description="Search scope - 'file' searches at file level (requires collections with enable_summary=true), 'segment' searches at segment level")
-    collections: Annotated[List[StrictStr], Field(min_length=1)] = Field(description="List of collection IDs to search within. Must be rich-transcript collections (collection_type='rich-transcripts'). For file-level search, collections must have 'enable_summary: true' in transcribe_config.")
+    collections: Annotated[List[StrictStr], Field(min_length=1)] = Field(description="List of collection IDs to search within. All collections must be of collection_type 'media-descriptions' or 'rich-transcripts'.   For file-level search, collections must have 'enable_summary: true' in transcribe_config.")
     query: Annotated[str, Field(min_length=1, strict=True)] = Field(description="Text search query to find relevant content")
     limit: Optional[Annotated[int, Field(le=100, strict=True, ge=1)]] = Field(default=10, description="Maximum number of search results to return")
     filter: Optional[SearchFilter] = None

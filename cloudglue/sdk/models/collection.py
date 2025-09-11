@@ -55,8 +55,8 @@ class Collection(BaseModel):
     @field_validator('collection_type')
     def collection_type_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in set(['entities', 'rich-transcripts', 'media-descriptions']):
-            raise ValueError("must be one of enum values ('entities', 'rich-transcripts', 'media-descriptions')")
+        if value not in set(['media-descriptions', 'entities', 'rich-transcripts']):
+            raise ValueError("must be one of enum values ('media-descriptions', 'entities', 'rich-transcripts')")
         return value
 
     model_config = ConfigDict(

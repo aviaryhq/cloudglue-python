@@ -45,7 +45,7 @@ class ExtractApi:
     @validate_call
     def create_extract(
         self,
-        new_extract: Annotated[NewExtract, Field(description="Extract structured data from a video")],
+        new_extract: Annotated[NewExtract, Field(description="Extract job parameters")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -61,9 +61,9 @@ class ExtractApi:
     ) -> Extract:
         """Create a new extract job
 
-        Creates a new extract
+        Extract structured data from a video
 
-        :param new_extract: Extract structured data from a video (required)
+        :param new_extract: Extract job parameters (required)
         :type new_extract: NewExtract
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
@@ -116,7 +116,7 @@ class ExtractApi:
     @validate_call
     def create_extract_with_http_info(
         self,
-        new_extract: Annotated[NewExtract, Field(description="Extract structured data from a video")],
+        new_extract: Annotated[NewExtract, Field(description="Extract job parameters")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -132,9 +132,9 @@ class ExtractApi:
     ) -> ApiResponse[Extract]:
         """Create a new extract job
 
-        Creates a new extract
+        Extract structured data from a video
 
-        :param new_extract: Extract structured data from a video (required)
+        :param new_extract: Extract job parameters (required)
         :type new_extract: NewExtract
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
@@ -187,7 +187,7 @@ class ExtractApi:
     @validate_call
     def create_extract_without_preload_content(
         self,
-        new_extract: Annotated[NewExtract, Field(description="Extract structured data from a video")],
+        new_extract: Annotated[NewExtract, Field(description="Extract job parameters")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -203,9 +203,9 @@ class ExtractApi:
     ) -> RESTResponseType:
         """Create a new extract job
 
-        Creates a new extract
+        Extract structured data from a video
 
-        :param new_extract: Extract structured data from a video (required)
+        :param new_extract: Extract job parameters (required)
         :type new_extract: NewExtract
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request

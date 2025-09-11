@@ -58,7 +58,7 @@ class SearchApi:
     ) -> SearchResponse:
         """Search across video files and segments to find relevant content
 
-        Search for videos or video segments in collections to find relevant videos or moments/clips in a video. Supports filtering by metadata, video info, and file properties.  **Important:** Currently only rich-transcript collections support search. For file-level search (scope='file'), the collection must be configured with 'enable_summary: true' in the transcribe_config.
+        Search for videos or video segments in collections to find relevant videos or moments/clips in a video
 
         :param search_request: Search parameters (required)
         :type search_request: SearchRequest
@@ -128,7 +128,7 @@ class SearchApi:
     ) -> ApiResponse[SearchResponse]:
         """Search across video files and segments to find relevant content
 
-        Search for videos or video segments in collections to find relevant videos or moments/clips in a video. Supports filtering by metadata, video info, and file properties.  **Important:** Currently only rich-transcript collections support search. For file-level search (scope='file'), the collection must be configured with 'enable_summary: true' in the transcribe_config.
+        Search for videos or video segments in collections to find relevant videos or moments/clips in a video
 
         :param search_request: Search parameters (required)
         :type search_request: SearchRequest
@@ -198,7 +198,7 @@ class SearchApi:
     ) -> RESTResponseType:
         """Search across video files and segments to find relevant content
 
-        Search for videos or video segments in collections to find relevant videos or moments/clips in a video. Supports filtering by metadata, video info, and file properties.  **Important:** Currently only rich-transcript collections support search. For file-level search (scope='file'), the collection must be configured with 'enable_summary: true' in the transcribe_config.
+        Search for videos or video segments in collections to find relevant videos or moments/clips in a video
 
         :param search_request: Search parameters (required)
         :type search_request: SearchRequest

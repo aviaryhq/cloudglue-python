@@ -218,11 +218,7 @@ class Completions:
         model: str = "nimbus-001",
         collections: Optional[List[str]] = None,
         filter: Optional[Union[ChatCompletionRequestFilter, Dict[str, Any]]] = None,
-        force_search: Optional[bool] = None,
-        include_citations: Optional[bool] = None,
-        max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
-        top_p: Optional[float] = None,
         **kwargs,
     ):
         """Create a chat completion.
@@ -233,11 +229,7 @@ class Completions:
             collections: List of collection IDs to search.
             filter: Filter criteria to constrain search results. Can be a ChatCompletionRequestFilter object
                    or a dictionary with 'metadata', 'video_info', and/or 'file' keys.
-            force_search: Whether to force a search. If None, uses API default.
-            include_citations: Whether to include citations in the response. If None, uses API default.
-            max_tokens: Maximum number of tokens to generate. If None, uses API default.
             temperature: Sampling temperature. If None, uses API default.
-            top_p: Nucleus sampling parameter. If None, uses API default.
             **kwargs: Additional parameters for the request.
 
         Returns:
@@ -263,11 +255,7 @@ class Completions:
                 messages=messages,
                 collections=collections or [],
                 filter=filter,
-                force_search=force_search,
-                include_citations=include_citations,
-                max_tokens=max_tokens,
                 temperature=temperature,
-                top_p=top_p,
                 **kwargs,
             )
             return self.api.create_completion(chat_completion_request=request)
@@ -420,7 +408,7 @@ class Collections:
     def add_video(
         self,
         collection_id: str,
-        file_id: str,
+        file_id: Optional[str] = None,
         url: Optional[str] = None,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
@@ -432,8 +420,8 @@ class Collections:
 
         Args:
             collection_id: The ID of the collection
-            file_id: The ID of the file to add to the collection
-            url: The URL of the file to add to the collection (optional, derived from file_id if not provided)
+            file_id: The ID of the file to add to the collection (optional, either file_id or url is required)
+            url: The URL of the file to add to the collection (optional, either file_id or url is required)
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             wait_until_finish: Whether to wait for the video processing to complete
@@ -448,6 +436,10 @@ class Collections:
             CloudGlueError: If there is an error adding the video or processing the request.
         """
         try:
+            # Validate that either file_id or url is provided
+            if not file_id and not url:
+                raise CloudGlueError("Either file_id or url must be provided")
+            
             if segmentation_id and segmentation_config:
                 raise ValueError("Cannot provide both segmentation_id and segmentation_config")
 
@@ -456,9 +448,11 @@ class Collections:
                 segmentation_config = SegmentationConfig.from_dict(segmentation_config)
 
             # Create request object using the SDK model
+            # The post-processing script fixes the generated model to properly handle
+            # the oneOf constraint (either file_id or url, not both required)
             request = AddCollectionFile(
                 file_id=file_id,
-                url=url or f"cloudglue://files/{file_id}",  # Default URL format if not provided
+                url=url,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
             )
@@ -473,89 +467,12 @@ class Collections:
                 return response
 
             # Otherwise poll until completion or timeout
+            response_file_id = response.file_id
             elapsed = 0
             terminal_states = ["ready", "completed", "failed", "not_applicable"]
 
             while elapsed < timeout:
-                status = self.get_video(collection_id=collection_id, file_id=file_id)
-
-                if status.status in terminal_states:
-                    return status
-
-                time.sleep(poll_interval)
-                elapsed += poll_interval
-
-            raise TimeoutError(
-                f"Video processing did not complete within {timeout} seconds"
-            )
-
-        except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
-        except Exception as e:
-            raise CloudGlueError(str(e))
-
-    def add_youtube_video(
-        self,
-        collection_id: str,
-        url: str,
-        metadata: Optional[Dict[str, Any]] = None,
-        segmentation_id: Optional[str] = None,
-        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
-        wait_until_finish: bool = False,
-        poll_interval: int = 5,
-        timeout: int = 600,
-    ):
-        """Add a YouTube video to a collection by URL.
-
-        Args:
-            collection_id: The ID of the collection
-            url: The URL of the YouTube video to add
-            metadata: Optional user-provided metadata about the YouTube video
-            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
-            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
-            wait_until_finish: Whether to wait for the video processing to complete
-            poll_interval: How often to check the video status (in seconds) if waiting
-            timeout: Maximum time to wait for processing (in seconds) if waiting
-
-        Returns:
-            The typed CollectionFile object with association details. If wait_until_finish
-            is True, waits for processing to complete and returns the final video state.
-
-        Raises:
-            CloudGlueError: If there is an error adding the video or processing the request.
-        """
-        try:
-            if segmentation_id and segmentation_config:
-                raise ValueError("Cannot provide both segmentation_id and segmentation_config")
-
-            # Handle segmentation_config parameter
-            if isinstance(segmentation_config, dict):
-                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
-
-            # Create request object using the SDK model
-            request = AddYouTubeCollectionFile(
-                url=url,
-                metadata=metadata,
-                segmentation_id=segmentation_id,
-                segmentation_config=segmentation_config,
-            )
-
-            # Use the standard method to get a properly typed object
-            response = self.api.add_you_tube_video(
-                collection_id=collection_id, add_you_tube_collection_file=request
-            )
-
-            # If not waiting for completion, return immediately
-            if not wait_until_finish:
-                return response
-
-            # Otherwise poll until completion or timeout
-            file_id = response.file_id
-            elapsed = 0
-            terminal_states = ["ready", "completed", "failed", "not_applicable"]
-
-            while elapsed < timeout:
-                status = self.get_video(collection_id=collection_id, file_id=file_id)
+                status = self.get_video(collection_id=collection_id, file_id=response_file_id)
 
                 if status.status in terminal_states:
                     return status
