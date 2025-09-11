@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing_extensions import Annotated
 from cloudglue.sdk.models.chat_completion_request_filter import ChatCompletionRequestFilter
@@ -31,14 +31,10 @@ class ChatCompletionRequest(BaseModel):
     """ # noqa: E501
     model: StrictStr = Field(description="Name of the video understanding model to use.")
     messages: List[ChatMessage] = Field(description="A list of messages comprising the conversation so far")
-    collections: Annotated[List[StrictStr], Field(min_length=1, max_length=1)] = Field(description="List of collection IDs to use as context for the chat.  Note that 'nimbus-001' only supports collections with collection_type 'rich-transcripts'")
+    collections: Annotated[List[StrictStr], Field(min_length=1, max_length=1)] = Field(description="List of collection IDs to use as context for the chat.  Note that 'nimbus-001' only supports collections with collection_type 'media-descriptions' or 'rich-transcripts'")
     filter: Optional[ChatCompletionRequestFilter] = None
-    force_search: Optional[StrictBool] = Field(default=False, description="Whether to force the model to always perform a search when answering questions, even if it believes it knows the answer")
-    include_citations: Optional[StrictBool] = Field(default=True, description="Whether to include citations to specific video segments")
     temperature: Optional[Union[Annotated[float, Field(le=2, strict=True, ge=0)], Annotated[int, Field(le=2, strict=True, ge=0)]]] = Field(default=0.7, description="Sampling temperature to use, between 0 and 2")
-    top_p: Optional[Union[Annotated[float, Field(le=1, strict=True, ge=0)], Annotated[int, Field(le=1, strict=True, ge=0)]]] = Field(default=1.0, description="An alternative to sampling with temperature, called nucleus sampling")
-    max_tokens: Optional[StrictInt] = Field(default=1024, description="The maximum number of tokens to generate in the chat completion")
-    __properties: ClassVar[List[str]] = ["model", "messages", "collections", "filter", "force_search", "include_citations", "temperature", "top_p", "max_tokens"]
+    __properties: ClassVar[List[str]] = ["model", "messages", "collections", "filter", "temperature"]
 
     @field_validator('model')
     def model_validate_enum(cls, value):
@@ -112,11 +108,7 @@ class ChatCompletionRequest(BaseModel):
             "messages": [ChatMessage.from_dict(_item) for _item in obj["messages"]] if obj.get("messages") is not None else None,
             "collections": obj.get("collections"),
             "filter": ChatCompletionRequestFilter.from_dict(obj["filter"]) if obj.get("filter") is not None else None,
-            "force_search": obj.get("force_search") if obj.get("force_search") is not None else False,
-            "include_citations": obj.get("include_citations") if obj.get("include_citations") is not None else True,
-            "temperature": obj.get("temperature") if obj.get("temperature") is not None else 0.7,
-            "top_p": obj.get("top_p") if obj.get("top_p") is not None else 1.0,
-            "max_tokens": obj.get("max_tokens") if obj.get("max_tokens") is not None else 1024
+            "temperature": obj.get("temperature") if obj.get("temperature") is not None else 0.7
         })
         return _obj
 

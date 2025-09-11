@@ -61,7 +61,7 @@ class TranscribeApi:
     ) -> Transcribe:
         """Create a new transcription job
 
-        Creates a new transcription job for video content
+        Creates a new transcription job for video content.  Note: For most use cases, you should use the `/describe` endpoint instead. This API will be deprecated in the future and only supports speech level understanding.
 
         :param new_transcribe: Transcription job parameters (required)
         :type new_transcribe: NewTranscribe
@@ -132,7 +132,7 @@ class TranscribeApi:
     ) -> ApiResponse[Transcribe]:
         """Create a new transcription job
 
-        Creates a new transcription job for video content
+        Creates a new transcription job for video content.  Note: For most use cases, you should use the `/describe` endpoint instead. This API will be deprecated in the future and only supports speech level understanding.
 
         :param new_transcribe: Transcription job parameters (required)
         :type new_transcribe: NewTranscribe
@@ -203,7 +203,7 @@ class TranscribeApi:
     ) -> RESTResponseType:
         """Create a new transcription job
 
-        Creates a new transcription job for video content
+        Creates a new transcription job for video content.  Note: For most use cases, you should use the `/describe` endpoint instead. This API will be deprecated in the future and only supports speech level understanding.
 
         :param new_transcribe: Transcription job parameters (required)
         :type new_transcribe: NewTranscribe

@@ -77,6 +77,10 @@ generate:
 	# Create __init__.py files if needed
 	touch cloudglue/sdk/__init__.py
 	
+	# Post-process generated files to fix oneOf constraints
+	@echo "Post-processing generated files to fix oneOf constraints..."
+	$(PYTHON) fix-oneof-constraints.py
+	
 	# Clean up temporary directory
 	rm -rf temp-sdk
 	

@@ -41,7 +41,8 @@ class SegmentSearchResult(BaseModel):
     visual_description: Optional[List[SegmentSearchResultVisualDescriptionInner]] = Field(default=None, description="Visual descriptions for the segment")
     scene_text: Optional[List[SegmentSearchResultVisualDescriptionInner]] = Field(default=None, description="Text detected on screen in the segment")
     speech: Optional[List[SegmentSearchResultVisualDescriptionInner]] = Field(default=None, description="Speech transcription for the segment")
-    __properties: ClassVar[List[str]] = ["type", "file_id", "collection_id", "segment_id", "id", "score", "start_time", "end_time", "title", "filename", "visual_description", "scene_text", "speech"]
+    thumbnail_url: Optional[StrictStr] = Field(default=None, description="URL of the thumbnail for the segment if available")
+    __properties: ClassVar[List[str]] = ["type", "file_id", "collection_id", "segment_id", "id", "score", "start_time", "end_time", "title", "filename", "visual_description", "scene_text", "speech", "thumbnail_url"]
 
     @field_validator('type')
     def type_validate_enum(cls, value):
@@ -134,7 +135,8 @@ class SegmentSearchResult(BaseModel):
             "filename": obj.get("filename"),
             "visual_description": [SegmentSearchResultVisualDescriptionInner.from_dict(_item) for _item in obj["visual_description"]] if obj.get("visual_description") is not None else None,
             "scene_text": [SegmentSearchResultVisualDescriptionInner.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None,
-            "speech": [SegmentSearchResultVisualDescriptionInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None
+            "speech": [SegmentSearchResultVisualDescriptionInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
+            "thumbnail_url": obj.get("thumbnail_url")
         })
         return _obj
 

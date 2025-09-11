@@ -30,7 +30,7 @@ class Extract(BaseModel):
     """ # noqa: E501
     job_id: StrictStr
     status: StrictStr
-    url: Optional[StrictStr] = None
+    url: Optional[StrictStr] = Field(default=None, description="The URL of the processed video")
     created_at: Optional[StrictInt] = Field(default=None, description="Unix timestamp of when the job was created")
     extract_config: Optional[ExtractExtractConfig] = None
     data: Optional[ExtractData] = None

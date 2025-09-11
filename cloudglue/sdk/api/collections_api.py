@@ -370,7 +370,7 @@ class CollectionsApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> CollectionFile:
-        """Add a YouTube video to a collection
+        """(Deprecated) Add a YouTube video to a collection
 
         Add a YouTube video to a collection by URL
 
@@ -399,6 +399,7 @@ class CollectionsApi:
         :type _host_index: int, optional
         :return: Returns the result object.
         """ # noqa: E501
+        warnings.warn("POST /collections/{collection_id}/youtube is deprecated.", DeprecationWarning)
 
         _param = self._add_you_tube_video_serialize(
             collection_id=collection_id,
@@ -444,7 +445,7 @@ class CollectionsApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> ApiResponse[CollectionFile]:
-        """Add a YouTube video to a collection
+        """(Deprecated) Add a YouTube video to a collection
 
         Add a YouTube video to a collection by URL
 
@@ -473,6 +474,7 @@ class CollectionsApi:
         :type _host_index: int, optional
         :return: Returns the result object.
         """ # noqa: E501
+        warnings.warn("POST /collections/{collection_id}/youtube is deprecated.", DeprecationWarning)
 
         _param = self._add_you_tube_video_serialize(
             collection_id=collection_id,
@@ -518,7 +520,7 @@ class CollectionsApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> RESTResponseType:
-        """Add a YouTube video to a collection
+        """(Deprecated) Add a YouTube video to a collection
 
         Add a YouTube video to a collection by URL
 
@@ -547,6 +549,7 @@ class CollectionsApi:
         :type _host_index: int, optional
         :return: Returns the result object.
         """ # noqa: E501
+        warnings.warn("POST /collections/{collection_id}/youtube is deprecated.", DeprecationWarning)
 
         _param = self._add_you_tube_video_serialize(
             collection_id=collection_id,

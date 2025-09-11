@@ -35,7 +35,8 @@ class FileSearchResult(BaseModel):
     filename: Optional[StrictStr] = Field(default=None, description="Original filename of the video")
     summary: Optional[StrictStr] = Field(default=None, description="Generated summary of the video")
     generated_title: Optional[StrictStr] = Field(default=None, description="Generated title of the video")
-    __properties: ClassVar[List[str]] = ["type", "file_id", "collection_id", "id", "score", "filename", "summary", "generated_title"]
+    thumbnail_url: Optional[StrictStr] = Field(default=None, description="URL of the thumbnail for the file if available.")
+    __properties: ClassVar[List[str]] = ["type", "file_id", "collection_id", "id", "score", "filename", "summary", "generated_title", "thumbnail_url"]
 
     @field_validator('type')
     def type_validate_enum(cls, value):
@@ -102,7 +103,8 @@ class FileSearchResult(BaseModel):
             "score": obj.get("score"),
             "filename": obj.get("filename"),
             "summary": obj.get("summary"),
-            "generated_title": obj.get("generated_title")
+            "generated_title": obj.get("generated_title"),
+            "thumbnail_url": obj.get("thumbnail_url")
         })
         return _obj
 

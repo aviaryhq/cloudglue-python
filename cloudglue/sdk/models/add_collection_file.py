@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, model_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
@@ -30,8 +30,8 @@ class AddCollectionFile(BaseModel):
     """ # noqa: E501
     segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
     segmentation_config: Optional[SegmentationConfig] = Field(default=None, description="Configuration for video segmentation. Cannot be provided together with segmentation_id.")
-    file_id: StrictStr = Field(description="The ID of the file to add to the collection")
-    url: StrictStr = Field(description="The URL of the file to add to the collection")
+    file_id: Optional[StrictStr] = Field(default=None, description="The ID of the file to add to the collection")
+    url: Optional[StrictStr] = Field(default=None, description="The URL of the video to add to the collection. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and S3 or Dropbox URIs which have been granted access to Cloudglue via data connectors.  Note that YouTube videos are currently limited to speech level understanding only. For S3 and Dropbox URI support see our documentation on data connectors for setup information.")
     thumbnails_config: Optional[ThumbnailsConfig] = None
     __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "file_id", "url", "thumbnails_config"]
 
@@ -40,6 +40,13 @@ class AddCollectionFile(BaseModel):
         validate_assignment=True,
         protected_namespaces=(),
     )
+
+    @model_validator(mode='after')
+    def validate_file_id_or_url(self) -> 'AddCollectionFile':
+        """Validate that exactly one of file_id or url is provided (oneOf constraint)"""
+        if not self.file_id and not self.url:
+            raise ValueError('Either file_id or url must be provided')
+        return self
 
 
     def to_str(self) -> str:

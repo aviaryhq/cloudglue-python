@@ -61,7 +61,7 @@ class DescribeApi:
     ) -> Describe:
         """Create a new media description job
 
-        Creates a new media description job for video content
+        Get a comprehensive multimodal description of a video
 
         :param new_describe: Media description job parameters (required)
         :type new_describe: NewDescribe
@@ -132,7 +132,7 @@ class DescribeApi:
     ) -> ApiResponse[Describe]:
         """Create a new media description job
 
-        Creates a new media description job for video content
+        Get a comprehensive multimodal description of a video
 
         :param new_describe: Media description job parameters (required)
         :type new_describe: NewDescribe
@@ -203,7 +203,7 @@ class DescribeApi:
     ) -> RESTResponseType:
         """Create a new media description job
 
-        Creates a new media description job for video content
+        Get a comprehensive multimodal description of a video
 
         :param new_describe: Media description job parameters (required)
         :type new_describe: NewDescribe
