@@ -27,13 +27,14 @@ class SearchResponse(BaseModel):
     """
     SearchResponse
     """ # noqa: E501
+    id: StrictStr = Field(description="ID of the search response")
     object: StrictStr = Field(description="Object type, always 'search'")
     query: StrictStr = Field(description="The search query that was executed")
     scope: StrictStr = Field(description="The search scope that was used")
     results: List[SearchResponseResultsInner] = Field(description="Array of search results ranked by relevance score")
     total: StrictInt = Field(description="Total number of results returned")
     limit: StrictInt = Field(description="The limit that was applied to the search")
-    __properties: ClassVar[List[str]] = ["object", "query", "scope", "results", "total", "limit"]
+    __properties: ClassVar[List[str]] = ["id", "object", "query", "scope", "results", "total", "limit"]
 
     @field_validator('object')
     def object_validate_enum(cls, value):
@@ -107,6 +108,7 @@ class SearchResponse(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "id": obj.get("id"),
             "object": obj.get("object"),
             "query": obj.get("query"),
             "scope": obj.get("scope"),

@@ -17,33 +17,28 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List
+from cloudglue.sdk.models.segments import Segments
 from typing import Optional, Set
 from typing_extensions import Self
 
-class SearchFilterVideoInfoInner(BaseModel):
+class SegmentsList(BaseModel):
     """
-    SearchFilterVideoInfoInner
+    SegmentsList
     """ # noqa: E501
-    path: StrictStr
-    operator: StrictStr = Field(description="Comparison operator to apply")
-    value_text: Optional[StrictStr] = Field(default=None, description="Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)", alias="valueText")
-    value_text_array: Optional[List[StrictStr]] = Field(default=None, description="Array of values for array comparisons (used with ContainsAny, ContainsAll, In)", alias="valueTextArray")
-    __properties: ClassVar[List[str]] = ["path", "operator", "valueText", "valueTextArray"]
+    object: StrictStr = Field(description="Object type, always 'list'")
+    data: List[Segments] = Field(description="Array of segmentation job objects")
+    total: StrictInt = Field(description="Total number of segmentation jobs matching the query")
+    limit: StrictInt = Field(description="Number of items returned in this response")
+    offset: StrictInt = Field(description="Offset from the start of the list")
+    __properties: ClassVar[List[str]] = ["object", "data", "total", "limit", "offset"]
 
-    @field_validator('path')
-    def path_validate_enum(cls, value):
+    @field_validator('object')
+    def object_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in set(['duration_seconds', 'has_audio']):
-            raise ValueError("must be one of enum values ('duration_seconds', 'has_audio')")
-        return value
-
-    @field_validator('operator')
-    def operator_validate_enum(cls, value):
-        """Validates the enum"""
-        if value not in set(['NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In', 'Like']):
-            raise ValueError("must be one of enum values ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In', 'Like')")
+        if value not in set(['list']):
+            raise ValueError("must be one of enum values ('list')")
         return value
 
     model_config = ConfigDict(
@@ -64,7 +59,7 @@ class SearchFilterVideoInfoInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of SearchFilterVideoInfoInner from a JSON string"""
+        """Create an instance of SegmentsList from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -85,11 +80,18 @@ class SearchFilterVideoInfoInner(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
+        _items = []
+        if self.data:
+            for _item_data in self.data:
+                if _item_data:
+                    _items.append(_item_data.to_dict())
+            _dict['data'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of SearchFilterVideoInfoInner from a dict"""
+        """Create an instance of SegmentsList from a dict"""
         if obj is None:
             return None
 
@@ -97,10 +99,11 @@ class SearchFilterVideoInfoInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "path": obj.get("path"),
-            "operator": obj.get("operator"),
-            "valueText": obj.get("valueText"),
-            "valueTextArray": obj.get("valueTextArray")
+            "object": obj.get("object"),
+            "data": [Segments.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None,
+            "total": obj.get("total"),
+            "limit": obj.get("limit"),
+            "offset": obj.get("offset")
         })
         return _obj
 

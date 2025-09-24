@@ -19,8 +19,9 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional, Union
-from typing_extensions import Annotated
-from cloudglue.sdk.models.segment_search_result_visual_description_inner import SegmentSearchResultVisualDescriptionInner
+from cloudglue.sdk.models.chat_completion_response_choices_inner_citations_inner_scene_text_inner import ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner
+from cloudglue.sdk.models.chat_completion_response_choices_inner_citations_inner_speech_inner import ChatCompletionResponseChoicesInnerCitationsInnerSpeechInner
+from cloudglue.sdk.models.chat_completion_response_choices_inner_citations_inner_visual_scene_description_inner import ChatCompletionResponseChoicesInnerCitationsInnerVisualSceneDescriptionInner
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -33,14 +34,14 @@ class SegmentSearchResult(BaseModel):
     collection_id: StrictStr = Field(description="ID of the collection containing this file")
     segment_id: StrictStr = Field(description="ID of the segment")
     id: StrictStr = Field(description="ID of the search document")
-    score: Union[Annotated[float, Field(le=1, strict=True, ge=0)], Annotated[int, Field(le=1, strict=True, ge=0)]] = Field(description="Relevance score (0-1, higher is more relevant)")
+    score: Union[StrictFloat, StrictInt] = Field(description="Relevance score (higher is more relevant)")
     start_time: Union[StrictFloat, StrictInt] = Field(description="Start time of the segment in seconds")
     end_time: Union[StrictFloat, StrictInt] = Field(description="End time of the segment in seconds")
     title: Optional[StrictStr] = Field(default=None, description="Title associated with the segment")
     filename: Optional[StrictStr] = Field(default=None, description="Original filename of the video")
-    visual_description: Optional[List[SegmentSearchResultVisualDescriptionInner]] = Field(default=None, description="Visual descriptions for the segment")
-    scene_text: Optional[List[SegmentSearchResultVisualDescriptionInner]] = Field(default=None, description="Text detected on screen in the segment")
-    speech: Optional[List[SegmentSearchResultVisualDescriptionInner]] = Field(default=None, description="Speech transcription for the segment")
+    visual_description: Optional[List[ChatCompletionResponseChoicesInnerCitationsInnerVisualSceneDescriptionInner]] = Field(default=None, description="Visual descriptions for the segment")
+    scene_text: Optional[List[ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner]] = Field(default=None, description="Text detected on screen in the segment")
+    speech: Optional[List[ChatCompletionResponseChoicesInnerCitationsInnerSpeechInner]] = Field(default=None, description="Speech transcription for the segment")
     thumbnail_url: Optional[StrictStr] = Field(default=None, description="URL of the thumbnail for the segment if available")
     __properties: ClassVar[List[str]] = ["type", "file_id", "collection_id", "segment_id", "id", "score", "start_time", "end_time", "title", "filename", "visual_description", "scene_text", "speech", "thumbnail_url"]
 
@@ -133,9 +134,9 @@ class SegmentSearchResult(BaseModel):
             "end_time": obj.get("end_time"),
             "title": obj.get("title"),
             "filename": obj.get("filename"),
-            "visual_description": [SegmentSearchResultVisualDescriptionInner.from_dict(_item) for _item in obj["visual_description"]] if obj.get("visual_description") is not None else None,
-            "scene_text": [SegmentSearchResultVisualDescriptionInner.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None,
-            "speech": [SegmentSearchResultVisualDescriptionInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
+            "visual_description": [ChatCompletionResponseChoicesInnerCitationsInnerVisualSceneDescriptionInner.from_dict(_item) for _item in obj["visual_description"]] if obj.get("visual_description") is not None else None,
+            "scene_text": [ChatCompletionResponseChoicesInnerCitationsInnerSceneTextInner.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None,
+            "speech": [ChatCompletionResponseChoicesInnerCitationsInnerSpeechInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
             "thumbnail_url": obj.get("thumbnail_url")
         })
         return _obj

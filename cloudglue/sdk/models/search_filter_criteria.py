@@ -28,15 +28,15 @@ class SearchFilterCriteria(BaseModel):
     """ # noqa: E501
     path: StrictStr = Field(description="JSON path for the field to filter on")
     operator: StrictStr = Field(description="Comparison operator to apply")
-    value_text: Optional[StrictStr] = Field(default=None, description="Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)", alias="valueText")
+    value_text: Optional[StrictStr] = Field(default=None, description="Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)", alias="valueText")
     value_text_array: Optional[List[StrictStr]] = Field(default=None, description="Array of values for array comparisons (used with ContainsAny, ContainsAll, In)", alias="valueTextArray")
     __properties: ClassVar[List[str]] = ["path", "operator", "valueText", "valueTextArray"]
 
     @field_validator('operator')
     def operator_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in set(['NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In']):
-            raise ValueError("must be one of enum values ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In')")
+        if value not in set(['NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In', 'Like']):
+            raise ValueError("must be one of enum values ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In', 'Like')")
         return value
 
     model_config = ConfigDict(

@@ -1525,6 +1525,7 @@ class FilesApi:
         offset: Annotated[Optional[StrictInt], Field(description="Number of files to skip")] = None,
         order: Annotated[Optional[StrictStr], Field(description="Order the files by a specific field")] = None,
         sort: Annotated[Optional[StrictStr], Field(description="Sort the files in ascending or descending order")] = None,
+        filter: Annotated[Optional[StrictStr], Field(description="JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.  **Supported Filter Types:**  • **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory') • **video_info** - Filter by video information properties   - `duration_seconds` - Video duration in seconds   - `has_audio` - Whether the video has audio (true/false)  • **file** - Filter by file properties   - `filename` - File name (string)   - `uri` - File URI (string)   - `id` - File ID (UUID string)   - `created_at` - Creation timestamp (ISO 8601 string)   - `bytes` - File size in bytes (number)  **Supported Operators:** • **Equal** - Exact match (requires valueText) • **NotEqual** - Not equal to value (requires valueText) • **LessThan** - Less than value (requires valueText) • **GreaterThan** - Greater than value (requires valueText) • **Like** - Case-insensitive pattern matching with wildcards (requires valueText) • **In** - Value is in array (requires valueTextArray) • **ContainsAny** - Array contains any of the values (requires valueTextArray) • **ContainsAll** - Array contains all of the values (requires valueTextArray)  **Examples:**  **Metadata filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]} ```  **Video info filtering:** ```json {\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]} ```  **File property filtering:** ```json {\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ``` ```json {\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]} ``` ```json {\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]} ```  **Combined filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ```")] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1556,6 +1557,8 @@ class FilesApi:
         :type order: str
         :param sort: Sort the files in ascending or descending order
         :type sort: str
+        :param filter: JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.  **Supported Filter Types:**  • **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory') • **video_info** - Filter by video information properties   - `duration_seconds` - Video duration in seconds   - `has_audio` - Whether the video has audio (true/false)  • **file** - Filter by file properties   - `filename` - File name (string)   - `uri` - File URI (string)   - `id` - File ID (UUID string)   - `created_at` - Creation timestamp (ISO 8601 string)   - `bytes` - File size in bytes (number)  **Supported Operators:** • **Equal** - Exact match (requires valueText) • **NotEqual** - Not equal to value (requires valueText) • **LessThan** - Less than value (requires valueText) • **GreaterThan** - Greater than value (requires valueText) • **Like** - Case-insensitive pattern matching with wildcards (requires valueText) • **In** - Value is in array (requires valueTextArray) • **ContainsAny** - Array contains any of the values (requires valueTextArray) • **ContainsAll** - Array contains all of the values (requires valueTextArray)  **Examples:**  **Metadata filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]} ```  **Video info filtering:** ```json {\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]} ```  **File property filtering:** ```json {\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ``` ```json {\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]} ``` ```json {\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]} ```  **Combined filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ```
+        :type filter: str
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1586,6 +1589,7 @@ class FilesApi:
             offset=offset,
             order=order,
             sort=sort,
+            filter=filter,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -1617,6 +1621,7 @@ class FilesApi:
         offset: Annotated[Optional[StrictInt], Field(description="Number of files to skip")] = None,
         order: Annotated[Optional[StrictStr], Field(description="Order the files by a specific field")] = None,
         sort: Annotated[Optional[StrictStr], Field(description="Sort the files in ascending or descending order")] = None,
+        filter: Annotated[Optional[StrictStr], Field(description="JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.  **Supported Filter Types:**  • **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory') • **video_info** - Filter by video information properties   - `duration_seconds` - Video duration in seconds   - `has_audio` - Whether the video has audio (true/false)  • **file** - Filter by file properties   - `filename` - File name (string)   - `uri` - File URI (string)   - `id` - File ID (UUID string)   - `created_at` - Creation timestamp (ISO 8601 string)   - `bytes` - File size in bytes (number)  **Supported Operators:** • **Equal** - Exact match (requires valueText) • **NotEqual** - Not equal to value (requires valueText) • **LessThan** - Less than value (requires valueText) • **GreaterThan** - Greater than value (requires valueText) • **Like** - Case-insensitive pattern matching with wildcards (requires valueText) • **In** - Value is in array (requires valueTextArray) • **ContainsAny** - Array contains any of the values (requires valueTextArray) • **ContainsAll** - Array contains all of the values (requires valueTextArray)  **Examples:**  **Metadata filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]} ```  **Video info filtering:** ```json {\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]} ```  **File property filtering:** ```json {\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ``` ```json {\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]} ``` ```json {\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]} ```  **Combined filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ```")] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1648,6 +1653,8 @@ class FilesApi:
         :type order: str
         :param sort: Sort the files in ascending or descending order
         :type sort: str
+        :param filter: JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.  **Supported Filter Types:**  • **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory') • **video_info** - Filter by video information properties   - `duration_seconds` - Video duration in seconds   - `has_audio` - Whether the video has audio (true/false)  • **file** - Filter by file properties   - `filename` - File name (string)   - `uri` - File URI (string)   - `id` - File ID (UUID string)   - `created_at` - Creation timestamp (ISO 8601 string)   - `bytes` - File size in bytes (number)  **Supported Operators:** • **Equal** - Exact match (requires valueText) • **NotEqual** - Not equal to value (requires valueText) • **LessThan** - Less than value (requires valueText) • **GreaterThan** - Greater than value (requires valueText) • **Like** - Case-insensitive pattern matching with wildcards (requires valueText) • **In** - Value is in array (requires valueTextArray) • **ContainsAny** - Array contains any of the values (requires valueTextArray) • **ContainsAll** - Array contains all of the values (requires valueTextArray)  **Examples:**  **Metadata filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]} ```  **Video info filtering:** ```json {\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]} ```  **File property filtering:** ```json {\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ``` ```json {\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]} ``` ```json {\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]} ```  **Combined filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ```
+        :type filter: str
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1678,6 +1685,7 @@ class FilesApi:
             offset=offset,
             order=order,
             sort=sort,
+            filter=filter,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -1709,6 +1717,7 @@ class FilesApi:
         offset: Annotated[Optional[StrictInt], Field(description="Number of files to skip")] = None,
         order: Annotated[Optional[StrictStr], Field(description="Order the files by a specific field")] = None,
         sort: Annotated[Optional[StrictStr], Field(description="Sort the files in ascending or descending order")] = None,
+        filter: Annotated[Optional[StrictStr], Field(description="JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.  **Supported Filter Types:**  • **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory') • **video_info** - Filter by video information properties   - `duration_seconds` - Video duration in seconds   - `has_audio` - Whether the video has audio (true/false)  • **file** - Filter by file properties   - `filename` - File name (string)   - `uri` - File URI (string)   - `id` - File ID (UUID string)   - `created_at` - Creation timestamp (ISO 8601 string)   - `bytes` - File size in bytes (number)  **Supported Operators:** • **Equal** - Exact match (requires valueText) • **NotEqual** - Not equal to value (requires valueText) • **LessThan** - Less than value (requires valueText) • **GreaterThan** - Greater than value (requires valueText) • **Like** - Case-insensitive pattern matching with wildcards (requires valueText) • **In** - Value is in array (requires valueTextArray) • **ContainsAny** - Array contains any of the values (requires valueTextArray) • **ContainsAll** - Array contains all of the values (requires valueTextArray)  **Examples:**  **Metadata filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]} ```  **Video info filtering:** ```json {\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]} ```  **File property filtering:** ```json {\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ``` ```json {\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]} ``` ```json {\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]} ```  **Combined filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ```")] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1740,6 +1749,8 @@ class FilesApi:
         :type order: str
         :param sort: Sort the files in ascending or descending order
         :type sort: str
+        :param filter: JSON string containing filter criteria to constrain file search results. This is the JSON string version of the SearchFilter object used in the search API.  **Supported Filter Types:**  • **metadata** - Filter by file metadata using JSON path expressions (e.g., 'metadata.speaker', 'metadata.category.subcategory') • **video_info** - Filter by video information properties   - `duration_seconds` - Video duration in seconds   - `has_audio` - Whether the video has audio (true/false)  • **file** - Filter by file properties   - `filename` - File name (string)   - `uri` - File URI (string)   - `id` - File ID (UUID string)   - `created_at` - Creation timestamp (ISO 8601 string)   - `bytes` - File size in bytes (number)  **Supported Operators:** • **Equal** - Exact match (requires valueText) • **NotEqual** - Not equal to value (requires valueText) • **LessThan** - Less than value (requires valueText) • **GreaterThan** - Greater than value (requires valueText) • **Like** - Case-insensitive pattern matching with wildcards (requires valueText) • **In** - Value is in array (requires valueTextArray) • **ContainsAny** - Array contains any of the values (requires valueTextArray) • **ContainsAll** - Array contains all of the values (requires valueTextArray)  **Examples:**  **Metadata filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Like\",\"valueText\":\"YO%\"}]} ```  **Video info filtering:** ```json {\"video_info\":[{\"path\":\"video_info.duration_seconds\",\"operator\":\"GreaterThan\",\"valueText\":\"60\"}]} ```  **File property filtering:** ```json {\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ``` ```json {\"file\":[{\"path\":\"bytes\",\"operator\":\"GreaterThan\",\"valueText\":\"1048576\"}]} ``` ```json {\"file\":[{\"path\":\"created_at\",\"operator\":\"GreaterThan\",\"valueText\":\"2024-01-01T00:00:00Z\"}]} ```  **Combined filtering:** ```json {\"metadata\":[{\"path\":\"metadata.speaker\",\"operator\":\"Equal\",\"valueText\":\"John\"}],\"video_info\":[{\"path\":\"video_info.has_audio\",\"operator\":\"Equal\",\"valueText\":\"true\"}],\"file\":[{\"path\":\"filename\",\"operator\":\"Like\",\"valueText\":\"%.mp4\"}]} ```
+        :type filter: str
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1770,6 +1781,7 @@ class FilesApi:
             offset=offset,
             order=order,
             sort=sort,
+            filter=filter,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -1796,6 +1808,7 @@ class FilesApi:
         offset,
         order,
         sort,
+        filter,
         _request_auth,
         _content_type,
         _headers,
@@ -1863,6 +1876,10 @@ class FilesApi:
         if sort is not None:
             
             _query_params.append(('sort', sort))
+            
+        if filter is not None:
+            
+            _query_params.append(('filter', filter))
             
         # process the header parameters
         # process the form parameters
