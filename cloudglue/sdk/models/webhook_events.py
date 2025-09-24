@@ -40,6 +40,9 @@ class WebhookEvents(str, Enum):
     COLLECTION_DOT_FILE_DOT_JOB_DOT_COMPLETED = 'collection.file.job.completed'
     COLLECTION_DOT_FILE_DOT_JOB_DOT_FAILED = 'collection.file.job.failed'
     COLLECTION_DOT_FILE_DOT_JOB_DOT_DELETED = 'collection.file.job.deleted'
+    SEGMENT_DOT_JOB_DOT_PROCESSING = 'segment.job.processing'
+    SEGMENT_DOT_JOB_DOT_COMPLETED = 'segment.job.completed'
+    SEGMENT_DOT_JOB_DOT_FAILED = 'segment.job.failed'
 
     @classmethod
     def from_json(cls, json_str: str) -> Self:

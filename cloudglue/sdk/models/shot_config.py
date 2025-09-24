@@ -17,19 +17,30 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List, Optional
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
-class TranscribeDataSpeechInner(BaseModel):
+class ShotConfig(BaseModel):
     """
-    TranscribeDataSpeechInner
+    ShotConfig
     """ # noqa: E501
-    text: Optional[StrictStr] = Field(default=None, description="Transcribed speech text")
-    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start time of speech in seconds")
-    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="End time of speech in seconds")
-    __properties: ClassVar[List[str]] = ["text", "start_time", "end_time"]
+    detector: Optional[StrictStr] = Field(default='adaptive', description="Detection algorithm: • **adaptive**: Designed for dynamic footage with camera movement and action (default) • **content**: Optimized for controlled footage with clear visual transitions")
+    max_duration_seconds: Optional[Annotated[int, Field(le=3600, strict=True, ge=1)]] = Field(default=300, description="Maximum duration for each segment in seconds (1 second to 1 hour, default: 5 minutes)")
+    min_duration_seconds: Optional[Annotated[int, Field(le=3600, strict=True, ge=1)]] = Field(default=1, description="Minimum duration for each segment in seconds (1 second to 1 hour, default: 1 second)")
+    __properties: ClassVar[List[str]] = ["detector", "max_duration_seconds", "min_duration_seconds"]
+
+    @field_validator('detector')
+    def detector_validate_enum(cls, value):
+        """Validates the enum"""
+        if value is None:
+            return value
+
+        if value not in set(['content', 'adaptive']):
+            raise ValueError("must be one of enum values ('content', 'adaptive')")
+        return value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +60,7 @@ class TranscribeDataSpeechInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of TranscribeDataSpeechInner from a JSON string"""
+        """Create an instance of ShotConfig from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,7 +85,7 @@ class TranscribeDataSpeechInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of TranscribeDataSpeechInner from a dict"""
+        """Create an instance of ShotConfig from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +93,9 @@ class TranscribeDataSpeechInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "text": obj.get("text"),
-            "start_time": obj.get("start_time"),
-            "end_time": obj.get("end_time")
+            "detector": obj.get("detector") if obj.get("detector") is not None else 'adaptive',
+            "max_duration_seconds": obj.get("max_duration_seconds") if obj.get("max_duration_seconds") is not None else 300,
+            "min_duration_seconds": obj.get("min_duration_seconds") if obj.get("min_duration_seconds") is not None else 1
         })
         return _obj
 

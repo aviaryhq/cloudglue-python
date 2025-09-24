@@ -17,9 +17,8 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional, Union
-from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -31,7 +30,7 @@ class FileSearchResult(BaseModel):
     file_id: StrictStr = Field(description="ID of the file")
     collection_id: StrictStr = Field(description="ID of the collection containing this file")
     id: StrictStr = Field(description="ID of the search document")
-    score: Union[Annotated[float, Field(le=1, strict=True, ge=0)], Annotated[int, Field(le=1, strict=True, ge=0)]] = Field(description="Relevance score (0-1, higher is more relevant)")
+    score: Union[StrictFloat, StrictInt] = Field(description="Relevance score (higher is more relevant)")
     filename: Optional[StrictStr] = Field(default=None, description="Original filename of the video")
     summary: Optional[StrictStr] = Field(default=None, description="Generated summary of the video")
     generated_title: Optional[StrictStr] = Field(default=None, description="Generated title of the video")

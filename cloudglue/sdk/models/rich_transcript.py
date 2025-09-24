@@ -19,9 +19,9 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
+from cloudglue.sdk.models.chat_completion_response_choices_inner_citations_inner_speech_inner import ChatCompletionResponseChoicesInnerCitationsInnerSpeechInner
 from cloudglue.sdk.models.transcribe_data_scene_text_inner import TranscribeDataSceneTextInner
 from cloudglue.sdk.models.transcribe_data_segment_summary_inner import TranscribeDataSegmentSummaryInner
-from cloudglue.sdk.models.transcribe_data_speech_inner import TranscribeDataSpeechInner
 from cloudglue.sdk.models.transcribe_data_visual_scene_description_inner import TranscribeDataVisualSceneDescriptionInner
 from typing import Optional, Set
 from typing_extensions import Self
@@ -35,7 +35,7 @@ class RichTranscript(BaseModel):
     content: Optional[StrictStr] = Field(default=None, description="Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested")
     title: Optional[StrictStr] = Field(default=None, description="Generated title of the video")
     summary: Optional[StrictStr] = Field(default=None, description="Generated video level summary")
-    speech: Optional[List[TranscribeDataSpeechInner]] = Field(default=None, description="Array of speech transcriptions")
+    speech: Optional[List[ChatCompletionResponseChoicesInnerCitationsInnerSpeechInner]] = Field(default=None, description="Array of speech transcriptions")
     visual_scene_description: Optional[List[TranscribeDataVisualSceneDescriptionInner]] = Field(default=None, description="Array of visual descriptions")
     scene_text: Optional[List[TranscribeDataSceneTextInner]] = Field(default=None, description="Array of scene text extractions")
     segment_summary: Optional[List[TranscribeDataSegmentSummaryInner]] = Field(default=None, description="Array of summary information for each segment of the video. Only available when enable_summary is set to true in the transcribe configuration.")
@@ -125,7 +125,7 @@ class RichTranscript(BaseModel):
             "content": obj.get("content"),
             "title": obj.get("title"),
             "summary": obj.get("summary"),
-            "speech": [TranscribeDataSpeechInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
+            "speech": [ChatCompletionResponseChoicesInnerCitationsInnerSpeechInner.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
             "visual_scene_description": [TranscribeDataVisualSceneDescriptionInner.from_dict(_item) for _item in obj["visual_scene_description"]] if obj.get("visual_scene_description") is not None else None,
             "scene_text": [TranscribeDataSceneTextInner.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None,
             "segment_summary": [TranscribeDataSegmentSummaryInner.from_dict(_item) for _item in obj["segment_summary"]] if obj.get("segment_summary") is not None else None

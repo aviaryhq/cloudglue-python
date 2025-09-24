@@ -17,34 +17,17 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class SearchFilterVideoInfoInner(BaseModel):
+class NarrativeConfig(BaseModel):
     """
-    SearchFilterVideoInfoInner
+    NarrativeConfig
     """ # noqa: E501
-    path: StrictStr
-    operator: StrictStr = Field(description="Comparison operator to apply")
-    value_text: Optional[StrictStr] = Field(default=None, description="Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)", alias="valueText")
-    value_text_array: Optional[List[StrictStr]] = Field(default=None, description="Array of values for array comparisons (used with ContainsAny, ContainsAll, In)", alias="valueTextArray")
-    __properties: ClassVar[List[str]] = ["path", "operator", "valueText", "valueTextArray"]
-
-    @field_validator('path')
-    def path_validate_enum(cls, value):
-        """Validates the enum"""
-        if value not in set(['duration_seconds', 'has_audio']):
-            raise ValueError("must be one of enum values ('duration_seconds', 'has_audio')")
-        return value
-
-    @field_validator('operator')
-    def operator_validate_enum(cls, value):
-        """Validates the enum"""
-        if value not in set(['NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In', 'Like']):
-            raise ValueError("must be one of enum values ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'ContainsAny', 'ContainsAll', 'In', 'Like')")
-        return value
+    prompt: Optional[StrictStr] = Field(default=None, description="Optional custom prompt to guide the narrative segmentation analysis. This will be incorporated into the main segmentation prompt as additional guidance.")
+    __properties: ClassVar[List[str]] = ["prompt"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -64,7 +47,7 @@ class SearchFilterVideoInfoInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of SearchFilterVideoInfoInner from a JSON string"""
+        """Create an instance of NarrativeConfig from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -89,7 +72,7 @@ class SearchFilterVideoInfoInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of SearchFilterVideoInfoInner from a dict"""
+        """Create an instance of NarrativeConfig from a dict"""
         if obj is None:
             return None
 
@@ -97,10 +80,7 @@ class SearchFilterVideoInfoInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "path": obj.get("path"),
-            "operator": obj.get("operator"),
-            "valueText": obj.get("valueText"),
-            "valueTextArray": obj.get("valueTextArray")
+            "prompt": obj.get("prompt")
         })
         return _obj
 

@@ -17,19 +17,21 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictFloat, StrictInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
-class SegmentSearchResultVisualDescriptionInner(BaseModel):
+class Segment(BaseModel):
     """
-    SegmentSearchResultVisualDescriptionInner
+    Segment
     """ # noqa: E501
-    text: Optional[StrictStr] = None
-    start_time: Optional[Union[StrictFloat, StrictInt]] = None
-    end_time: Optional[Union[StrictFloat, StrictInt]] = None
-    __properties: ClassVar[List[str]] = ["text", "start_time", "end_time"]
+    start_time: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]] = Field(description="Start time of the segment in seconds")
+    end_time: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]] = Field(description="End time of the segment in seconds")
+    description: Optional[StrictStr] = Field(default=None, description="Optional description of the segment content (available for narrative segmentation)")
+    thumbnail_url: Optional[StrictStr] = Field(default=None, description="Optional URL of the thumbnail for this segment")
+    __properties: ClassVar[List[str]] = ["start_time", "end_time", "description", "thumbnail_url"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +51,7 @@ class SegmentSearchResultVisualDescriptionInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of SegmentSearchResultVisualDescriptionInner from a JSON string"""
+        """Create an instance of Segment from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,7 +76,7 @@ class SegmentSearchResultVisualDescriptionInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of SegmentSearchResultVisualDescriptionInner from a dict"""
+        """Create an instance of Segment from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +84,10 @@ class SegmentSearchResultVisualDescriptionInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "text": obj.get("text"),
             "start_time": obj.get("start_time"),
-            "end_time": obj.get("end_time")
+            "end_time": obj.get("end_time"),
+            "description": obj.get("description"),
+            "thumbnail_url": obj.get("thumbnail_url")
         })
         return _obj
 

@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional, Union
 import os
 import pathlib
 import time
+import json
 
 from cloudglue.sdk.models.chat_completion_request import ChatCompletionRequest
 from cloudglue.sdk.models.chat_completion_request_filter import ChatCompletionRequestFilter
@@ -13,9 +14,7 @@ from cloudglue.sdk.models.new_transcribe import NewTranscribe
 from cloudglue.sdk.models.new_describe import NewDescribe
 from cloudglue.sdk.models.new_extract import NewExtract
 from cloudglue.sdk.models.new_collection import NewCollection
-from cloudglue.sdk.models.new_collection_describe_config import NewCollectionDescribeConfig
 from cloudglue.sdk.models.add_collection_file import AddCollectionFile
-from cloudglue.sdk.models.add_you_tube_collection_file import AddYouTubeCollectionFile
 from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
@@ -29,6 +28,11 @@ from cloudglue.sdk.rest import ApiException
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from cloudglue.sdk.api.segmentations_api import SegmentationsApi
 from cloudglue.sdk.models.create_file_segmentation_request import CreateFileSegmentationRequest
+from cloudglue.sdk.models.new_segments import NewSegments
+from cloudglue.sdk.models.shot_config import ShotConfig
+from cloudglue.sdk.models.narrative_config import NarrativeConfig
+from cloudglue.sdk.models.segments import Segments
+from cloudglue.sdk.models.segments_list import SegmentsList
 
 
 class CloudGlueError(Exception):
@@ -1439,6 +1443,168 @@ class Files:
         """Initialize with the API client."""
         self.api = api
 
+    @staticmethod
+    def _create_metadata_filter(
+        path: str,
+        operator: str,
+        value_text: Optional[str] = None,
+        value_text_array: Optional[List[str]] = None,
+    ) -> SearchFilterCriteria:
+        """Create a metadata filter for file listing.
+        
+        Args:
+            path: JSON path on metadata object (e.g. 'my_custom_field', 'category.subcategory')
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
+            value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            
+        Returns:
+            SearchFilterCriteria object
+        """
+        return SearchFilterCriteria(
+            path=path,
+            operator=operator,
+            value_text=value_text,
+            value_text_array=value_text_array,
+        )
+
+    @staticmethod
+    def _create_video_info_filter(
+        path: str,
+        operator: str,
+        value_text: Optional[str] = None,
+        value_text_array: Optional[List[str]] = None,
+    ) -> SearchFilterVideoInfoInner:
+        """Create a video info filter for file listing.
+        
+        Args:
+            path: JSON path on video_info object ('duration_seconds', 'has_audio')
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
+            value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            
+        Returns:
+            SearchFilterVideoInfoInner object
+        """
+        return SearchFilterVideoInfoInner(
+            path=path,
+            operator=operator,
+            value_text=value_text,
+            value_text_array=value_text_array,
+        )
+
+    @staticmethod
+    def _create_file_filter(
+        path: str,
+        operator: str,
+        value_text: Optional[str] = None,
+        value_text_array: Optional[List[str]] = None,
+    ) -> SearchFilterFileInner:
+        """Create a file property filter for file listing.
+        
+        Args:
+            path: JSON path on file object ('bytes', 'filename', 'uri', 'created_at', 'id')
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
+            value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            
+        Returns:
+            SearchFilterFileInner object
+        """
+        return SearchFilterFileInner(
+            path=path,
+            operator=operator,
+            value_text=value_text,
+            value_text_array=value_text_array,
+        )
+
+    @staticmethod
+    def create_filter(
+        metadata_filters: Optional[List[Dict[str, Any]]] = None,
+        video_info_filters: Optional[List[Dict[str, Any]]] = None,
+        file_filters: Optional[List[Dict[str, Any]]] = None,
+    ) -> SearchFilter:
+        """Create a filter object for file listing.
+
+        Args:
+            metadata_filters: List of metadata filter dictionaries. Each dict should contain:
+                - path: JSON path on metadata object (e.g. 'my_custom_field', 'category.subcategory')
+                - operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+                - value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
+                - value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            video_info_filters: List of video info filter dictionaries. Each dict should contain:
+                - path: JSON path on video_info object ('duration_seconds', 'has_audio')
+                - operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+                - value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
+                - value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            file_filters: List of file property filter dictionaries. Each dict should contain:
+                - path: JSON path on file object ('bytes', 'filename', 'uri', 'created_at', 'id')
+                - operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+                - value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
+                - value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+
+        Returns:
+            SearchFilter object
+
+        Examples:
+            # Filter by metadata
+            filter_obj = Files.create_filter(
+                metadata_filters=[
+                    {"path": "speaker", "operator": "Equal", "value_text": "John"}
+                ]
+            )
+
+            # Filter by video info
+            filter_obj = Files.create_filter(
+                video_info_filters=[
+                    {"path": "duration_seconds", "operator": "GreaterThan", "value_text": "60"}
+                ]
+            )
+
+            # Filter by file properties
+            filter_obj = Files.create_filter(
+                file_filters=[
+                    {"path": "filename", "operator": "Like", "value_text": "%.mp4"}
+                ]
+            )
+
+            # Combined filtering
+            filter_obj = Files.create_filter(
+                metadata_filters=[
+                    {"path": "speaker", "operator": "Equal", "value_text": "John"}
+                ],
+                video_info_filters=[
+                    {"path": "has_audio", "operator": "Equal", "value_text": "true"}
+                ],
+                file_filters=[
+                    {"path": "filename", "operator": "Like", "value_text": "%.mp4"}
+                ]
+            )
+        """
+        metadata = None
+        if metadata_filters:
+            metadata = [
+                Files._create_metadata_filter(**filter_dict) for filter_dict in metadata_filters
+            ]
+
+        video_info = None
+        if video_info_filters:
+            video_info = [
+                Files._create_video_info_filter(**filter_dict) for filter_dict in video_info_filters
+            ]
+
+        file = None
+        if file_filters:
+            file = [
+                Files._create_file_filter(**filter_dict) for filter_dict in file_filters
+            ]
+
+        return SearchFilter(
+            metadata=metadata,
+            video_info=video_info,
+            file=file,
+        )
+
     def upload(
         self,
         file_path: str,
@@ -1519,6 +1685,7 @@ class Files:
         offset: Optional[int] = None,
         order: Optional[str] = None,
         sort: Optional[str] = None,
+        filter: Optional[Union[SearchFilter, Dict[str, Any]]] = None,
     ):
         """List available files.
 
@@ -1530,6 +1697,8 @@ class Files:
             offset: Optional number of files to skip.
             order: Optional field to sort by ('created_at', 'filename'). Defaults to 'created_at'.
             sort: Optional sort direction ('asc', 'desc'). Defaults to 'desc'.
+            filter: Optional filter object or dictionary for advanced filtering by metadata, video info, or file properties.
+                   Use Files.create_filter() to create filter objects.
 
         Returns:
             A list of file objects.
@@ -1538,6 +1707,15 @@ class Files:
             CloudGlueError: If there is an error listing files or processing the request.
         """
         try:
+            # Convert filter dict to SearchFilter object if needed
+            filter_obj = None
+            if filter is not None:
+                if isinstance(filter, dict):
+                    # Convert dict to SearchFilter object
+                    filter_obj = SearchFilter(**filter)
+                else:
+                    filter_obj = filter
+
             return self.api.list_files(
                 status=status,
                 created_before=created_before,
@@ -1546,6 +1724,7 @@ class Files:
                 offset=offset,
                 order=order,
                 sort=sort,
+                filter=json.dumps(filter_obj.to_dict()) if filter_obj else None,
             )
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -1970,6 +2149,220 @@ class Segmentations:
             raise CloudGlueError(str(e))
 
 
+class Segments:
+    """Client for the CloudGlue Segments API."""
+
+    def __init__(self, api):
+        """Initialize the Segments client.
+
+        Args:
+            api: The SegmentsApi instance.
+        """
+        self.api = api
+
+    @staticmethod
+    def create_shot_config(
+        detector: str = "adaptive",
+        max_duration_seconds: int = 300,
+        min_duration_seconds: int = 1,
+    ) -> ShotConfig:
+        """Create a shot-based segmentation configuration.
+
+        Args:
+            detector: Detection algorithm ('adaptive' or 'content')
+            max_duration_seconds: Maximum duration for each segment in seconds (1-3600)
+            min_duration_seconds: Minimum duration for each segment in seconds (1-3600)
+
+        Returns:
+            ShotConfig object
+        """
+        return ShotConfig(
+            detector=detector,
+            max_duration_seconds=max_duration_seconds,
+            min_duration_seconds=min_duration_seconds,
+        )
+
+    @staticmethod
+    def create_narrative_config(
+        prompt: Optional[str] = None,
+    ) -> NarrativeConfig:
+        """Create a narrative-based segmentation configuration.
+
+        Args:
+            prompt: Optional custom prompt to guide the narrative segmentation analysis
+
+        Returns:
+            NarrativeConfig object
+        """
+        return NarrativeConfig(prompt=prompt)
+
+    def create(
+        self,
+        url: str,
+        criteria: str,
+        shot_config: Optional[Union[ShotConfig, Dict[str, Any]]] = None,
+        narrative_config: Optional[Union[NarrativeConfig, Dict[str, Any]]] = None,
+    ) -> Segments:
+        """Create a new segmentation job.
+
+        Args:
+            url: Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint,
+                public HTTP URLs, and S3 or Dropbox URIs which have been granted access to
+                Cloudglue via data connectors. **⚠️ Important: YouTube URLs are NOT supported
+                for the segments API.**
+            criteria: Segmentation criteria ('shot' or 'narrative')
+            shot_config: Configuration for shot-based segmentation (only when criteria is 'shot')
+            narrative_config: Configuration for narrative-based segmentation (only when criteria is 'narrative')
+
+        Returns:
+            Segments object representing the created job
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            # Convert dict configs to objects if needed
+            if isinstance(shot_config, dict):
+                shot_config = ShotConfig(**shot_config)
+            if isinstance(narrative_config, dict):
+                narrative_config = NarrativeConfig(**narrative_config)
+
+            new_segments = NewSegments(
+                url=url,
+                criteria=criteria,
+                shot_config=shot_config,
+                narrative_config=narrative_config,
+            )
+
+            response = self.api.create_segments(new_segments)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def get(self, job_id: str) -> Segments:
+        """Get a segmentation job by ID.
+
+        Args:
+            job_id: The unique identifier of the segmentation job
+
+        Returns:
+            Segments object
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.get_segments(job_id)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        status: Optional[str] = None,
+        criteria: Optional[str] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
+        url: Optional[str] = None,
+    ) -> SegmentsList:
+        """List segmentation jobs.
+
+        Args:
+            limit: Maximum number of segmentation jobs to return (max 100)
+            offset: Number of segmentation jobs to skip
+            status: Filter segmentation jobs by status
+            criteria: Filter segmentation jobs by criteria type
+            created_before: Filter segmentation jobs created before a specific date (YYYY-MM-DD format)
+            created_after: Filter segmentation jobs created after a specific date (YYYY-MM-DD format)
+            url: Filter segmentation jobs by the input URL used for segmentation
+
+        Returns:
+            SegmentsList object
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.list_segments(
+                limit=limit,
+                offset=offset,
+                status=status,
+                criteria=criteria,
+                created_before=created_before,
+                created_after=created_after,
+                url=url,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def run(
+        self,
+        url: str,
+        criteria: str,
+        shot_config: Optional[Union[ShotConfig, Dict[str, Any]]] = None,
+        narrative_config: Optional[Union[NarrativeConfig, Dict[str, Any]]] = None,
+        poll_interval: int = 5,
+        timeout: int = 600,
+    ) -> Segments:
+        """Create a segmentation job and wait for it to complete.
+
+        Args:
+            url: Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint,
+                public HTTP URLs, and S3 or Dropbox URIs which have been granted access to
+                Cloudglue via data connectors. **⚠️ Important: YouTube URLs are NOT supported
+                for the segments API.**
+            criteria: Segmentation criteria ('shot' or 'narrative')
+            shot_config: Configuration for shot-based segmentation (only when criteria is 'shot')
+            narrative_config: Configuration for narrative-based segmentation (only when criteria is 'narrative')
+            poll_interval: How often to check the job status (in seconds).
+            timeout: Maximum time to wait for the job to complete (in seconds).
+
+        Returns:
+            Segments: The completed Segments object with status and segments data.
+
+        Raises:
+            CloudGlueError: If there is an error creating or processing the segmentation job.
+            TimeoutError: If the job does not complete within the specified timeout.
+        """
+        try:
+            # Create the segmentation job
+            job = self.create(
+                url=url,
+                criteria=criteria,
+                shot_config=shot_config,
+                narrative_config=narrative_config,
+            )
+            job_id = job.job_id
+
+            # Poll for completion
+            elapsed = 0
+            while elapsed < timeout:
+                status = self.get(job_id=job_id)
+
+                if status.status in ["completed", "failed"]:
+                    return status
+
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+
+            raise TimeoutError(
+                f"Segmentation job did not complete within {timeout} seconds"
+            )
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+
 class Search:
     """Client for the CloudGlue Search API."""
 
@@ -1992,8 +2385,8 @@ class Search:
         
         Args:
             path: JSON path on metadata object (e.g. 'my_custom_field', 'category.subcategory')
-            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll')
-            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
             value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
             
         Returns:
@@ -2017,8 +2410,8 @@ class Search:
         
         Args:
             path: Video info field ('duration_seconds', 'has_audio')
-            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll')
-            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
             value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
             
         Returns:
@@ -2042,8 +2435,8 @@ class Search:
         
         Args:
             path: File field ('bytes', 'filename', 'uri', 'created_at', 'id')
-            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll')
-            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan)
+            operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
+            value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
             value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
             
         Returns:
@@ -2070,7 +2463,7 @@ class Search:
         Args:
             metadata_filters: List of metadata filter dictionaries. Each dict should have:
                 - 'path': JSON path on metadata object
-                - 'operator': Comparison operator
+                - 'operator': Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
                 - 'value_text': (optional) Text value for scalar comparison  
                 - 'value_text_array': (optional) Array of values for array comparisons
             video_info_filters: List of video info filter dictionaries (same structure)

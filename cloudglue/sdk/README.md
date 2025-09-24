@@ -128,6 +128,9 @@ Class | Method | HTTP request | Description
 *SegmentationsApi* | [**delete_segmentation**](docs/SegmentationsApi.md#delete_segmentation) | **DELETE** /segmentations/{segmentation_id} | Delete a segmentation
 *SegmentationsApi* | [**get_segmentation**](docs/SegmentationsApi.md#get_segmentation) | **GET** /segmentations/{segmentation_id} | Get a specific segmentation
 *SegmentationsApi* | [**get_segmentation_thumbnails**](docs/SegmentationsApi.md#get_segmentation_thumbnails) | **GET** /segmentations/{segmentation_id}/thumbnails | Get thumbnails for a segmentation
+*SegmentsApi* | [**create_segments**](docs/SegmentsApi.md#create_segments) | **POST** /segments | Create a new video segmentation job
+*SegmentsApi* | [**get_segments**](docs/SegmentsApi.md#get_segments) | **GET** /segments/{job_id} | Retrieve the current state of a segmentation job
+*SegmentsApi* | [**list_segments**](docs/SegmentsApi.md#list_segments) | **GET** /segments | List all segmentation jobs
 *ThumbnailsApi* | [**get_segmentation_thumbnails**](docs/ThumbnailsApi.md#get_segmentation_thumbnails) | **GET** /segmentations/{segmentation_id}/thumbnails | Get thumbnails for a segmentation
 *ThumbnailsApi* | [**get_thumbnails**](docs/ThumbnailsApi.md#get_thumbnails) | **GET** /files/{file_id}/thumbnails | Get thumbnails for a file
 *TranscribeApi* | [**create_transcribe**](docs/TranscribeApi.md#create_transcribe) | **POST** /transcribe | Create a new transcription job
@@ -202,12 +205,14 @@ Class | Method | HTTP request | Description
  - [FileUpdate](docs/FileUpdate.md)
  - [FileVideoInfo](docs/FileVideoInfo.md)
  - [MediaDescription](docs/MediaDescription.md)
+ - [NarrativeConfig](docs/NarrativeConfig.md)
  - [NewCollection](docs/NewCollection.md)
  - [NewCollectionDescribeConfig](docs/NewCollectionDescribeConfig.md)
  - [NewCollectionExtractConfig](docs/NewCollectionExtractConfig.md)
  - [NewCollectionTranscribeConfig](docs/NewCollectionTranscribeConfig.md)
  - [NewDescribe](docs/NewDescribe.md)
  - [NewExtract](docs/NewExtract.md)
+ - [NewSegments](docs/NewSegments.md)
  - [NewTranscribe](docs/NewTranscribe.md)
  - [RichTranscript](docs/RichTranscript.md)
  - [SearchFilter](docs/SearchFilter.md)
@@ -217,8 +222,8 @@ Class | Method | HTTP request | Description
  - [SearchRequest](docs/SearchRequest.md)
  - [SearchResponse](docs/SearchResponse.md)
  - [SearchResponseResultsInner](docs/SearchResponseResultsInner.md)
+ - [Segment](docs/Segment.md)
  - [SegmentSearchResult](docs/SegmentSearchResult.md)
- - [SegmentSearchResultVisualDescriptionInner](docs/SegmentSearchResultVisualDescriptionInner.md)
  - [Segmentation](docs/Segmentation.md)
  - [SegmentationConfig](docs/SegmentationConfig.md)
  - [SegmentationData](docs/SegmentationData.md)
@@ -226,6 +231,9 @@ Class | Method | HTTP request | Description
  - [SegmentationList](docs/SegmentationList.md)
  - [SegmentationShotDetectorConfig](docs/SegmentationShotDetectorConfig.md)
  - [SegmentationUniformConfig](docs/SegmentationUniformConfig.md)
+ - [Segments](docs/Segments.md)
+ - [SegmentsList](docs/SegmentsList.md)
+ - [ShotConfig](docs/ShotConfig.md)
  - [Thumbnail](docs/Thumbnail.md)
  - [ThumbnailList](docs/ThumbnailList.md)
  - [ThumbnailsConfig](docs/ThumbnailsConfig.md)
@@ -233,7 +241,6 @@ Class | Method | HTTP request | Description
  - [TranscribeData](docs/TranscribeData.md)
  - [TranscribeDataSceneTextInner](docs/TranscribeDataSceneTextInner.md)
  - [TranscribeDataSegmentSummaryInner](docs/TranscribeDataSegmentSummaryInner.md)
- - [TranscribeDataSpeechInner](docs/TranscribeDataSpeechInner.md)
  - [TranscribeDataVisualSceneDescriptionInner](docs/TranscribeDataVisualSceneDescriptionInner.md)
  - [TranscribeList](docs/TranscribeList.md)
  - [TranscribeTranscribeConfig](docs/TranscribeTranscribeConfig.md)

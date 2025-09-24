@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing_extensions import Annotated
 from typing import Optional, Set
@@ -27,7 +27,7 @@ class SegmentationShotDetectorConfig(BaseModel):
     """
     SegmentationShotDetectorConfig
     """ # noqa: E501
-    threshold: Optional[Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]]] = Field(default=None, description="Detection sensitivity threshold - lower values create more segments:  • **adaptive**: Sensitivity to scene changes (default: 3.0). Lower values detect more subtle transitions. • **content**: Sensitivity to visual differences (default: 27.0). Lower values detect smaller changes in color/lighting.")
+    threshold: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Detection sensitivity threshold - lower values create more segments:  • **content**: Sensitivity to visual differences (default: 27.0). Lower values detect smaller changes in color/lighting. • **adaptive**: Does not support threshold parameter - uses internal adaptive algorithm.")
     min_seconds: Optional[Union[Annotated[float, Field(le=60, strict=True, ge=2)], Annotated[int, Field(le=60, strict=True, ge=2)]]] = Field(default=None, description="The minimum length of a shot in seconds")
     max_seconds: Optional[Union[Annotated[float, Field(le=60, strict=True, ge=2)], Annotated[int, Field(le=60, strict=True, ge=2)]]] = Field(default=None, description="The maximum length of a shot in seconds")
     detector: StrictStr = Field(description="The detector strategy to use:  • **adaptive**: Designed for dynamic footage with camera movement, panning, or action. Examples: sports broadcasts, drone footage, handheld documentaries, action movies, live events. • **content**: Optimized for controlled footage with clear visual transitions. Examples: studio interviews, corporate videos, educational content, product demos, scripted content.")

@@ -74,12 +74,14 @@ from cloudglue.sdk.models.file_segmentation_config import FileSegmentationConfig
 from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.file_video_info import FileVideoInfo
 from cloudglue.sdk.models.media_description import MediaDescription
+from cloudglue.sdk.models.narrative_config import NarrativeConfig
 from cloudglue.sdk.models.new_collection import NewCollection
 from cloudglue.sdk.models.new_collection_describe_config import NewCollectionDescribeConfig
 from cloudglue.sdk.models.new_collection_extract_config import NewCollectionExtractConfig
 from cloudglue.sdk.models.new_collection_transcribe_config import NewCollectionTranscribeConfig
 from cloudglue.sdk.models.new_describe import NewDescribe
 from cloudglue.sdk.models.new_extract import NewExtract
+from cloudglue.sdk.models.new_segments import NewSegments
 from cloudglue.sdk.models.new_transcribe import NewTranscribe
 from cloudglue.sdk.models.rich_transcript import RichTranscript
 from cloudglue.sdk.models.search_filter import SearchFilter
@@ -89,8 +91,8 @@ from cloudglue.sdk.models.search_filter_video_info_inner import SearchFilterVide
 from cloudglue.sdk.models.search_request import SearchRequest
 from cloudglue.sdk.models.search_response import SearchResponse
 from cloudglue.sdk.models.search_response_results_inner import SearchResponseResultsInner
+from cloudglue.sdk.models.segment import Segment
 from cloudglue.sdk.models.segment_search_result import SegmentSearchResult
-from cloudglue.sdk.models.segment_search_result_visual_description_inner import SegmentSearchResultVisualDescriptionInner
 from cloudglue.sdk.models.segmentation import Segmentation
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.segmentation_data import SegmentationData
@@ -98,6 +100,9 @@ from cloudglue.sdk.models.segmentation_data_segments_inner import SegmentationDa
 from cloudglue.sdk.models.segmentation_list import SegmentationList
 from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
 from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
+from cloudglue.sdk.models.segments import Segments
+from cloudglue.sdk.models.segments_list import SegmentsList
+from cloudglue.sdk.models.shot_config import ShotConfig
 from cloudglue.sdk.models.thumbnail import Thumbnail
 from cloudglue.sdk.models.thumbnail_list import ThumbnailList
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
@@ -105,7 +110,6 @@ from cloudglue.sdk.models.transcribe import Transcribe
 from cloudglue.sdk.models.transcribe_data import TranscribeData
 from cloudglue.sdk.models.transcribe_data_scene_text_inner import TranscribeDataSceneTextInner
 from cloudglue.sdk.models.transcribe_data_segment_summary_inner import TranscribeDataSegmentSummaryInner
-from cloudglue.sdk.models.transcribe_data_speech_inner import TranscribeDataSpeechInner
 from cloudglue.sdk.models.transcribe_data_visual_scene_description_inner import TranscribeDataVisualSceneDescriptionInner
 from cloudglue.sdk.models.transcribe_list import TranscribeList
 from cloudglue.sdk.models.transcribe_transcribe_config import TranscribeTranscribeConfig
