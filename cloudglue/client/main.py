@@ -13,11 +13,14 @@ from cloudglue.sdk.api.segmentations_api import SegmentationsApi
 from cloudglue.sdk.api.segments_api import SegmentsApi
 from cloudglue.sdk.api.search_api import SearchApi
 from cloudglue.sdk.api.thumbnails_api import ThumbnailsApi
+from cloudglue.sdk.api.frames_api import FramesApi
+from cloudglue.sdk.api.face_detection_api import FaceDetectionApi
+from cloudglue.sdk.api.face_match_api import FaceMatchApi
 from cloudglue.sdk.configuration import Configuration
 from cloudglue.sdk.api_client import ApiClient
 
 # Import resource classes
-from cloudglue.client.resources import Chat, Files, Transcribe, Describe, Extract, Collections, Segmentations, Segments, Search, Thumbnails
+from cloudglue.client.resources import Chat, Files, Transcribe, Describe, Extract, Collections, Segmentations, Segments, Search, Thumbnails, Frames, FaceDetection, FaceMatch
 from cloudglue._version import __version__
 
 # SDK client constants
@@ -61,6 +64,9 @@ class CloudGlue:
         self.segments_api = SegmentsApi(self.api_client)
         self.search_api = SearchApi(self.api_client)
         self.thumbnails_api = ThumbnailsApi(self.api_client)
+        self.frames_api = FramesApi(self.api_client)
+        self.face_detection_api = FaceDetectionApi(self.api_client)
+        self.face_match_api = FaceMatchApi(self.api_client)
 
         # Set up resources with their respective API clients
         self.chat = Chat(self.chat_api)
@@ -73,6 +79,9 @@ class CloudGlue:
         self.segments = Segments(self.segments_api)
         self.search = Search(self.search_api)
         self.thumbnails = Thumbnails(self.thumbnails_api)
+        self.frames = Frames(self.frames_api)
+        self.face_detection = FaceDetection(self.face_detection_api)
+        self.face_match = FaceMatch(self.face_match_api)
 
     def close(self):
         """Close the API client."""
