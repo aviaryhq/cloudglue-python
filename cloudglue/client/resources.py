@@ -47,6 +47,9 @@ from cloudglue.sdk.models.face_match_request import FaceMatchRequest
 from cloudglue.sdk.models.delete_face_match200_response import DeleteFaceMatch200Response
 from cloudglue.sdk.models.source_image import SourceImage
 from cloudglue.sdk.models.frame_extraction_config import FrameExtractionConfig
+from cloudglue.sdk.models.create_file_frame_extraction_request import CreateFileFrameExtractionRequest
+from cloudglue.sdk.models.frame_extraction_uniform_config import FrameExtractionUniformConfig
+from cloudglue.sdk.models.frame_extraction_thumbnails_config import FrameExtractionThumbnailsConfig
 
 
 class CloudGlueError(Exception):
@@ -2027,6 +2030,98 @@ class Files:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def create_frame_extraction(
+        self,
+        file_id: str,
+        strategy: str = "uniform",
+        uniform_config: Optional[Union[FrameExtractionUniformConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[FrameExtractionThumbnailsConfig, Dict[str, Any]]] = None,
+        start_time_seconds: Optional[float] = None,
+        end_time_seconds: Optional[float] = None,
+        wait_until_finish: bool = False,
+        poll_interval: int = 5,
+        timeout: int = 600,
+    ):
+        """Create a frame extraction job for a file.
+
+        Args:
+            file_id: The ID of the file to extract frames from
+            strategy: Frame extraction strategy - currently only 'uniform' is supported
+            uniform_config: Configuration for uniform frame extraction (frames_per_second, max_width)
+            thumbnails_config: Configuration for frame thumbnails (optional)
+            start_time_seconds: Start time in seconds to begin extracting frames
+            end_time_seconds: End time in seconds to stop extracting frames
+            wait_until_finish: Whether to wait for the job to complete
+            poll_interval: How often to check the job status (in seconds)
+            timeout: Maximum time to wait for the job to complete (in seconds)
+
+        Returns:
+            FrameExtraction: The frame extraction job object
+
+        Raises:
+            CloudGlueError: If there is an error creating the frame extraction job
+        """
+        try:
+            # Convert config dicts to objects if needed
+            uniform_config_obj = None
+            if uniform_config is not None:
+                if isinstance(uniform_config, dict):
+                    uniform_config_obj = FrameExtractionUniformConfig(**uniform_config)
+                else:
+                    uniform_config_obj = uniform_config
+            
+            thumbnails_config_obj = None
+            if thumbnails_config is not None:
+                if isinstance(thumbnails_config, dict):
+                    thumbnails_config_obj = FrameExtractionThumbnailsConfig(**thumbnails_config)
+                else:
+                    thumbnails_config_obj = thumbnails_config
+
+            # Create the request object
+            request = CreateFileFrameExtractionRequest(
+                strategy=strategy,
+                uniform_config=uniform_config_obj,
+                thumbnails_config=thumbnails_config_obj,
+                start_time_seconds=start_time_seconds,
+                end_time_seconds=end_time_seconds
+            )
+
+            # Create the frame extraction job
+            response = self.api.create_file_frame_extraction(
+                file_id=file_id,
+                create_file_frame_extraction_request=request
+            )
+
+            # If wait_until_finish is True, poll until completion
+            if wait_until_finish:
+                start_time = time.time()
+                while time.time() - start_time < timeout:
+                    # Check if the job is complete
+                    if hasattr(response, 'status') and response.status in ['completed', 'failed']:
+                        break
+                    
+                    # Wait before checking again
+                    time.sleep(poll_interval)
+                    
+                    # Get updated status
+                    try:
+                        from cloudglue.client.main import CloudGlue
+                        client = CloudGlue()  # This is not ideal but we need access to frames API
+                        response = client.frames.get(response.id)
+                    except Exception:
+                        # If we can't get status, just return what we have
+                        break
+                        
+                # Check if we timed out
+                if hasattr(response, 'status') and response.status not in ['completed', 'failed']:
+                    raise CloudGlueError(f"Frame extraction job timed out after {timeout} seconds")
+
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
 
 class Segmentations:
     """Client for the CloudGlue Segmentations API."""
@@ -2785,12 +2880,49 @@ class Frames:
         self.api = api
 
     @staticmethod
+    def create_uniform_config(
+        frames_per_second: Optional[float] = 1.0,
+        max_width: Optional[int] = 1024,
+    ) -> FrameExtractionUniformConfig:
+        """Create a uniform frame extraction configuration.
+
+        Args:
+            frames_per_second: Number of frames to extract per second (0.1-30)
+            max_width: Maximum width of extracted frames in pixels (64-4096)
+
+        Returns:
+            FrameExtractionUniformConfig object
+        """
+        return FrameExtractionUniformConfig(
+            frames_per_second=frames_per_second,
+            max_width=max_width
+        )
+
+    @staticmethod
+    def create_thumbnails_config(
+        **kwargs
+    ) -> FrameExtractionThumbnailsConfig:
+        """Create a frame extraction thumbnails configuration.
+
+        Args:
+            **kwargs: Configuration parameters for thumbnails
+
+        Returns:
+            FrameExtractionThumbnailsConfig object
+        """
+        return FrameExtractionThumbnailsConfig(**kwargs)
+
+    @staticmethod
     def create_frame_extraction_request(
         url: str,
         frame_extraction_config: Optional[Union[FrameExtractionConfig, Dict[str, Any]]] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """Create a frame extraction request configuration.
+
+        Note: Frame extraction jobs are created through the Files API using 
+        client.files.create_frame_extraction(). This method is for creating
+        configuration dictionaries for other APIs that accept frame extraction parameters.
 
         Args:
             url: URL of the target video to extract frames from
