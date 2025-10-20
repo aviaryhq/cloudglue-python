@@ -4,6 +4,8 @@ import os
 import pathlib
 import time
 import json
+import base64
+import mimetypes
 
 from cloudglue.sdk.models.chat_completion_request import ChatCompletionRequest
 from cloudglue.sdk.models.chat_completion_request_filter import ChatCompletionRequestFilter
@@ -33,6 +35,21 @@ from cloudglue.sdk.models.shot_config import ShotConfig
 from cloudglue.sdk.models.narrative_config import NarrativeConfig
 from cloudglue.sdk.models.segments import Segments
 from cloudglue.sdk.models.segments_list import SegmentsList
+from cloudglue.sdk.models.delete_segments200_response import DeleteSegments200Response
+from cloudglue.sdk.models.collection_update import CollectionUpdate
+from cloudglue.sdk.models.frame_extraction import FrameExtraction
+from cloudglue.sdk.models.delete_frame_extraction200_response import DeleteFrameExtraction200Response
+from cloudglue.sdk.models.face_detection import FaceDetection
+from cloudglue.sdk.models.face_detection_request import FaceDetectionRequest
+from cloudglue.sdk.models.delete_face_detection200_response import DeleteFaceDetection200Response
+from cloudglue.sdk.models.face_match import FaceMatch
+from cloudglue.sdk.models.face_match_request import FaceMatchRequest
+from cloudglue.sdk.models.delete_face_match200_response import DeleteFaceMatch200Response
+from cloudglue.sdk.models.source_image import SourceImage
+from cloudglue.sdk.models.frame_extraction_config import FrameExtractionConfig
+from cloudglue.sdk.models.create_file_frame_extraction_request import CreateFileFrameExtractionRequest
+from cloudglue.sdk.models.frame_extraction_uniform_config import FrameExtractionUniformConfig
+from cloudglue.sdk.models.frame_extraction_thumbnails_config import FrameExtractionThumbnailsConfig
 
 
 class CloudGlueError(Exception):
@@ -409,6 +426,47 @@ class Collections:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def update(
+        self,
+        collection_id: str,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+    ):
+        """Update a collection.
+
+        Args:
+            collection_id: The ID of the collection to update
+            name: New name for the collection
+            description: New description for the collection
+
+        Returns:
+            The updated Collection object
+
+        Raises:
+            CloudGlueError: If there is an error updating the collection or processing the request.
+        """
+        try:
+            # Create update request object
+            update_data = {}
+            if name is not None:
+                update_data["name"] = name
+            if description is not None:
+                update_data["description"] = description
+            
+            if not update_data:
+                raise CloudGlueError("At least one field (name or description) must be provided for update")
+            
+            collection_update = CollectionUpdate(**update_data)
+            response = self.api.update_collection(
+                collection_id=collection_id,
+                collection_update=collection_update
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
     def add_video(
         self,
         collection_id: str,
@@ -616,15 +674,23 @@ class Collections:
         except Exception as e:
             raise CloudGlueError(str(e))
 
-    def get_video_entities(self, collection_id: str, file_id: str):
+    def get_video_entities(
+        self, 
+        collection_id: str, 
+        file_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
         """Get the entities extracted from a video in a collection.
 
         Args:
             collection_id: The ID of the collection
             file_id: The ID of the file to retrieve entities for
+            limit: Maximum number of segment entities to return (1-100)
+            offset: Number of segment entities to skip
 
         Returns:
-            The typed Entities object with video entities data
+            The typed FileEntities object with video entities data
 
         Raises:
             CloudGlueError: If there is an error retrieving the entities or processing the request.
@@ -634,6 +700,8 @@ class Collections:
             response = self.api.get_entities(
                 collection_id=collection_id,
                 file_id=file_id,
+                limit=limit,
+                offset=offset,
             )
             return response
         except ApiException as e:
@@ -1962,6 +2030,98 @@ class Files:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def create_frame_extraction(
+        self,
+        file_id: str,
+        strategy: str = "uniform",
+        uniform_config: Optional[Union[FrameExtractionUniformConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[FrameExtractionThumbnailsConfig, Dict[str, Any]]] = None,
+        start_time_seconds: Optional[float] = None,
+        end_time_seconds: Optional[float] = None,
+        wait_until_finish: bool = False,
+        poll_interval: int = 5,
+        timeout: int = 600,
+    ):
+        """Create a frame extraction job for a file.
+
+        Args:
+            file_id: The ID of the file to extract frames from
+            strategy: Frame extraction strategy - currently only 'uniform' is supported
+            uniform_config: Configuration for uniform frame extraction (frames_per_second, max_width)
+            thumbnails_config: Configuration for frame thumbnails (optional)
+            start_time_seconds: Start time in seconds to begin extracting frames
+            end_time_seconds: End time in seconds to stop extracting frames
+            wait_until_finish: Whether to wait for the job to complete
+            poll_interval: How often to check the job status (in seconds)
+            timeout: Maximum time to wait for the job to complete (in seconds)
+
+        Returns:
+            FrameExtraction: The frame extraction job object
+
+        Raises:
+            CloudGlueError: If there is an error creating the frame extraction job
+        """
+        try:
+            # Convert config dicts to objects if needed
+            uniform_config_obj = None
+            if uniform_config is not None:
+                if isinstance(uniform_config, dict):
+                    uniform_config_obj = FrameExtractionUniformConfig(**uniform_config)
+                else:
+                    uniform_config_obj = uniform_config
+            
+            thumbnails_config_obj = None
+            if thumbnails_config is not None:
+                if isinstance(thumbnails_config, dict):
+                    thumbnails_config_obj = FrameExtractionThumbnailsConfig(**thumbnails_config)
+                else:
+                    thumbnails_config_obj = thumbnails_config
+
+            # Create the request object
+            request = CreateFileFrameExtractionRequest(
+                strategy=strategy,
+                uniform_config=uniform_config_obj,
+                thumbnails_config=thumbnails_config_obj,
+                start_time_seconds=start_time_seconds,
+                end_time_seconds=end_time_seconds
+            )
+
+            # Create the frame extraction job
+            response = self.api.create_file_frame_extraction(
+                file_id=file_id,
+                create_file_frame_extraction_request=request
+            )
+
+            # If wait_until_finish is True, poll until completion
+            if wait_until_finish:
+                start_time = time.time()
+                while time.time() - start_time < timeout:
+                    # Check if the job is complete
+                    if hasattr(response, 'status') and response.status in ['completed', 'failed']:
+                        break
+                    
+                    # Wait before checking again
+                    time.sleep(poll_interval)
+                    
+                    # Get updated status
+                    try:
+                        from cloudglue.client.main import CloudGlue
+                        client = CloudGlue()  # This is not ideal but we need access to frames API
+                        response = client.frames.get(response.id)
+                    except Exception:
+                        # If we can't get status, just return what we have
+                        break
+                        
+                # Check if we timed out
+                if hasattr(response, 'status') and response.status not in ['completed', 'failed']:
+                    raise CloudGlueError(f"Frame extraction job timed out after {timeout} seconds")
+
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
 
 class Segmentations:
     """Client for the CloudGlue Segmentations API."""
@@ -2208,8 +2368,9 @@ class Segments:
         Args:
             url: Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint,
                 public HTTP URLs, and S3 or Dropbox URIs which have been granted access to
-                Cloudglue via data connectors. **⚠️ Important: YouTube URLs are NOT supported
-                for the segments API.**
+                Cloudglue via data connectors. **⚠️ Note: YouTube URLs are supported for 
+                narrative-based segmentation only.** Shot-based segmentation requires direct 
+                video file access.
             criteria: Segmentation criteria ('shot' or 'narrative')
             shot_config: Configuration for shot-based segmentation (only when criteria is 'shot')
             narrative_config: Configuration for narrative-based segmentation (only when criteria is 'narrative')
@@ -2304,6 +2465,26 @@ class Segments:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def delete(self, job_id: str):
+        """Delete a segments job.
+
+        Args:
+            job_id: The ID of the segments job to delete
+
+        Returns:
+            The deletion confirmation
+
+        Raises:
+            CloudGlueError: If there is an error deleting the segments job.
+        """
+        try:
+            response = self.api.delete_segments(job_id=job_id)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
     def run(
         self,
         url: str,
@@ -2318,8 +2499,9 @@ class Segments:
         Args:
             url: Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint,
                 public HTTP URLs, and S3 or Dropbox URIs which have been granted access to
-                Cloudglue via data connectors. **⚠️ Important: YouTube URLs are NOT supported
-                for the segments API.**
+                Cloudglue via data connectors. **⚠️ Note: YouTube URLs are supported for 
+                narrative-based segmentation only.** Shot-based segmentation requires direct 
+                video file access.
             criteria: Segmentation criteria ('shot' or 'narrative')
             shot_config: Configuration for shot-based segmentation (only when criteria is 'shot')
             narrative_config: Configuration for narrative-based segmentation (only when criteria is 'narrative')
@@ -2684,6 +2866,577 @@ class Thumbnails:
         return ThumbnailsConfig(
             enable_segment_thumbnails=enable_segment_thumbnails
         )
+
+
+class Frames:
+    """Client for the CloudGlue Frames API."""
+
+    def __init__(self, api):
+        """Initialize the Frames client.
+
+        Args:
+            api: The FramesApi instance.
+        """
+        self.api = api
+
+    @staticmethod
+    def create_uniform_config(
+        frames_per_second: Optional[float] = 1.0,
+        max_width: Optional[int] = 1024,
+    ) -> FrameExtractionUniformConfig:
+        """Create a uniform frame extraction configuration.
+
+        Args:
+            frames_per_second: Number of frames to extract per second (0.1-30)
+            max_width: Maximum width of extracted frames in pixels (64-4096)
+
+        Returns:
+            FrameExtractionUniformConfig object
+        """
+        return FrameExtractionUniformConfig(
+            frames_per_second=frames_per_second,
+            max_width=max_width
+        )
+
+    @staticmethod
+    def create_thumbnails_config(
+        **kwargs
+    ) -> FrameExtractionThumbnailsConfig:
+        """Create a frame extraction thumbnails configuration.
+
+        Args:
+            **kwargs: Configuration parameters for thumbnails
+
+        Returns:
+            FrameExtractionThumbnailsConfig object
+        """
+        return FrameExtractionThumbnailsConfig(**kwargs)
+
+    @staticmethod
+    def create_frame_extraction_request(
+        url: str,
+        frame_extraction_config: Optional[Union[FrameExtractionConfig, Dict[str, Any]]] = None,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """Create a frame extraction request configuration.
+
+        Note: Frame extraction jobs are created through the Files API using 
+        client.files.create_frame_extraction(). This method is for creating
+        configuration dictionaries for other APIs that accept frame extraction parameters.
+
+        Args:
+            url: URL of the target video to extract frames from
+            frame_extraction_config: Optional frame extraction configuration
+            **kwargs: Additional parameters
+
+        Returns:
+            Dictionary with frame extraction request parameters
+        """
+        request_params = {
+            "url": url,
+            **kwargs
+        }
+        
+        if frame_extraction_config is not None:
+            if isinstance(frame_extraction_config, dict):
+                request_params["frame_extraction_config"] = FrameExtractionConfig(**frame_extraction_config)
+            else:
+                request_params["frame_extraction_config"] = frame_extraction_config
+                
+        return request_params
+
+    def get(
+        self,
+        frame_extraction_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """Get a specific frame extraction including its frames.
+
+        Args:
+            frame_extraction_id: The ID of the frame extraction to retrieve
+            limit: Number of frames to return (max 100)
+            offset: Offset from the start of the frames list
+
+        Returns:
+            The typed FrameExtraction object with frames and metadata
+
+        Raises:
+            CloudGlueError: If there is an error retrieving the frame extraction or processing the request.
+        """
+        try:
+            response = self.api.get_frame_extraction(
+                frame_extraction_id=frame_extraction_id,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def delete(self, frame_extraction_id: str):
+        """Delete a frame extraction.
+
+        Args:
+            frame_extraction_id: The ID of the frame extraction to delete
+
+        Returns:
+            The deletion confirmation
+
+        Raises:
+            CloudGlueError: If there is an error deleting the frame extraction or processing the request.
+        """
+        try:
+            response = self.api.delete_frame_extraction(frame_extraction_id=frame_extraction_id)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+
+class FaceDetection:
+    """Client for the CloudGlue Face Detection API."""
+
+    def __init__(self, api):
+        """Initialize the FaceDetection client.
+
+        Args:
+            api: The FaceDetectionApi instance.
+        """
+        self.api = api
+
+    @staticmethod
+    def create_face_detection_request(
+        url: str,
+        frame_extraction_id: Optional[str] = None,
+        frame_extraction_config: Optional[Union[FrameExtractionConfig, Dict[str, Any]]] = None,
+        **kwargs
+    ) -> FaceDetectionRequest:
+        """Create a face detection request configuration.
+
+        Args:
+            url: URL of the target video to analyze
+            frame_extraction_id: Optional ID of previously extracted frames
+            frame_extraction_config: Optional frame extraction configuration
+            **kwargs: Additional parameters
+
+        Returns:
+            FaceDetectionRequest object
+        """
+        request_params = {
+            "url": url,
+            "frame_extraction_id": frame_extraction_id,
+            **kwargs
+        }
+        
+        if frame_extraction_config is not None:
+            if isinstance(frame_extraction_config, dict):
+                request_params["frame_extraction_config"] = FrameExtractionConfig(**frame_extraction_config)
+            else:
+                request_params["frame_extraction_config"] = frame_extraction_config
+                
+        return FaceDetectionRequest(**request_params)
+
+    def create(
+        self,
+        face_detection_request: Union[FaceDetectionRequest, Dict[str, Any]],
+    ):
+        """Create a face detection job.
+
+        Args:
+            face_detection_request: Face detection request parameters
+
+        Returns:
+            FaceDetection object
+
+        Raises:
+            CloudGlueError: If there is an error creating the face detection job.
+        """
+        try:
+            if isinstance(face_detection_request, dict):
+                face_detection_request = FaceDetectionRequest(**face_detection_request)
+            
+            response = self.api.create_face_detection(face_detection_request)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def get(
+        self,
+        face_detection_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """Get face detection results.
+
+        Args:
+            face_detection_id: The ID of the face detection to retrieve
+            limit: Number of detected faces to return
+            offset: Offset from the start of the detected faces list
+
+        Returns:
+            FaceDetection object
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.get_face_detection(
+                face_detection_id=face_detection_id,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def delete(self, face_detection_id: str):
+        """Delete a face detection analysis.
+
+        Args:
+            face_detection_id: The ID of the face detection to delete
+
+        Returns:
+            The deletion confirmation
+
+        Raises:
+            CloudGlueError: If there is an error deleting the face detection.
+        """
+        try:
+            response = self.api.delete_face_detection(face_detection_id=face_detection_id)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def run(
+        self,
+        url: str,
+        frame_extraction_id: Optional[str] = None,
+        frame_extraction_config: Optional[Union[FrameExtractionConfig, Dict[str, Any]]] = None,
+        poll_interval: int = 5,
+        timeout: int = 600,
+        **kwargs
+    ):
+        """Create and run a face detection job to completion.
+
+        Args:
+            url: URL of the target video to analyze
+            frame_extraction_id: Optional ID of previously extracted frames
+            frame_extraction_config: Optional frame extraction configuration
+            poll_interval: How often to check the job status (in seconds)
+            timeout: Maximum time to wait for the job to complete (in seconds)
+            **kwargs: Additional parameters for the request
+
+        Returns:
+            FaceDetection: The completed face detection object with status and results
+
+        Raises:
+            CloudGlueError: If there is an error creating or processing the face detection job.
+            TimeoutError: If the job does not complete within the specified timeout.
+        """
+        try:
+            # Create the face detection job
+            request = self.create_face_detection_request(
+                url=url,
+                frame_extraction_id=frame_extraction_id,
+                frame_extraction_config=frame_extraction_config,
+                **kwargs
+            )
+            job = self.create(request)
+            face_detection_id = job.face_detection_id
+
+            # Poll for completion
+            elapsed = 0
+            while elapsed < timeout:
+                status = self.get(face_detection_id=face_detection_id)
+
+                if status.status in ["completed", "failed"]:
+                    return status
+
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+
+            raise TimeoutError(
+                f"Face detection job did not complete within {timeout} seconds"
+            )
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+
+class FaceMatch:
+    """Client for the CloudGlue Face Match API."""
+
+    def __init__(self, api):
+        """Initialize the FaceMatch client.
+
+        Args:
+            api: The FaceMatchApi instance.
+        """
+        self.api = api
+
+    @staticmethod
+    def encode_image_file(file_path: str) -> str:
+        """Convert a local image file to base64 string.
+
+        Args:
+            file_path: Path to the image file (JPG/PNG only)
+
+        Returns:
+            Base64 encoded image string
+
+        Raises:
+            CloudGlueError: If file is not found, not a valid image type, or cannot be read
+        """
+        try:
+            if not os.path.exists(file_path):
+                raise CloudGlueError(f"File not found: {file_path}")
+            
+            # Check file extension
+            file_ext = pathlib.Path(file_path).suffix.lower()
+            if file_ext not in ['.jpg', '.jpeg', '.png']:
+                raise CloudGlueError(f"Unsupported file type: {file_ext}. Only JPG and PNG are supported.")
+            
+            # Read and encode the file
+            with open(file_path, 'rb') as image_file:
+                image_data = image_file.read()
+                base64_string = base64.b64encode(image_data).decode('utf-8')
+                return base64_string
+                
+        except Exception as e:
+            if isinstance(e, CloudGlueError):
+                raise
+            raise CloudGlueError(f"Error encoding image file: {str(e)}")
+
+    @staticmethod
+    def create_face_match_request(
+        source_image: Union[str, Dict[str, Any]],
+        target_video_url: str,
+        max_faces: Optional[int] = None,
+        face_detection_id: Optional[str] = None,
+        frame_extraction_id: Optional[str] = None,
+        frame_extraction_config: Optional[Union[FrameExtractionConfig, Dict[str, Any]]] = None,
+        **kwargs
+    ) -> FaceMatchRequest:
+        """Create a face match request configuration.
+
+        Args:
+            source_image: Source image - can be:
+                - URL string (public image URL)
+                - Local file path (will be converted to base64)
+                - Base64 string (raw base64 or with data: prefix)
+                - Dictionary with 'url' or 'base64_image' keys
+            target_video_url: URL of the target video to search in
+            max_faces: Maximum number of faces to return
+            face_detection_id: Optional ID of previously analyzed face detections
+            frame_extraction_id: Optional ID of previously extracted frames
+            frame_extraction_config: Optional frame extraction configuration
+            **kwargs: Additional parameters
+
+        Returns:
+            FaceMatchRequest object
+
+        Raises:
+            CloudGlueError: If source_image format is invalid or file operations fail
+        """
+        try:
+            # Handle source_image parameter
+            source_image_obj = None
+            
+            if isinstance(source_image, dict):
+                # Already in SourceImage format
+                source_image_obj = SourceImage(**source_image)
+            elif isinstance(source_image, str):
+                if source_image.startswith(('http://', 'https://')):
+                    # URL
+                    source_image_obj = SourceImage(url=source_image)
+                elif source_image.startswith('data:image/'):
+                    # Data URL - extract base64 part
+                    base64_part = source_image.split(',')[1] if ',' in source_image else source_image
+                    source_image_obj = SourceImage(base64_image=base64_part)
+                elif os.path.exists(source_image):
+                    # File path
+                    base64_data = FaceMatch.encode_image_file(source_image)
+                    source_image_obj = SourceImage(base64_image=base64_data)
+                else:
+                    # Assume raw base64 string
+                    source_image_obj = SourceImage(base64_image=source_image)
+            else:
+                raise CloudGlueError("source_image must be a string (URL, file path, or base64) or dictionary")
+            
+            request_params = {
+                "source_image": source_image_obj,
+                "target_video_url": target_video_url,
+                "max_faces": max_faces,
+                "face_detection_id": face_detection_id,
+                "frame_extraction_id": frame_extraction_id,
+                **kwargs
+            }
+            
+            if frame_extraction_config is not None:
+                if isinstance(frame_extraction_config, dict):
+                    request_params["frame_extraction_config"] = FrameExtractionConfig(**frame_extraction_config)
+                else:
+                    request_params["frame_extraction_config"] = frame_extraction_config
+                    
+            return FaceMatchRequest(**request_params)
+            
+        except Exception as e:
+            if isinstance(e, CloudGlueError):
+                raise
+            raise CloudGlueError(f"Error creating face match request: {str(e)}")
+
+    def create(
+        self,
+        face_match_request: Union[FaceMatchRequest, Dict[str, Any]],
+    ):
+        """Create a face match job.
+
+        Args:
+            face_match_request: Face match request parameters
+
+        Returns:
+            FaceMatch object
+
+        Raises:
+            CloudGlueError: If there is an error creating the face match job.
+        """
+        try:
+            if isinstance(face_match_request, dict):
+                face_match_request = FaceMatchRequest(**face_match_request)
+            
+            response = self.api.create_face_match(face_match_request)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def get(
+        self,
+        face_match_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """Get face match results.
+
+        Args:
+            face_match_id: The ID of the face match to retrieve
+            limit: Number of face matches to return
+            offset: Offset from the start of the face matches list
+
+        Returns:
+            FaceMatch object
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.get_face_match(
+                face_match_id=face_match_id,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def delete(self, face_match_id: str):
+        """Delete a face match analysis.
+
+        Args:
+            face_match_id: The ID of the face match to delete
+
+        Returns:
+            The deletion confirmation
+
+        Raises:
+            CloudGlueError: If there is an error deleting the face match.
+        """
+        try:
+            response = self.api.delete_face_match(face_match_id=face_match_id)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def run(
+        self,
+        source_image: Union[str, Dict[str, Any]],
+        target_video_url: str,
+        max_faces: Optional[int] = None,
+        face_detection_id: Optional[str] = None,
+        frame_extraction_id: Optional[str] = None,
+        frame_extraction_config: Optional[Union[FrameExtractionConfig, Dict[str, Any]]] = None,
+        poll_interval: int = 5,
+        timeout: int = 600,
+        **kwargs
+    ):
+        """Create and run a face match job to completion.
+
+        Args:
+            source_image: Source image containing the face to search for
+            target_video_url: URL of the target video to search in
+            max_faces: Maximum number of faces to return
+            face_detection_id: Optional ID of previously analyzed face detections
+            frame_extraction_id: Optional ID of previously extracted frames
+            frame_extraction_config: Optional frame extraction configuration
+            poll_interval: How often to check the job status (in seconds)
+            timeout: Maximum time to wait for the job to complete (in seconds)
+            **kwargs: Additional parameters for the request
+
+        Returns:
+            FaceMatch: The completed face match object with status and results
+
+        Raises:
+            CloudGlueError: If there is an error creating or processing the face match job.
+            TimeoutError: If the job does not complete within the specified timeout.
+        """
+        try:
+            # Create the face match job
+            request = self.create_face_match_request(
+                source_image=source_image,
+                target_video_url=target_video_url,
+                max_faces=max_faces,
+                face_detection_id=face_detection_id,
+                frame_extraction_id=frame_extraction_id,
+                frame_extraction_config=frame_extraction_config,
+                **kwargs
+            )
+            job = self.create(request)
+            face_match_id = job.face_match_id
+
+            # Poll for completion
+            elapsed = 0
+            while elapsed < timeout:
+                status = self.get(face_match_id=face_match_id)
+
+                if status.status in ["completed", "failed"]:
+                    return status
+
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+
+            raise TimeoutError(
+                f"Face match job did not complete within {timeout} seconds"
+            )
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
 
 
 class Chat:
