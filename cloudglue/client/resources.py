@@ -1131,6 +1131,7 @@ class Transcribe:
         enable_speech: bool = True,
         enable_scene_text: bool = False,
         enable_visual_scene_description: bool = False,
+        enable_audio_description: bool = False,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
@@ -1143,6 +1144,7 @@ class Transcribe:
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text.
             enable_visual_scene_description: Whether to generate visual scene description.
+            enable_audio_description: Whether to generate audio description.
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             thumbnails_config: Optional configuration for segment thumbnails
@@ -1175,6 +1177,7 @@ class Transcribe:
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
+                enable_audio_description=enable_audio_description,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
                 thumbnails_config=thumbnails_config_obj,
@@ -1262,6 +1265,7 @@ class Transcribe:
         enable_speech: bool = True,
         enable_scene_text: bool = False,
         enable_visual_scene_description: bool = False,
+        enable_audio_description: bool = False,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
@@ -1277,6 +1281,7 @@ class Transcribe:
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text.
             enable_visual_scene_description: Whether to generate visual scene description.
+            enable_audio_description: Whether to generate audio description.
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             thumbnails_config: Optional configuration for segment thumbnails
@@ -1295,6 +1300,7 @@ class Transcribe:
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
+                enable_audio_description=enable_audio_description,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
                 thumbnails_config=thumbnails_config,
@@ -1337,6 +1343,7 @@ class Describe:
         enable_speech: bool = True,
         enable_scene_text: bool = True,
         enable_visual_scene_description: bool = True,
+        enable_audio_description: bool = True,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
@@ -1349,6 +1356,7 @@ class Describe:
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text extraction.
             enable_visual_scene_description: Whether to generate visual scene description.
+            enable_audio_description: Whether to generate audio description.
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             thumbnails_config: Optional configuration for segment thumbnails
@@ -1381,6 +1389,7 @@ class Describe:
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
+                enable_audio_description=enable_audio_description,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
                 thumbnails_config=thumbnails_config_obj,
@@ -1476,6 +1485,7 @@ class Describe:
         enable_speech: bool = True,
         enable_scene_text: bool = True,
         enable_visual_scene_description: bool = True,
+        enable_audio_description: bool = False,
         segmentation_id: Optional[str] = None,
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
@@ -1491,6 +1501,7 @@ class Describe:
             enable_speech: Whether to generate speech transcript.
             enable_scene_text: Whether to generate scene text extraction.
             enable_visual_scene_description: Whether to generate visual scene description.
+            enable_audio_description: Whether to generate audio description.
             segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             thumbnails_config: Optional configuration for segment thumbnails
@@ -1509,6 +1520,7 @@ class Describe:
                 enable_speech=enable_speech,
                 enable_scene_text=enable_scene_text,
                 enable_visual_scene_description=enable_visual_scene_description,
+                enable_audio_description=enable_audio_description,
                 segmentation_id=segmentation_id,
                 segmentation_config=segmentation_config,
                 thumbnails_config=thumbnails_config,
