@@ -648,6 +648,8 @@ class Collections:
         self,
         collection_id: str,
         file_id: str,
+        start_time_seconds: Optional[float] = None,
+        end_time_seconds: Optional[float] = None,
         response_format: Optional[str] = None,
     ):
         """Get the rich transcript of a video in a collection.
@@ -655,6 +657,8 @@ class Collections:
         Args:
             collection_id: The ID of the collection
             file_id: The ID of the file to retrieve the rich transcript for
+            start_time_seconds: The start time in seconds to filter the rich transcript
+            end_time_seconds: The end time in seconds to filter the rich transcript
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
 
         Returns:
@@ -666,7 +670,7 @@ class Collections:
         try:
             # Use the standard method to get a properly typed object
             response = self.api.get_transcripts(
-                collection_id=collection_id, file_id=file_id, response_format=response_format
+                collection_id=collection_id, file_id=file_id, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds, response_format=response_format
             )
             return response
         except ApiException as e:
@@ -810,6 +814,8 @@ class Collections:
         self,
         collection_id: str,
         file_id: str,
+        start_time_seconds: Optional[float] = None,
+        end_time_seconds: Optional[float] = None,
         response_format: Optional[str] = None,
     ):
         """Get the media descriptions of a video in a collection.
@@ -817,6 +823,8 @@ class Collections:
         Args:
             collection_id: The ID of the collection
             file_id: The ID of the file to retrieve the media descriptions for
+            start_time_seconds: The start time in seconds to filter the media descriptions
+            end_time_seconds: The end time in seconds to filter the media descriptions
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
 
         Returns:
@@ -828,7 +836,7 @@ class Collections:
         try:
             # Use the standard method to get a properly typed object
             response = self.api.get_media_descriptions(
-                collection_id=collection_id, file_id=file_id, response_format=response_format
+                collection_id=collection_id, file_id=file_id, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds, response_format=response_format
             )
             return response
         except ApiException as e:
@@ -966,12 +974,18 @@ class Extract:
         except Exception as e:
             raise CloudGlueError(str(e))
 
-    def get(self, job_id: str):
+    def get(
+        self, 
+        job_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        ):
         """Get the status of an extraction job.
 
         Args:
             job_id: The ID of the extraction job.
-
+            limit: Maximum number of segment entities to return (1-100)
+            offset: Number of segment entities to skip
         Returns:
             Extract: A typed Extract object containing the job status and extracted data if available.
 
@@ -979,7 +993,7 @@ class Extract:
             CloudGlueError: If there is an error retrieving the extraction job or processing the request.
         """
         try:
-            response = self.api.get_extract(job_id=job_id)
+            response = self.api.get_extract(job_id=job_id, limit=limit, offset=offset)
             return response
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -1368,13 +1382,20 @@ class Describe:
         except Exception as e:
             raise CloudGlueError(str(e))
 
-    def get(self, job_id: str, response_format: Optional[str] = None):
+    def get(
+        self,
+        job_id: str,
+        response_format: Optional[str] = None,
+        start_time_seconds: Optional[float] = None,
+        end_time_seconds: Optional[float] = None,
+    ):
         """Get the status and data of a media description job.
 
         Args:
             job_id: The unique identifier of the description job.
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
-
+            start_time_seconds: The start time in seconds to filter the media descriptions
+            end_time_seconds: The end time in seconds to filter the media descriptions  
         Returns:
             The typed Describe job object with current status and data (if completed).
 
@@ -1383,7 +1404,7 @@ class Describe:
         """
         try:
             # Use the standard method to get a properly typed object
-            response = self.api.get_describe(job_id=job_id, response_format=response_format)
+            response = self.api.get_describe(job_id=job_id, response_format=response_format, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds)
             return response
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
