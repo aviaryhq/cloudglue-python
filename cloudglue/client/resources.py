@@ -583,6 +583,7 @@ class Collections:
         added_after: Optional[str] = None,
         order: Optional[str] = None,
         sort: Optional[str] = None,
+        filter: Optional[Union[SearchFilter, Dict[str, Any]]] = None,
     ):
         """List videos in a collection.
 
@@ -595,7 +596,8 @@ class Collections:
             added_after: Filter by videos added after a specific date, YYYY-MM-DD format in UTC
             order: Field to sort by ('created_at'). Defaults to 'created_at'
             sort: Sort direction ('asc', 'desc'). Defaults to 'desc'
-
+            filter: Optional filter object or dictionary for advanced filtering by metadata, video info, or file properties.
+                   Use Files.create_filter() to create filter objects.
         Returns:
             The typed CollectionFileList object with videos and metadata
 
@@ -603,6 +605,15 @@ class Collections:
             CloudGlueError: If there is an error listing the videos or processing the request.
         """
         try:
+            # Convert filter dict to SearchFilter object if needed
+            filter_obj = None
+            if filter is not None:
+                if isinstance(filter, dict):
+                    # Convert dict to SearchFilter object
+                    filter_obj = SearchFilter(**filter)
+                else:
+                    filter_obj = filter
+
             # Use the standard method to get a properly typed object
             response = self.api.list_videos(
                 collection_id=collection_id,
@@ -613,6 +624,7 @@ class Collections:
                 added_after=added_after,
                 order=order,
                 sort=sort,
+                filter=json.dumps(filter_obj.to_dict()) if filter_obj else None,
             )
             return response
         except ApiException as e:
