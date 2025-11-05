@@ -17,27 +17,22 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Any, ClassVar, Dict, List, Optional
 from cloudglue.sdk.models.describe_output_part import DescribeOutputPart
 from cloudglue.sdk.models.speech_output_part import SpeechOutputPart
-from cloudglue.sdk.models.transcribe_data_all_of_segment_summary_inner import TranscribeDataAllOfSegmentSummaryInner
 from typing import Optional, Set
 from typing_extensions import Self
 
-class DescribeData(BaseModel):
+class DescribeOutput(BaseModel):
     """
-    DescribeData
+    DescribeOutput
     """ # noqa: E501
     visual_scene_description: Optional[List[DescribeOutputPart]] = Field(default=None, description="Array of visual descriptions")
     scene_text: Optional[List[DescribeOutputPart]] = Field(default=None, description="Array of scene text extractions")
     speech: Optional[List[SpeechOutputPart]] = Field(default=None, description="Array of speech transcriptions")
     audio_description: Optional[List[DescribeOutputPart]] = Field(default=None, description="Array of audio descriptions")
-    content: Optional[StrictStr] = Field(default=None, description="Content string returned based on formatting, e.g. set to markdown text when response_format=markdown is requested")
-    title: Optional[StrictStr] = Field(default=None, description="Generated title of the video; for YouTube videos, this is the title of the video as it appears on YouTube")
-    summary: Optional[StrictStr] = Field(default=None, description="Generated video level summary; for YouTube videos, this is the summary of the video as it appears on YouTube")
-    segment_summary: Optional[List[TranscribeDataAllOfSegmentSummaryInner]] = Field(default=None, description="Array of summary information for each segment of the video. Only available when enable_summary is set to true in the describe configuration.")
-    __properties: ClassVar[List[str]] = ["visual_scene_description", "scene_text", "speech", "audio_description", "content", "title", "summary", "segment_summary"]
+    __properties: ClassVar[List[str]] = ["visual_scene_description", "scene_text", "speech", "audio_description"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -57,7 +52,7 @@ class DescribeData(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of DescribeData from a JSON string"""
+        """Create an instance of DescribeOutput from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -106,18 +101,11 @@ class DescribeData(BaseModel):
                 if _item_audio_description:
                     _items.append(_item_audio_description.to_dict())
             _dict['audio_description'] = _items
-        # override the default output from pydantic by calling `to_dict()` of each item in segment_summary (list)
-        _items = []
-        if self.segment_summary:
-            for _item_segment_summary in self.segment_summary:
-                if _item_segment_summary:
-                    _items.append(_item_segment_summary.to_dict())
-            _dict['segment_summary'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of DescribeData from a dict"""
+        """Create an instance of DescribeOutput from a dict"""
         if obj is None:
             return None
 
@@ -128,11 +116,7 @@ class DescribeData(BaseModel):
             "visual_scene_description": [DescribeOutputPart.from_dict(_item) for _item in obj["visual_scene_description"]] if obj.get("visual_scene_description") is not None else None,
             "scene_text": [DescribeOutputPart.from_dict(_item) for _item in obj["scene_text"]] if obj.get("scene_text") is not None else None,
             "speech": [SpeechOutputPart.from_dict(_item) for _item in obj["speech"]] if obj.get("speech") is not None else None,
-            "audio_description": [DescribeOutputPart.from_dict(_item) for _item in obj["audio_description"]] if obj.get("audio_description") is not None else None,
-            "content": obj.get("content"),
-            "title": obj.get("title"),
-            "summary": obj.get("summary"),
-            "segment_summary": [TranscribeDataAllOfSegmentSummaryInner.from_dict(_item) for _item in obj["segment_summary"]] if obj.get("segment_summary") is not None else None
+            "audio_description": [DescribeOutputPart.from_dict(_item) for _item in obj["audio_description"]] if obj.get("audio_description") is not None else None
         })
         return _obj
 
