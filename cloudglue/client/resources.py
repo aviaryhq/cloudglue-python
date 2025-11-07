@@ -324,7 +324,7 @@ class Collections:
             transcribe_config: Optional configuration for transcription processing
             describe_config: Optional configuration for media description processing
             default_segmentation_config: Default segmentation configuration for files in this collection
-            face_detection_config: Optional configuration for face detection processing (required for 'face-analysis' collection type)
+            face_detection_config: Optional configuration for face detection processing
 
         Returns:
             The typed Collection object with all properties
