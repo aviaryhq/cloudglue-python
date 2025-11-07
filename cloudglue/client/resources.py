@@ -50,6 +50,12 @@ from cloudglue.sdk.models.frame_extraction_config import FrameExtractionConfig
 from cloudglue.sdk.models.create_file_frame_extraction_request import CreateFileFrameExtractionRequest
 from cloudglue.sdk.models.frame_extraction_uniform_config import FrameExtractionUniformConfig
 from cloudglue.sdk.models.frame_extraction_thumbnails_config import FrameExtractionThumbnailsConfig
+from cloudglue.sdk.models.new_collection_face_detection_config import NewCollectionFaceDetectionConfig
+from cloudglue.sdk.models.collection_face_detection_config_frame_extraction_config import CollectionFaceDetectionConfigFrameExtractionConfig
+from cloudglue.sdk.models.collection_face_detection_config_thumbnails_config import CollectionFaceDetectionConfigThumbnailsConfig
+from cloudglue.sdk.models.collection_face_detection_config_frame_extraction_config_uniform_config import CollectionFaceDetectionConfigFrameExtractionConfigUniformConfig
+from cloudglue.sdk.models.file_face_detections import FileFaceDetections
+from cloudglue.sdk.models.search_request_source_image import SearchRequestSourceImage
 
 
 class CloudGlueError(Exception):
@@ -306,17 +312,19 @@ class Collections:
         transcribe_config: Optional[Dict[str, Any]] = None,
         describe_config: Optional[Dict[str, Any]] = None,
         default_segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        face_detection_config: Optional[Union[NewCollectionFaceDetectionConfig, Dict[str, Any]]] = None,
     ):
         """Create a new collection.
 
         Args:
-            collection_type: Type of collection ('entities', 'rich-transcripts', 'media-descriptions')
+            collection_type: Type of collection ('entities', 'rich-transcripts', 'media-descriptions', 'face-analysis')
             name: Name of the collection (must be unique)
             description: Optional description of the collection
             extract_config: Optional configuration for extraction processing
             transcribe_config: Optional configuration for transcription processing
             describe_config: Optional configuration for media description processing
             default_segmentation_config: Default segmentation configuration for files in this collection
+            face_detection_config: Optional configuration for face detection processing (required for 'face-analysis' collection type)
 
         Returns:
             The typed Collection object with all properties
@@ -333,6 +341,10 @@ class Collections:
             if isinstance(default_segmentation_config, dict):
                 default_segmentation_config = SegmentationConfig.from_dict(default_segmentation_config)
 
+            # Handle face_detection_config parameter
+            if isinstance(face_detection_config, dict):
+                face_detection_config = NewCollectionFaceDetectionConfig.from_dict(face_detection_config)
+
             request = NewCollection(
                 collection_type=collection_type,
                 name=name,
@@ -341,6 +353,7 @@ class Collections:
                 transcribe_config=transcribe_config,
                 describe_config=describe_config,
                 default_segmentation_config=default_segmentation_config,
+                face_detection_config=face_detection_config,
             )
             # Use the standard method to get a properly typed object
             response = self.api.create_collection(new_collection=request)
@@ -904,6 +917,44 @@ class Collections:
         except Exception as e:
             raise CloudGlueError(
                 f"Failed to list media descriptions in collection {collection_id}: {str(e)}"
+            )
+
+    def get_face_detections(
+        self,
+        collection_id: str,
+        file_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """Retrieve face detections for a specific file in a collection.
+
+        This API is only available when a collection is created with collection_type 'face-analysis'.
+
+        Args:
+            collection_id: The ID of the collection
+            file_id: The ID of the file
+            limit: Maximum number of faces to return (1-100, default 50)
+            offset: Number of faces to skip (default 0)
+
+        Returns:
+            FileFaceDetections object containing detected faces
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.get_face_detections(
+                collection_id=collection_id,
+                file_id=file_id,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(
+                f"Failed to get face detections for file {file_id} in collection {collection_id}: {str(e)}"
             )
 
 
@@ -2738,23 +2789,31 @@ class Search:
         self,
         scope: str,
         collections: List[str],
-        query: str,
+        query: Optional[str] = None,
         limit: Optional[int] = None,
         filter: Optional[Union[SearchFilter, Dict[str, Any]]] = None,
+        source_image: Optional[Union[str, Dict[str, Any]]] = None,
         **kwargs,
     ):
         """Search across video files and segments to find relevant content.
 
         Args:
             scope: Search scope - 'file' searches at file level (requires collections with enable_summary=true), 
-                   'segment' searches at segment level
-            collections: List of collection IDs to search within. Must be rich-transcript collections 
-                        (collection_type='rich-transcripts'). For file-level search, collections must have 
-                        'enable_summary: true' in transcribe_config.
-            query: Text search query to find relevant content
+                   'segment' searches at segment level, 'face' searches for faces in videos using image matching
+            collections: List of collection IDs to search within. 
+                        For text search (scope='file' or 'segment'): Must be rich-transcript collections 
+                        (collection_type='rich-transcripts' or 'media-descriptions'). For file-level search, 
+                        collections must have 'enable_summary: true' in transcribe_config.
+                        For face search (scope='face'): Must be face-analysis collections (collection_type='face-analysis').
+            query: Text search query to find relevant content (required for scope='file' or 'segment', not used for scope='face')
             limit: Maximum number of search results to return (1-100, default 10)
             filter: Filter criteria to constrain search results. Can be a SearchFilter object
                    or a dictionary with 'metadata', 'video_info', and/or 'file' keys.
+            source_image: Source image for face search (required for scope='face'). Can be:
+                - URL string (public image URL)
+                - Local file path (will be converted to base64)
+                - Base64 string (raw base64 or with data: prefix)
+                - Dictionary with 'url' or 'base64' keys
             **kwargs: Additional parameters for the request.
 
         Returns:
@@ -2764,7 +2823,7 @@ class Search:
             CloudGlueError: If there is an error making the API request or processing the response.
 
         Example:
-            # Search for content in collections
+            # Text search for content in collections
             results = client.search.search(
                 scope="segment",
                 collections=["collection_123"],
@@ -2772,7 +2831,7 @@ class Search:
                 limit=20
             )
             
-            # Search with filters
+            # Text search with filters
             search_filter = client.search.create_filter(
                 metadata_filters=[
                     {'path': 'category', 'operator': 'Equal', 'value_text': 'tutorial'}
@@ -2783,6 +2842,14 @@ class Search:
                 collections=["collection_123"],
                 query="python programming",
                 filter=search_filter
+            )
+            
+            # Face search
+            results = client.search.search(
+                scope="face",
+                collections=["face_collection_123"],
+                source_image="https://example.com/image.jpg",
+                limit=20
             )
         """
         try:
@@ -2797,18 +2864,53 @@ class Search:
                 else:
                     raise ValueError("filter must be a SearchFilter object or dictionary")
             
+            # Handle source_image parameter for face search
+            source_image_obj = None
+            if source_image is not None:
+                if isinstance(source_image, dict):
+                    # Already in SearchRequestSourceImage format
+                    source_image_obj = SearchRequestSourceImage(**source_image)
+                elif isinstance(source_image, str):
+                    if source_image.startswith(('http://', 'https://')):
+                        # URL
+                        source_image_obj = SearchRequestSourceImage(url=source_image)
+                    elif source_image.startswith('data:image/'):
+                        # Data URL - extract base64 part
+                        base64_part = source_image.split(',')[1] if ',' in source_image else source_image
+                        source_image_obj = SearchRequestSourceImage(base64=base64_part)
+                    elif os.path.exists(source_image):
+                        # File path - encode to base64
+                        # Check file extension
+                        file_ext = pathlib.Path(source_image).suffix.lower()
+                        if file_ext not in ['.jpg', '.jpeg', '.png']:
+                            raise CloudGlueError(f"Unsupported file type: {file_ext}. Only JPG and PNG are supported.")
+                        
+                        # Read and encode the file
+                        with open(source_image, 'rb') as image_file:
+                            image_data = image_file.read()
+                            base64_string = base64.b64encode(image_data).decode('utf-8')
+                            source_image_obj = SearchRequestSourceImage(base64=base64_string)
+                    else:
+                        # Assume raw base64 string
+                        source_image_obj = SearchRequestSourceImage(base64=source_image)
+                else:
+                    raise CloudGlueError("source_image must be a string (URL, file path, or base64) or dictionary")
+            
             request = SearchRequest(
                 scope=scope,
                 collections=collections,
                 query=query,
                 limit=limit,
                 filter=filter,
+                source_image=source_image_obj,
                 **kwargs,
             )
             return self.api.search_content(search_request=request)
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
+            if isinstance(e, CloudGlueError):
+                raise
             raise CloudGlueError(str(e))
 
 
