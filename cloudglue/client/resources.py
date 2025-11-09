@@ -2441,16 +2441,37 @@ class Segments:
     @staticmethod
     def create_narrative_config(
         prompt: Optional[str] = None,
+        strategy: Optional[str] = None,
+        number_of_chapters: Optional[int] = None,
     ) -> NarrativeConfig:
         """Create a narrative-based segmentation configuration.
 
         Args:
-            prompt: Optional custom prompt to guide the narrative segmentation analysis
+            prompt: Optional custom prompt to guide the narrative segmentation analysis.
+                This will be incorporated into the main segmentation prompt as additional guidance.
+            strategy: Optional narrative segmentation strategy. Options:
+                - 'balanced': Uses multimodal describe job for comprehensive analysis.
+                  Default strategy, recommended for most videos. Supports YouTube URLs.
+                - 'direct': Directly analyzes the full video URL with AI.
+                  Ideal for videos less than 10 minutes long. Provides finer grain control
+                  and expressibility with direct integration of your prompt with the Video AI model.
+                - 'long': Optimized for longer videos beyond 10 minutes.
+                  Provides finer grain control and expressibility with direct integration of
+                  your prompt with the Video AI model.
+                Note: YouTube URLs automatically use the 'balanced' strategy regardless of
+                the strategy field value. Other strategies are not supported for YouTube URLs.
+            number_of_chapters: Optional target number of chapters to generate.
+                If provided, the AI will attempt to generate exactly this number of chapters.
+                Must be >= 1 if provided.
 
         Returns:
             NarrativeConfig object
         """
-        return NarrativeConfig(prompt=prompt)
+        return NarrativeConfig(
+            prompt=prompt,
+            strategy=strategy,
+            number_of_chapters=number_of_chapters,
+        )
 
     def create(
         self,
