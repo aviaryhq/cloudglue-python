@@ -21,6 +21,8 @@ from cloudglue.sdk.models.file_update import FileUpdate
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
 from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
+from cloudglue.sdk.models.segmentation_manual_config import SegmentationManualConfig
+from cloudglue.sdk.models.segmentation_manual_config_segments_inner import SegmentationManualConfigSegmentsInner
 from cloudglue.sdk.models.search_request import SearchRequest
 from cloudglue.sdk.models.search_filter import SearchFilter
 from cloudglue.sdk.models.search_filter_criteria import SearchFilterCriteria
@@ -2020,6 +2022,7 @@ class Files:
                 strategy=segmentation_config.strategy,
                 uniform_config=segmentation_config.uniform_config,
                 shot_detector_config=segmentation_config.shot_detector_config,
+                manual_config=segmentation_config.manual_config,
                 start_time_seconds=segmentation_config.start_time_seconds,
                 end_time_seconds=segmentation_config.end_time_seconds,
                 thumbnails_config=thumbnails_config_obj,
@@ -2321,6 +2324,48 @@ class Segmentations:
             end_time_seconds=end_time_seconds,
         )
 
+    @staticmethod
+    def create_manual_config(
+        segments: List[Dict[str, Union[int, float]]],
+    ) -> SegmentationConfig:
+        """Create a manual segmentation configuration.
+
+        Args:
+            segments: List of segment definitions, each containing:
+                - start_time: Start time of the segment in seconds
+                - end_time: End time of the segment in seconds
+
+        Returns:
+            SegmentationConfig configured for manual segmentation
+
+        Example:
+            # Manual segmentation with specific time ranges
+            config = client.segmentations.create_manual_config(
+                segments=[
+                    {"start_time": 0, "end_time": 30},
+                    {"start_time": 30, "end_time": 60},
+                    {"start_time": 60, "end_time": 90}
+                ]
+            )
+        """
+        # Convert dict segments to SegmentationManualConfigSegmentsInner objects
+        segment_objects = [
+            SegmentationManualConfigSegmentsInner(
+                start_time=seg.get("start_time"),
+                end_time=seg.get("end_time")
+            )
+            for seg in segments
+        ]
+        
+        manual_config = SegmentationManualConfig(
+            segments=segment_objects,
+        )
+        
+        return SegmentationConfig(
+            strategy="manual",
+            manual_config=manual_config,
+        )
+
     def get(
         self,
         segmentation_id: str,
@@ -2452,14 +2497,10 @@ class Segments:
             strategy: Optional narrative segmentation strategy. Options:
                 - 'balanced': Uses multimodal describe job for comprehensive analysis.
                   Default strategy, recommended for most videos. Supports YouTube URLs.
-                - 'direct': Directly analyzes the full video URL with AI.
-                  Ideal for videos less than 10 minutes long. Provides finer grain control
-                  and expressibility with direct integration of your prompt with the Video AI model.
-                - 'long': Optimized for longer videos beyond 10 minutes.
-                  Provides finer grain control and expressibility with direct integration of
-                  your prompt with the Video AI model.
+                - 'comprehensive': Uses a VLM to deeply analyze logical segments of video.
+                  Only available for non-YouTube videos.
                 Note: YouTube URLs automatically use the 'balanced' strategy regardless of
-                the strategy field value. Other strategies are not supported for YouTube URLs.
+                the strategy field value. The 'comprehensive' strategy is not supported for YouTube URLs.
             number_of_chapters: Optional target number of chapters to generate.
                 If provided, the AI will attempt to generate exactly this number of chapters.
                 Must be >= 1 if provided.
@@ -2484,8 +2525,7 @@ class Segments:
 
         Args:
             url: Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint,
-                public HTTP URLs, and S3 or Dropbox URIs which have been granted access to
-                Cloudglue via data connectors. **⚠️ Note: YouTube URLs are supported for 
+                public HTTP URLs, S3 files, and other data connected URLs. **⚠️ Note: YouTube URLs are supported for 
                 narrative-based segmentation only.** Shot-based segmentation requires direct 
                 video file access.
             criteria: Segmentation criteria ('shot' or 'narrative')
@@ -2615,8 +2655,7 @@ class Segments:
 
         Args:
             url: Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint,
-                public HTTP URLs, and S3 or Dropbox URIs which have been granted access to
-                Cloudglue via data connectors. **⚠️ Note: YouTube URLs are supported for 
+                public HTTP URLs, S3 files, and other data connected URLs. **⚠️ Note: YouTube URLs are supported for 
                 narrative-based segmentation only.** Shot-based segmentation requires direct 
                 video file access.
             criteria: Segmentation criteria ('shot' or 'narrative')
@@ -2814,6 +2853,9 @@ class Search:
         limit: Optional[int] = None,
         filter: Optional[Union[SearchFilter, Dict[str, Any]]] = None,
         source_image: Optional[Union[str, Dict[str, Any]]] = None,
+        group_by_key: Optional[str] = None,
+        threshold: Optional[Union[int, float]] = None,
+        sort_by: Optional[str] = None,
         **kwargs,
     ):
         """Search across video files and segments to find relevant content.
@@ -2827,7 +2869,8 @@ class Search:
                         collections must have 'enable_summary: true' in transcribe_config.
                         For face search (scope='face'): Must be face-analysis collections (collection_type='face-analysis').
             query: Text search query to find relevant content (required for scope='file' or 'segment', not used for scope='face')
-            limit: Maximum number of search results to return (1-100, default 10)
+            limit: Maximum number of search results to return (1-100, default 10). When group_by_key is specified,
+                   this applies to total items across groups (not the number of groups).
             filter: Filter criteria to constrain search results. Can be a SearchFilter object
                    or a dictionary with 'metadata', 'video_info', and/or 'file' keys.
             source_image: Source image for face search (required for scope='face'). Can be:
@@ -2835,6 +2878,11 @@ class Search:
                 - Local file path (will be converted to base64)
                 - Base64 string (raw base64 or with data: prefix)
                 - Dictionary with 'url' or 'base64' keys
+            group_by_key: Optional key to group results by. Currently only 'file' is supported.
+                         Cannot be used with scope='file'. When specified, results are grouped by file_id.
+            threshold: Optional minimum score threshold to filter results. Can be any real number.
+            sort_by: Optional sort order for results. Default: 'score'. When group_by_key is specified,
+                    can also use 'item_count' to sort by number of items per group.
             **kwargs: Additional parameters for the request.
 
         Returns:
@@ -2924,6 +2972,9 @@ class Search:
                 limit=limit,
                 filter=filter,
                 source_image=source_image_obj,
+                group_by_key=group_by_key,
+                threshold=threshold,
+                sort_by=sort_by,
                 **kwargs,
             )
             return self.api.search_content(search_request=request)

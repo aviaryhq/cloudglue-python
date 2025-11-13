@@ -17,29 +17,18 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.segmentation_data_segments_inner import SegmentationDataSegmentsInner
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt
+from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing import Optional, Set
 from typing_extensions import Self
 
-class SegmentationData(BaseModel):
+class SegmentationManualConfigSegmentsInner(BaseModel):
     """
-    Segment data with pagination (only present when status is completed and segments exist)
+    SegmentationManualConfigSegmentsInner
     """ # noqa: E501
-    object: StrictStr = Field(description="Object type, always 'list'")
-    segments: Optional[List[SegmentationDataSegmentsInner]] = None
-    total: StrictInt = Field(description="Total number of segments")
-    limit: StrictInt = Field(description="Number of segments returned in this response")
-    offset: StrictInt = Field(description="Offset from the start of the segments list")
-    __properties: ClassVar[List[str]] = ["object", "segments", "total", "limit", "offset"]
-
-    @field_validator('object')
-    def object_validate_enum(cls, value):
-        """Validates the enum"""
-        if value not in set(['list']):
-            raise ValueError("must be one of enum values ('list')")
-        return value
+    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="The start time of the segment in seconds")
+    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="The end time of the segment in seconds")
+    __properties: ClassVar[List[str]] = ["start_time", "end_time"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -59,7 +48,7 @@ class SegmentationData(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of SegmentationData from a JSON string"""
+        """Create an instance of SegmentationManualConfigSegmentsInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -80,18 +69,11 @@ class SegmentationData(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in segments (list)
-        _items = []
-        if self.segments:
-            for _item_segments in self.segments:
-                if _item_segments:
-                    _items.append(_item_segments.to_dict())
-            _dict['segments'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of SegmentationData from a dict"""
+        """Create an instance of SegmentationManualConfigSegmentsInner from a dict"""
         if obj is None:
             return None
 
@@ -99,11 +81,8 @@ class SegmentationData(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "object": obj.get("object"),
-            "segments": [SegmentationDataSegmentsInner.from_dict(_item) for _item in obj["segments"]] if obj.get("segments") is not None else None,
-            "total": obj.get("total"),
-            "limit": obj.get("limit"),
-            "offset": obj.get("offset")
+            "start_time": obj.get("start_time"),
+            "end_time": obj.get("end_time")
         })
         return _obj
 
