@@ -17,27 +17,33 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing_extensions import Annotated
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
-class NewDescribe(BaseModel):
+class SegmentationListItem(BaseModel):
     """
-    NewDescribe
+    Segmentation object as returned in list responses (does not include segments array or data property)
     """ # noqa: E501
-    segmentation_id: Optional[StrictStr] = Field(default=None, description="Segmentation job id to use. If not provided will use default to uniform 20s segmentation. Cannot be provided together with segmentation_config.")
-    segmentation_config: Optional[SegmentationConfig] = None
-    url: StrictStr = Field(description="Input video URL. Supports URIs of files uploaded to Cloudglue Files endpoint, public YouTube video URLs, public HTTP URLs, and files which have been granted access to Cloudglue via data connectors.  Note that YouTube videos are currently limited to speech level understanding only. For files via our Data connectors, see our documentation on data connectors for setup information.")
-    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate video-level and segment-level (moment-level) summaries and titles")
-    enable_speech: Optional[StrictBool] = Field(default=True, description="Whether to generate speech transcript")
-    enable_visual_scene_description: Optional[StrictBool] = Field(default=True, description="Whether to generate visual scene description")
-    enable_scene_text: Optional[StrictBool] = Field(default=True, description="Whether to generate scene text extraction")
-    enable_audio_description: Optional[StrictBool] = Field(default=False, description="Whether to generate audio description")
-    thumbnails_config: Optional[ThumbnailsConfig] = None
-    __properties: ClassVar[List[str]] = ["segmentation_id", "segmentation_config", "url", "enable_summary", "enable_speech", "enable_visual_scene_description", "enable_scene_text", "enable_audio_description", "thumbnails_config"]
+    segmentation_id: StrictStr = Field(description="Unique identifier for the segmentation job")
+    status: StrictStr = Field(description="Status of the segmentation job. If a job has the status 'not_applicable' it means that we were unable to find any appropriate scenes for this video. This can be possible if you use the shot-detector strategy.")
+    created_at: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]] = Field(description="Unix timestamp of when the segmentation was created")
+    file_id: StrictStr = Field(description="ID of the file this segmentation belongs to")
+    segmentation_config: SegmentationConfig
+    thumbnails_config: ThumbnailsConfig
+    total_segments: Optional[Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]]] = Field(default=None, description="Total number of segments in this segmentation (only present when status is completed)")
+    __properties: ClassVar[List[str]] = ["segmentation_id", "status", "created_at", "file_id", "segmentation_config", "thumbnails_config", "total_segments"]
+
+    @field_validator('status')
+    def status_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in set(['pending', 'processing', 'completed', 'failed', 'not_applicable']):
+            raise ValueError("must be one of enum values ('pending', 'processing', 'completed', 'failed', 'not_applicable')")
+        return value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -57,7 +63,7 @@ class NewDescribe(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of NewDescribe from a JSON string"""
+        """Create an instance of SegmentationListItem from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -88,7 +94,7 @@ class NewDescribe(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of NewDescribe from a dict"""
+        """Create an instance of SegmentationListItem from a dict"""
         if obj is None:
             return None
 
@@ -97,14 +103,12 @@ class NewDescribe(BaseModel):
 
         _obj = cls.model_validate({
             "segmentation_id": obj.get("segmentation_id"),
+            "status": obj.get("status"),
+            "created_at": obj.get("created_at"),
+            "file_id": obj.get("file_id"),
             "segmentation_config": SegmentationConfig.from_dict(obj["segmentation_config"]) if obj.get("segmentation_config") is not None else None,
-            "url": obj.get("url"),
-            "enable_summary": obj.get("enable_summary") if obj.get("enable_summary") is not None else True,
-            "enable_speech": obj.get("enable_speech") if obj.get("enable_speech") is not None else True,
-            "enable_visual_scene_description": obj.get("enable_visual_scene_description") if obj.get("enable_visual_scene_description") is not None else True,
-            "enable_scene_text": obj.get("enable_scene_text") if obj.get("enable_scene_text") is not None else True,
-            "enable_audio_description": obj.get("enable_audio_description") if obj.get("enable_audio_description") is not None else False,
-            "thumbnails_config": ThumbnailsConfig.from_dict(obj["thumbnails_config"]) if obj.get("thumbnails_config") is not None else None
+            "thumbnails_config": ThumbnailsConfig.from_dict(obj["thumbnails_config"]) if obj.get("thumbnails_config") is not None else None,
+            "total_segments": obj.get("total_segments")
         })
         return _obj
 

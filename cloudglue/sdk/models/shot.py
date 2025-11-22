@@ -17,18 +17,20 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from pydantic import BaseModel, ConfigDict, Field, StrictInt
+from typing import Any, ClassVar, Dict, List, Union
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
-class SegmentationManualConfigSegmentsInner(BaseModel):
+class Shot(BaseModel):
     """
-    SegmentationManualConfigSegmentsInner
+    Shot
     """ # noqa: E501
-    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="The start time of the segment in seconds")
-    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="The end time of the segment in seconds")
-    __properties: ClassVar[List[str]] = ["start_time", "end_time"]
+    index: StrictInt = Field(description="Index of the shot in the original video")
+    start_time: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]] = Field(description="Start time of the shot in seconds")
+    end_time: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]] = Field(description="End time of the shot in seconds")
+    __properties: ClassVar[List[str]] = ["index", "start_time", "end_time"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -48,7 +50,7 @@ class SegmentationManualConfigSegmentsInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of SegmentationManualConfigSegmentsInner from a JSON string"""
+        """Create an instance of Shot from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -73,7 +75,7 @@ class SegmentationManualConfigSegmentsInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of SegmentationManualConfigSegmentsInner from a dict"""
+        """Create an instance of Shot from a dict"""
         if obj is None:
             return None
 
@@ -81,6 +83,7 @@ class SegmentationManualConfigSegmentsInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "index": obj.get("index"),
             "start_time": obj.get("start_time"),
             "end_time": obj.get("end_time")
         })
