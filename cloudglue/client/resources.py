@@ -2856,6 +2856,7 @@ class Search:
         group_by_key: Optional[str] = None,
         threshold: Optional[Union[int, float]] = None,
         sort_by: Optional[str] = None,
+        search_modalities: Optional[List[str]] = None,
         **kwargs,
     ):
         """Search across video files and segments to find relevant content.
@@ -2883,6 +2884,11 @@ class Search:
             threshold: Optional minimum score threshold to filter results. Can be any real number.
             sort_by: Optional sort order for results. Default: 'score'. When group_by_key is specified,
                     can also use 'item_count' to sort by number of items per group.
+            search_modalities: Optional list of search modalities to use. Valid values are:
+                - 'general_content': General content search
+                - 'speech_lexical': Speech/transcript lexical search
+                - 'ocr_lexical': OCR/text lexical search
+                If not specified, general_content will be used.
             **kwargs: Additional parameters for the request.
 
         Returns:
@@ -2975,6 +2981,7 @@ class Search:
                 group_by_key=group_by_key,
                 threshold=threshold,
                 sort_by=sort_by,
+                search_modalities=search_modalities,
                 **kwargs,
             )
             return self.api.search_content(search_request=request)
