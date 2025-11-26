@@ -20,31 +20,27 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing_extensions import Annotated
-from cloudglue.sdk.models.segmentation_manual_config import SegmentationManualConfig
 from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
 from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniformConfig
-from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
-class CreateFileSegmentationRequest(BaseModel):
+class DefaultSegmentationConfig(BaseModel):
     """
-    Segmentation configuration (root level) with optional thumbnails configuration.
+    Configuration for video segmentation. **Choose a strategy and provide ONLY the corresponding config:**  • **uniform**: Provide `uniform_config`, do NOT provide `shot_detector_config` • **shot-detector**: Provide `shot_detector_config`, do NOT provide `uniform_config`  Optionally specify `start_time_seconds` and `end_time_seconds` to limit segmentation to a portion of the video.
     """ # noqa: E501
-    thumbnails_config: Optional[ThumbnailsConfig] = None
-    strategy: StrictStr = Field(description="Segmentation strategy - determines which config you must provide")
+    strategy: StrictStr = Field(description="Segmentation strategy - determines which config you must provide. Manual strategies are not supported for default segmentation configs")
     uniform_config: Optional[SegmentationUniformConfig] = None
     shot_detector_config: Optional[SegmentationShotDetectorConfig] = None
-    manual_config: Optional[SegmentationManualConfig] = None
     start_time_seconds: Optional[Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]]] = Field(default=None, description="Optional: The start time of the video in seconds to start segmenting from")
     end_time_seconds: Optional[Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]]] = Field(default=None, description="Optional: The end time of the video in seconds to stop segmenting at")
-    __properties: ClassVar[List[str]] = ["strategy", "uniform_config", "shot_detector_config", "manual_config", "start_time_seconds", "end_time_seconds"]
+    __properties: ClassVar[List[str]] = ["strategy", "uniform_config", "shot_detector_config", "start_time_seconds", "end_time_seconds"]
 
     @field_validator('strategy')
     def strategy_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in set(['uniform', 'shot-detector', 'manual']):
-            raise ValueError("must be one of enum values ('uniform', 'shot-detector', 'manual')")
+        if value not in set(['uniform', 'shot-detector']):
+            raise ValueError("must be one of enum values ('uniform', 'shot-detector')")
         return value
 
     model_config = ConfigDict(
@@ -65,7 +61,7 @@ class CreateFileSegmentationRequest(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of CreateFileSegmentationRequest from a JSON string"""
+        """Create an instance of DefaultSegmentationConfig from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -92,14 +88,11 @@ class CreateFileSegmentationRequest(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of shot_detector_config
         if self.shot_detector_config:
             _dict['shot_detector_config'] = self.shot_detector_config.to_dict()
-        # override the default output from pydantic by calling `to_dict()` of manual_config
-        if self.manual_config:
-            _dict['manual_config'] = self.manual_config.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of CreateFileSegmentationRequest from a dict"""
+        """Create an instance of DefaultSegmentationConfig from a dict"""
         if obj is None:
             return None
 
@@ -110,7 +103,6 @@ class CreateFileSegmentationRequest(BaseModel):
             "strategy": obj.get("strategy"),
             "uniform_config": SegmentationUniformConfig.from_dict(obj["uniform_config"]) if obj.get("uniform_config") is not None else None,
             "shot_detector_config": SegmentationShotDetectorConfig.from_dict(obj["shot_detector_config"]) if obj.get("shot_detector_config") is not None else None,
-            "manual_config": SegmentationManualConfig.from_dict(obj["manual_config"]) if obj.get("manual_config") is not None else None,
             "start_time_seconds": obj.get("start_time_seconds"),
             "end_time_seconds": obj.get("end_time_seconds")
         })

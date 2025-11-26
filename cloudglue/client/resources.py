@@ -2488,6 +2488,8 @@ class Segments:
         prompt: Optional[str] = None,
         strategy: Optional[str] = None,
         number_of_chapters: Optional[int] = None,
+        min_chapters: Optional[int] = None,
+        max_chapters: Optional[int] = None,
     ) -> NarrativeConfig:
         """Create a narrative-based segmentation configuration.
 
@@ -2504,7 +2506,12 @@ class Segments:
             number_of_chapters: Optional target number of chapters to generate.
                 If provided, the AI will attempt to generate exactly this number of chapters.
                 Must be >= 1 if provided.
-
+            min_chapters: Optional minimum number of chapters to generate.
+                If provided, the AI will attempt to generate at least this number of chapters.
+                Must be >= 1 if provided.
+            max_chapters: Optional maximum number of chapters to generate.
+                If provided, the AI will attempt to generate at most this number of chapters.
+                Must be >= 1 if provided.
         Returns:
             NarrativeConfig object
         """
@@ -2512,6 +2519,8 @@ class Segments:
             prompt=prompt,
             strategy=strategy,
             number_of_chapters=number_of_chapters,
+            min_chapters=min_chapters,
+            max_chapters=max_chapters,
         )
 
     def create(
