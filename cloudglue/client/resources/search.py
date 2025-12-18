@@ -179,6 +179,7 @@ class Search:
         threshold: Optional[Union[int, float]] = None,
         sort_by: Optional[str] = None,
         search_modalities: Optional[List[str]] = None,
+        label_filters: Optional[List[str]] = None,
         **kwargs,
     ):
         """Search across video files and segments to find relevant content.
@@ -207,10 +208,15 @@ class Search:
             sort_by: Optional sort order for results. Default: 'score'. When group_by_key is specified,
                     can also use 'item_count' to sort by number of items per group.
             search_modalities: Optional list of search modalities to use. Valid values are:
-                - 'general_content': General content search
-                - 'speech_lexical': Speech/transcript lexical search
-                - 'ocr_lexical': OCR/text lexical search
-                If not specified, general_content will be used.
+                - 'general_content': General content search based on visual/spoken content similarity
+                - 'speech_lexical': Keyword and exact match search against speech content
+                - 'ocr_lexical': Keyword and exact match search against screen text (OCR) content
+                - 'tag_semantic': Semantic similarity search against tag values
+                - 'tag_lexical': Keyword and exact match search against tag values
+                If not specified, general_content will be used. Currently only one modality per request.
+            label_filters: Optional list of label strings to filter eligible search items by presence of 
+                          one or more labels. Only supported for 'tag_semantic' and 'tag_lexical' search 
+                          modalities. If not specified, all tags will be considered.
             **kwargs: Additional parameters for the request.
 
         Returns:
@@ -247,6 +253,15 @@ class Search:
                 collections=["face_collection_123"],
                 source_image="https://example.com/image.jpg",
                 limit=20
+            )
+            
+            # Tag-based search with label filters
+            results = client.search.search(
+                scope="segment",
+                collections=["collection_123"],
+                query="person",
+                search_modalities=["tag_semantic"],
+                label_filters=["speaker", "character"]
             )
         """
         try:
@@ -304,6 +319,7 @@ class Search:
                 threshold=threshold,
                 sort_by=sort_by,
                 search_modalities=search_modalities,
+                label_filters=label_filters,
                 **kwargs,
             )
             return self.api.search_content(search_request=request)
