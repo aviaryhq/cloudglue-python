@@ -7,6 +7,7 @@ from typing import Dict, Any, Optional, Union
 from cloudglue.sdk.models.new_collection import NewCollection
 from cloudglue.sdk.models.add_collection_file import AddCollectionFile
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from cloudglue.sdk.models.default_segmentation_config import DefaultSegmentationConfig
 from cloudglue.sdk.models.search_filter import SearchFilter
 from cloudglue.sdk.models.collection_update import CollectionUpdate
 from cloudglue.sdk.models.new_collection_face_detection_config import NewCollectionFaceDetectionConfig
@@ -34,7 +35,7 @@ class Collections:
         extract_config: Optional[Dict[str, Any]] = None,
         transcribe_config: Optional[Dict[str, Any]] = None,
         describe_config: Optional[Dict[str, Any]] = None,
-        default_segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        default_segmentation_config: Optional[Union[DefaultSegmentationConfig, SegmentationConfig, Dict[str, Any]]] = None,
         face_detection_config: Optional[Union[NewCollectionFaceDetectionConfig, Dict[str, Any]]] = None,
     ):
         """Create a new collection.
@@ -46,7 +47,9 @@ class Collections:
             extract_config: Optional configuration for extraction processing
             transcribe_config: Optional configuration for transcription processing
             describe_config: Optional configuration for media description processing
-            default_segmentation_config: Default segmentation configuration for files in this collection
+            default_segmentation_config: Default segmentation configuration for files in this collection.
+                Can be a DefaultSegmentationConfig, SegmentationConfig (will be converted), or dict.
+                Note: Only 'uniform' and 'shot-detector' strategies are supported for collection defaults.
             face_detection_config: Optional configuration for face detection processing
 
         Returns:
@@ -60,9 +63,20 @@ class Collections:
             if description is None:  # TODO(kdr): temporary fix for API
                 description = ""
 
-            # Handle default_segmentation_config parameter
-            if isinstance(default_segmentation_config, dict):
-                default_segmentation_config = SegmentationConfig.from_dict(default_segmentation_config)
+            # Handle default_segmentation_config parameter - convert to DefaultSegmentationConfig
+            if default_segmentation_config is not None:
+                if isinstance(default_segmentation_config, dict):
+                    default_segmentation_config = DefaultSegmentationConfig.from_dict(default_segmentation_config)
+                elif isinstance(default_segmentation_config, SegmentationConfig):
+                    # Convert SegmentationConfig to DefaultSegmentationConfig
+                    default_segmentation_config = DefaultSegmentationConfig(
+                        strategy=default_segmentation_config.strategy,
+                        uniform_config=default_segmentation_config.uniform_config,
+                        shot_detector_config=default_segmentation_config.shot_detector_config,
+                        keyframe_config=default_segmentation_config.keyframe_config,
+                        start_time_seconds=default_segmentation_config.start_time_seconds,
+                        end_time_seconds=default_segmentation_config.end_time_seconds,
+                    )
 
             # Handle face_detection_config parameter
             if isinstance(face_detection_config, dict):
