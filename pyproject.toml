@@ -35,7 +35,7 @@ dependencies = [
 "Bug Tracker" = "https://github.com/aviaryhq/cloudglue-python/issues"
 
 [tool.setuptools]
-packages = ["cloudglue", "cloudglue.client", "cloudglue.sdk", "cloudglue.sdk.api", "cloudglue.sdk.models"]
+packages = ["cloudglue", "cloudglue.client", "cloudglue.client.resources", "cloudglue.sdk", "cloudglue.sdk.api", "cloudglue.sdk.models"]
 
 [tool.setuptools.package-data]
 cloudglue = ["*.json", "*.yaml"]
