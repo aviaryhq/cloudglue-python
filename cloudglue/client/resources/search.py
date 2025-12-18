@@ -3,11 +3,11 @@
 import base64
 import os
 import pathlib
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Union, Literal
 
 from cloudglue.sdk.models.search_request import SearchRequest
 from cloudglue.sdk.models.search_filter import SearchFilter
-from cloudglue.sdk.models.search_filter_criteria import SearchFilterCriteria
+from cloudglue.sdk.models.search_filter_metadata_inner import SearchFilterMetadataInner
 from cloudglue.sdk.models.search_filter_file_inner import SearchFilterFileInner
 from cloudglue.sdk.models.search_filter_video_info_inner import SearchFilterVideoInfoInner
 from cloudglue.sdk.models.search_request_source_image import SearchRequestSourceImage
@@ -33,7 +33,8 @@ class Search:
         operator: str,
         value_text: Optional[str] = None,
         value_text_array: Optional[List[str]] = None,
-    ) -> SearchFilterCriteria:
+        scope: Optional[Literal['file', 'segment']] = None,
+    ) -> SearchFilterMetadataInner:
         """Create a metadata filter for search.
         
         Args:
@@ -41,15 +42,19 @@ class Search:
             operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
             value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
             value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
+            scope: Specifies scope of eligible search items to check metadata filtering conditions.
+                   'file' checks file-level metadata, 'segment' checks segment-level metadata.
+                   Defaults to 'file' if not specified.
             
         Returns:
-            SearchFilterCriteria object
+            SearchFilterMetadataInner object
         """
-        return SearchFilterCriteria(
+        return SearchFilterMetadataInner(
             path=path,
             operator=operator,
             value_text=value_text,
             value_text_array=value_text_array,
+            scope=scope,
         )
 
     @staticmethod
@@ -119,8 +124,9 @@ class Search:
                 - 'operator': Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
                 - 'value_text': (optional) Text value for scalar comparison  
                 - 'value_text_array': (optional) Array of values for array comparisons
-            video_info_filters: List of video info filter dictionaries (same structure)
-            file_filters: List of file filter dictionaries (same structure)
+                - 'scope': (optional) Scope of eligible search items ('file' or 'segment'). Defaults to 'file'.
+            video_info_filters: List of video info filter dictionaries (same structure, without scope)
+            file_filters: List of file filter dictionaries (same structure, without scope)
             
         Returns:
             SearchFilter object
@@ -129,7 +135,8 @@ class Search:
             filter = client.search.create_filter(
                 metadata_filters=[
                     {'path': 'category', 'operator': 'Equal', 'value_text': 'tutorial'},
-                    {'path': 'tags', 'operator': 'ContainsAny', 'value_text_array': ['python', 'programming']}
+                    {'path': 'tags', 'operator': 'ContainsAny', 'value_text_array': ['python', 'programming']},
+                    {'path': 'segment_type', 'operator': 'Equal', 'value_text': 'intro', 'scope': 'segment'}
                 ],
                 video_info_filters=[
                     {'path': 'duration_seconds', 'operator': 'LessThan', 'value_text': '600'}
@@ -139,7 +146,7 @@ class Search:
         metadata_objs = None
         if metadata_filters:
             metadata_objs = [
-                SearchFilterCriteria(**f) for f in metadata_filters
+                SearchFilterMetadataInner(**f) for f in metadata_filters
             ]
             
         video_info_objs = None
