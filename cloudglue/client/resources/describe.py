@@ -1,0 +1,256 @@
+# cloudglue/client/resources/describe.py
+"""Describe resource for CloudGlue API."""
+import time
+from typing import Dict, Any, Optional, Union
+
+from cloudglue.sdk.models.new_describe import NewDescribe
+from cloudglue.sdk.models.segmentation_config import SegmentationConfig
+from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
+from cloudglue.sdk.rest import ApiException
+
+from cloudglue.client.resources.base import CloudGlueError
+
+
+class Describe:
+    """Handles media description operations."""
+
+    def __init__(self, api):
+        """Initialize with the API client."""
+        self.api = api
+
+    def create(
+        self,
+        url: str,
+        enable_summary: bool = True,
+        enable_speech: bool = True,
+        enable_scene_text: bool = True,
+        enable_visual_scene_description: bool = True,
+        enable_audio_description: bool = True,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
+    ):
+        """Create a new media description job for a video.
+
+        Args:
+            url: Input video URL. Can be YouTube URLs or URIs of uploaded files.
+            enable_summary: Whether to generate video-level and segment-level summaries and titles.
+            enable_speech: Whether to generate speech transcript.
+            enable_scene_text: Whether to generate scene text extraction.
+            enable_visual_scene_description: Whether to generate visual scene description.
+            enable_audio_description: Whether to generate audio description.
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
+            thumbnails_config: Optional configuration for segment thumbnails
+
+        Returns:
+            The typed Describe job object with job_id and status.
+
+        Raises:
+            CloudGlueError: If there is an error creating the describe job or processing the request.
+        """
+        try:
+            if segmentation_id and segmentation_config:
+                raise ValueError("Cannot provide both segmentation_id and segmentation_config")
+
+            # Handle segmentation_config parameter
+            if isinstance(segmentation_config, dict):
+                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
+
+            # Handle thumbnails_config parameter
+            thumbnails_config_obj = None
+            if thumbnails_config is not None:
+                if isinstance(thumbnails_config, dict):
+                    thumbnails_config_obj = ThumbnailsConfig.from_dict(thumbnails_config)
+                else:
+                    thumbnails_config_obj = thumbnails_config
+
+            request = NewDescribe(
+                url=url,
+                enable_summary=enable_summary,
+                enable_speech=enable_speech,
+                enable_scene_text=enable_scene_text,
+                enable_visual_scene_description=enable_visual_scene_description,
+                enable_audio_description=enable_audio_description,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
+                thumbnails_config=thumbnails_config_obj,
+            )
+
+            # Use the regular SDK method to create the job
+            response = self.api.create_describe(new_describe=request)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def get(
+        self,
+        job_id: str,
+        response_format: Optional[str] = None,
+        start_time_seconds: Optional[float] = None,
+        end_time_seconds: Optional[float] = None,
+    ):
+        """Get the status and data of a media description job.
+
+        Args:
+            job_id: The unique identifier of the description job.
+            response_format: The format of the response, one of 'json' or 'markdown' (json by default)
+            start_time_seconds: The start time in seconds to filter the media descriptions
+            end_time_seconds: The end time in seconds to filter the media descriptions  
+        Returns:
+            The typed Describe job object with current status and data (if completed).
+
+        Raises:
+            CloudGlueError: If there is an error retrieving the describe job or processing the request.
+        """
+        try:
+            # Use the standard method to get a properly typed object
+            response = self.api.get_describe(job_id=job_id, response_format=response_format, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        status: Optional[str] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
+        response_format: Optional[str] = None,
+        url: Optional[str] = None,
+        include_data: Optional[bool] = None,
+    ):
+        """List all media description jobs with optional filtering.
+
+        Args:
+            limit: Maximum number of description jobs to return.
+            offset: Number of description jobs to skip.
+            status: Filter description jobs by status.
+            created_before: Filter description jobs created before a specific date (YYYY-MM-DD format), in UTC timezone.
+            created_after: Filter description jobs created after a specific date (YYYY-MM-DD format), in UTC timezone.
+            response_format: The format of the response, one of 'json' or 'markdown' (json by default)
+            url: Filter description jobs by the input URL used for description.
+            include_data: Include the data in the response. If false, the response will only include
+                the job information and not the data to minimize the response size.
+
+        Returns:
+            The typed DescribeList object with array of describe jobs.
+
+        Raises:
+            CloudGlueError: If there is an error retrieving the describe jobs or processing the request.
+        """
+        try:
+            # Use the standard method to get a properly typed object
+            response = self.api.list_describes(
+                limit=limit,
+                offset=offset,
+                status=status,
+                created_before=created_before,
+                created_after=created_after,
+                response_format=response_format,
+                url=url,
+                include_data=include_data,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def delete(self, job_id: str):
+        """Delete a media description job.
+
+        Args:
+            job_id: The unique identifier of the description job to delete.
+
+        Returns:
+            The deletion confirmation.
+
+        Raises:
+            CloudGlueError: If there is an error deleting the description job.
+        """
+        try:
+            response = self.api.delete_describe(job_id=job_id)
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def run(
+        self,
+        url: str,
+        poll_interval: int = 5,
+        timeout: int = 600,
+        enable_summary: bool = True,
+        enable_speech: bool = True,
+        enable_scene_text: bool = True,
+        enable_visual_scene_description: bool = True,
+        enable_audio_description: bool = False,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
+        response_format: Optional[str] = None,
+    ):
+        """Create a media description job and wait for it to complete.
+
+        Args:
+            url: Input video URL. Can be YouTube URLs or URIs of uploaded files.
+            poll_interval: Seconds between status checks.
+            timeout: Total seconds to wait before giving up.
+            enable_summary: Whether to generate video-level and segment-level summaries and titles.
+            enable_speech: Whether to generate speech transcript.
+            enable_scene_text: Whether to generate scene text extraction.
+            enable_visual_scene_description: Whether to generate visual scene description.
+            enable_audio_description: Whether to generate audio description.
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
+            thumbnails_config: Optional configuration for segment thumbnails
+            response_format: The format of the response, one of 'json' or 'markdown' (json by default)
+        Returns:
+            The completed typed Describe job object.
+
+        Raises:
+            CloudGlueError: If there is an error creating or processing the describe job.
+        """
+        try:
+            # Create the job
+            job = self.create(
+                url=url,
+                enable_summary=enable_summary,
+                enable_speech=enable_speech,
+                enable_scene_text=enable_scene_text,
+                enable_visual_scene_description=enable_visual_scene_description,
+                enable_audio_description=enable_audio_description,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
+                thumbnails_config=thumbnails_config,
+            )
+
+            job_id = job.job_id
+
+            # Poll for completion
+            elapsed = 0
+            while elapsed < timeout:
+                status = self.get(job_id=job_id, response_format=response_format)
+
+                if status.status in ["completed", "failed"]:
+                    return status
+
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+
+            raise TimeoutError(
+                f"Describe job did not complete within {timeout} seconds"
+            )
+
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
