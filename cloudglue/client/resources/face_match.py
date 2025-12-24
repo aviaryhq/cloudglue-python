@@ -193,6 +193,34 @@ class FaceMatch:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """List all face match jobs.
+
+        Args:
+            limit: Number of face match jobs to return (default 50, max 100)
+            offset: Offset from the start of the face match jobs list
+
+        Returns:
+            FaceMatchListResponse object containing list of face match jobs
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.list_face_match(
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
     def delete(self, face_match_id: str):
         """Delete a face match analysis.
 

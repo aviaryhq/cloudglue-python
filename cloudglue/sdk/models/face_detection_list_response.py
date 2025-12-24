@@ -17,20 +17,29 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
+from cloudglue.sdk.models.face_detection_list_response_all_of_data import FaceDetectionListResponseAllOfData
 from typing import Optional, Set
 from typing_extensions import Self
 
-class NewCollectionExtractConfig(BaseModel):
+class FaceDetectionListResponse(BaseModel):
     """
-    🎯 **Use ONLY when collection_type = 'entities'**  Configuration for automatic entity extraction from videos. Required for entities collections. This config will be ignored for other collection types.
+    FaceDetectionListResponse
     """ # noqa: E501
-    prompt: Optional[StrictStr] = Field(default=None, description="A natural language prompt describing the data to extract. Required if no schema is provided.")
-    var_schema: Optional[Dict[str, Any]] = Field(default=None, description="A more rigid structure if you already know the JSON layout you want. Required if no prompt is provided.", alias="schema")
-    enable_video_level_entities: Optional[StrictBool] = Field(default=False, description="Whether to extract entities at the video level")
-    enable_segment_level_entities: Optional[StrictBool] = Field(default=True, description="Whether to extract entities at the segment level")
-    __properties: ClassVar[List[str]] = ["prompt", "schema", "enable_video_level_entities", "enable_segment_level_entities"]
+    object: StrictStr = Field(description="Object type, always 'list'")
+    total: StrictInt = Field(description="The total number of items")
+    limit: StrictInt = Field(description="The number of items per page")
+    offset: StrictInt = Field(description="The offset of the items")
+    data: Optional[List[FaceDetectionListResponseAllOfData]] = None
+    __properties: ClassVar[List[str]] = ["object", "total", "limit", "offset", "data"]
+
+    @field_validator('object')
+    def object_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in set(['list']):
+            raise ValueError("must be one of enum values ('list')")
+        return value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -50,7 +59,7 @@ class NewCollectionExtractConfig(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of NewCollectionExtractConfig from a JSON string"""
+        """Create an instance of FaceDetectionListResponse from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -71,11 +80,18 @@ class NewCollectionExtractConfig(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
+        _items = []
+        if self.data:
+            for _item_data in self.data:
+                if _item_data:
+                    _items.append(_item_data.to_dict())
+            _dict['data'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of NewCollectionExtractConfig from a dict"""
+        """Create an instance of FaceDetectionListResponse from a dict"""
         if obj is None:
             return None
 
@@ -83,10 +99,11 @@ class NewCollectionExtractConfig(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "prompt": obj.get("prompt"),
-            "schema": obj.get("schema"),
-            "enable_video_level_entities": obj.get("enable_video_level_entities") if obj.get("enable_video_level_entities") is not None else False,
-            "enable_segment_level_entities": obj.get("enable_segment_level_entities") if obj.get("enable_segment_level_entities") is not None else True
+            "object": obj.get("object"),
+            "total": obj.get("total"),
+            "limit": obj.get("limit"),
+            "offset": obj.get("offset"),
+            "data": [FaceDetectionListResponseAllOfData.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None
         })
         return _obj
 
