@@ -110,6 +110,34 @@ class FaceDetection:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """List all face detection jobs.
+
+        Args:
+            limit: Number of face detection jobs to return (default 50, max 100)
+            offset: Offset from the start of the face detection jobs list
+
+        Returns:
+            FaceDetectionListResponse object containing list of face detection jobs
+
+        Raises:
+            CloudGlueError: If the request fails
+        """
+        try:
+            response = self.api.list_face_detection(
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
     def delete(self, face_detection_id: str):
         """Delete a face detection analysis.
 

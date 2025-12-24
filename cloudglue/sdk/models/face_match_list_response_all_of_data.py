@@ -20,23 +20,22 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional, Union
 from cloudglue.sdk.models.face_bounding_box import FaceBoundingBox
-from cloudglue.sdk.models.face_match_data import FaceMatchData
 from typing import Optional, Set
 from typing_extensions import Self
 
-class FaceMatch(BaseModel):
+class FaceMatchListResponseAllOfData(BaseModel):
     """
-    FaceMatch
+    FaceMatchListResponseAllOfData
     """ # noqa: E501
-    face_match_id: StrictStr = Field(description="Unique identifier for the face match job")
+    job_id: StrictStr = Field(description="Unique identifier for the face match job")
     face_detection_id: Optional[StrictStr] = Field(default=None, description="ID of the face detection analysis used")
     frame_extraction_id: Optional[StrictStr] = Field(default=None, description="ID of the frame extraction used")
     file_id: Optional[StrictStr] = Field(default=None, description="ID of the target file")
     status: StrictStr = Field(description="Status of the face match job")
     created_at: Union[StrictFloat, StrictInt] = Field(description="Unix timestamp of when the job was created")
     source_face_bounding_box: Optional[FaceBoundingBox] = Field(default=None, description="Bounding box of the source face in the source image (null when job is pending/processing)")
-    data: Optional[FaceMatchData] = None
-    __properties: ClassVar[List[str]] = ["face_match_id", "face_detection_id", "frame_extraction_id", "file_id", "status", "created_at", "source_face_bounding_box", "data"]
+    match_count: Optional[StrictInt] = Field(default=None, description="Number of matches found")
+    __properties: ClassVar[List[str]] = ["job_id", "face_detection_id", "frame_extraction_id", "file_id", "status", "created_at", "source_face_bounding_box", "match_count"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
@@ -63,7 +62,7 @@ class FaceMatch(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of FaceMatch from a JSON string"""
+        """Create an instance of FaceMatchListResponseAllOfData from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -87,9 +86,6 @@ class FaceMatch(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of source_face_bounding_box
         if self.source_face_bounding_box:
             _dict['source_face_bounding_box'] = self.source_face_bounding_box.to_dict()
-        # override the default output from pydantic by calling `to_dict()` of data
-        if self.data:
-            _dict['data'] = self.data.to_dict()
         # set to None if source_face_bounding_box (nullable) is None
         # and model_fields_set contains the field
         if self.source_face_bounding_box is None and "source_face_bounding_box" in self.model_fields_set:
@@ -99,7 +95,7 @@ class FaceMatch(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of FaceMatch from a dict"""
+        """Create an instance of FaceMatchListResponseAllOfData from a dict"""
         if obj is None:
             return None
 
@@ -107,14 +103,14 @@ class FaceMatch(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "face_match_id": obj.get("face_match_id"),
+            "job_id": obj.get("job_id"),
             "face_detection_id": obj.get("face_detection_id"),
             "frame_extraction_id": obj.get("frame_extraction_id"),
             "file_id": obj.get("file_id"),
             "status": obj.get("status"),
             "created_at": obj.get("created_at"),
             "source_face_bounding_box": FaceBoundingBox.from_dict(obj["source_face_bounding_box"]) if obj.get("source_face_bounding_box") is not None else None,
-            "data": FaceMatchData.from_dict(obj["data"]) if obj.get("data") is not None else None
+            "match_count": obj.get("match_count")
         })
         return _obj
 
