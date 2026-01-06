@@ -17,21 +17,22 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
+from typing import Any, ClassVar, Dict, List, Optional, Union
+from cloudglue.sdk.models.chat_message import ChatMessage
+from cloudglue.sdk.models.search_filter import SearchFilter
 from typing import Optional, Set
 from typing_extensions import Self
 
-class DescribeConfig(BaseModel):
+class ChatCompletionPayload(BaseModel):
     """
-    Configuration for media description from videos
+    ChatCompletionPayload
     """ # noqa: E501
-    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate video-level and segment-level (moment-level) summaries and titles")
-    enable_speech: Optional[StrictBool] = Field(default=True, description="Whether to generate speech transcript")
-    enable_visual_scene_description: Optional[StrictBool] = Field(default=True, description="Whether to generate visual scene description")
-    enable_scene_text: Optional[StrictBool] = Field(default=True, description="Whether to generate scene text extraction")
-    enable_audio_description: Optional[StrictBool] = Field(default=False, description="Whether to generate audio description")
-    __properties: ClassVar[List[str]] = ["enable_summary", "enable_speech", "enable_visual_scene_description", "enable_scene_text", "enable_audio_description"]
+    messages: Optional[List[ChatMessage]] = None
+    temperature: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="The temperature of the chat completion")
+    filter: Optional[SearchFilter] = None
+    collections: Optional[List[StrictStr]] = None
+    __properties: ClassVar[List[str]] = ["messages", "temperature", "filter", "collections"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +52,7 @@ class DescribeConfig(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of DescribeConfig from a JSON string"""
+        """Create an instance of ChatCompletionPayload from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -72,11 +73,21 @@ class DescribeConfig(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in messages (list)
+        _items = []
+        if self.messages:
+            for _item_messages in self.messages:
+                if _item_messages:
+                    _items.append(_item_messages.to_dict())
+            _dict['messages'] = _items
+        # override the default output from pydantic by calling `to_dict()` of filter
+        if self.filter:
+            _dict['filter'] = self.filter.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of DescribeConfig from a dict"""
+        """Create an instance of ChatCompletionPayload from a dict"""
         if obj is None:
             return None
 
@@ -84,11 +95,10 @@ class DescribeConfig(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "enable_summary": obj.get("enable_summary") if obj.get("enable_summary") is not None else True,
-            "enable_speech": obj.get("enable_speech") if obj.get("enable_speech") is not None else True,
-            "enable_visual_scene_description": obj.get("enable_visual_scene_description") if obj.get("enable_visual_scene_description") is not None else True,
-            "enable_scene_text": obj.get("enable_scene_text") if obj.get("enable_scene_text") is not None else True,
-            "enable_audio_description": obj.get("enable_audio_description") if obj.get("enable_audio_description") is not None else False
+            "messages": [ChatMessage.from_dict(_item) for _item in obj["messages"]] if obj.get("messages") is not None else None,
+            "temperature": obj.get("temperature"),
+            "filter": SearchFilter.from_dict(obj["filter"]) if obj.get("filter") is not None else None,
+            "collections": obj.get("collections")
         })
         return _obj
 

@@ -17,26 +17,33 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List, Union
+from cloudglue.sdk.models.chat_completion_list_data_inner_choices_inner import ChatCompletionListDataInnerChoicesInner
+from cloudglue.sdk.models.chat_completion_list_data_inner_usage import ChatCompletionListDataInnerUsage
 from cloudglue.sdk.models.chat_completion_payload import ChatCompletionPayload
-from cloudglue.sdk.models.chat_completion_response_choices_inner import ChatCompletionResponseChoicesInner
-from cloudglue.sdk.models.chat_completion_response_usage import ChatCompletionResponseUsage
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ChatCompletionResponse(BaseModel):
+class ChatCompletionListDataInner(BaseModel):
     """
-    ChatCompletionResponse
+    ChatCompletionListDataInner
     """ # noqa: E501
-    id: Optional[StrictStr] = Field(default=None, description="Unique identifier for this chat completion")
-    object: Optional[StrictStr] = Field(default=None, description="Object type, always \"chat.completion\"")
-    created_at: Optional[StrictInt] = Field(default=None, description="Unix timestamp of when the chat completion was created")
-    model: Optional[StrictStr] = Field(default=None, description="The model used for the chat completion")
-    choices: Optional[List[ChatCompletionResponseChoicesInner]] = Field(default=None, description="The generated responses")
-    payload: Optional[ChatCompletionPayload] = None
-    usage: Optional[ChatCompletionResponseUsage] = None
-    __properties: ClassVar[List[str]] = ["id", "object", "created_at", "model", "choices", "payload", "usage"]
+    id: StrictStr = Field(description="The ID of the chat completion")
+    created_at: Union[StrictFloat, StrictInt] = Field(description="The timestamp of the chat completion")
+    object: StrictStr = Field(description="Object type, always 'chat.completion'")
+    model: StrictStr = Field(description="The model used for the chat completion")
+    usage: ChatCompletionListDataInnerUsage
+    choices: List[ChatCompletionListDataInnerChoicesInner] = Field(description="The choices of the chat completion")
+    payload: ChatCompletionPayload
+    __properties: ClassVar[List[str]] = ["id", "created_at", "object", "model", "usage", "choices", "payload"]
+
+    @field_validator('object')
+    def object_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in set(['chat.completion']):
+            raise ValueError("must be one of enum values ('chat.completion')")
+        return value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -56,7 +63,7 @@ class ChatCompletionResponse(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponse from a JSON string"""
+        """Create an instance of ChatCompletionListDataInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -77,6 +84,9 @@ class ChatCompletionResponse(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of usage
+        if self.usage:
+            _dict['usage'] = self.usage.to_dict()
         # override the default output from pydantic by calling `to_dict()` of each item in choices (list)
         _items = []
         if self.choices:
@@ -87,14 +97,11 @@ class ChatCompletionResponse(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of payload
         if self.payload:
             _dict['payload'] = self.payload.to_dict()
-        # override the default output from pydantic by calling `to_dict()` of usage
-        if self.usage:
-            _dict['usage'] = self.usage.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ChatCompletionResponse from a dict"""
+        """Create an instance of ChatCompletionListDataInner from a dict"""
         if obj is None:
             return None
 
@@ -103,12 +110,12 @@ class ChatCompletionResponse(BaseModel):
 
         _obj = cls.model_validate({
             "id": obj.get("id"),
-            "object": obj.get("object"),
             "created_at": obj.get("created_at"),
+            "object": obj.get("object"),
             "model": obj.get("model"),
-            "choices": [ChatCompletionResponseChoicesInner.from_dict(_item) for _item in obj["choices"]] if obj.get("choices") is not None else None,
-            "payload": ChatCompletionPayload.from_dict(obj["payload"]) if obj.get("payload") is not None else None,
-            "usage": ChatCompletionResponseUsage.from_dict(obj["usage"]) if obj.get("usage") is not None else None
+            "usage": ChatCompletionListDataInnerUsage.from_dict(obj["usage"]) if obj.get("usage") is not None else None,
+            "choices": [ChatCompletionListDataInnerChoicesInner.from_dict(_item) for _item in obj["choices"]] if obj.get("choices") is not None else None,
+            "payload": ChatCompletionPayload.from_dict(obj["payload"]) if obj.get("payload") is not None else None
         })
         return _obj
 
