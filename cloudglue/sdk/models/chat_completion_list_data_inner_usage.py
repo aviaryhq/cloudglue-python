@@ -17,21 +17,19 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool
+from pydantic import BaseModel, ConfigDict, Field, StrictInt
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class DescribeConfig(BaseModel):
+class ChatCompletionListDataInnerUsage(BaseModel):
     """
-    Configuration for media description from videos
+    The usage of the chat completion
     """ # noqa: E501
-    enable_summary: Optional[StrictBool] = Field(default=True, description="Whether to generate video-level and segment-level (moment-level) summaries and titles")
-    enable_speech: Optional[StrictBool] = Field(default=True, description="Whether to generate speech transcript")
-    enable_visual_scene_description: Optional[StrictBool] = Field(default=True, description="Whether to generate visual scene description")
-    enable_scene_text: Optional[StrictBool] = Field(default=True, description="Whether to generate scene text extraction")
-    enable_audio_description: Optional[StrictBool] = Field(default=False, description="Whether to generate audio description")
-    __properties: ClassVar[List[str]] = ["enable_summary", "enable_speech", "enable_visual_scene_description", "enable_scene_text", "enable_audio_description"]
+    prompt_tokens: Optional[StrictInt] = Field(default=None, description="The number of tokens in the prompt")
+    completion_tokens: Optional[StrictInt] = Field(default=None, description="The number of tokens in the completion")
+    total_tokens: Optional[StrictInt] = Field(default=None, description="The total number of tokens in the request")
+    __properties: ClassVar[List[str]] = ["prompt_tokens", "completion_tokens", "total_tokens"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +49,7 @@ class DescribeConfig(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of DescribeConfig from a JSON string"""
+        """Create an instance of ChatCompletionListDataInnerUsage from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -76,7 +74,7 @@ class DescribeConfig(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of DescribeConfig from a dict"""
+        """Create an instance of ChatCompletionListDataInnerUsage from a dict"""
         if obj is None:
             return None
 
@@ -84,11 +82,9 @@ class DescribeConfig(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "enable_summary": obj.get("enable_summary") if obj.get("enable_summary") is not None else True,
-            "enable_speech": obj.get("enable_speech") if obj.get("enable_speech") is not None else True,
-            "enable_visual_scene_description": obj.get("enable_visual_scene_description") if obj.get("enable_visual_scene_description") is not None else True,
-            "enable_scene_text": obj.get("enable_scene_text") if obj.get("enable_scene_text") is not None else True,
-            "enable_audio_description": obj.get("enable_audio_description") if obj.get("enable_audio_description") is not None else False
+            "prompt_tokens": obj.get("prompt_tokens"),
+            "completion_tokens": obj.get("completion_tokens"),
+            "total_tokens": obj.get("total_tokens")
         })
         return _obj
 
