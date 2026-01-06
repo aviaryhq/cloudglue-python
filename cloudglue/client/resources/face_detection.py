@@ -114,12 +114,18 @@ class FaceDetection:
         self,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
+        status: Optional[str] = None,
     ):
         """List all face detection jobs.
 
         Args:
             limit: Number of face detection jobs to return (default 50, max 100)
             offset: Offset from the start of the face detection jobs list
+            created_before: Filter jobs created before this date (YYYY-MM-DD format, UTC)
+            created_after: Filter jobs created after this date (YYYY-MM-DD format, UTC)
+            status: Filter by status ('pending', 'processing', 'completed', 'failed')
 
         Returns:
             FaceDetectionListResponse object containing list of face detection jobs
@@ -131,6 +137,9 @@ class FaceDetection:
             response = self.api.list_face_detection(
                 limit=limit,
                 offset=offset,
+                created_before=created_before,
+                created_after=created_after,
+                status=status,
             )
             return response
         except ApiException as e:

@@ -226,6 +226,58 @@ class Completions:
         except Exception as e:
             raise CloudGlueError(str(e))
 
+    def get(self, id: str):
+        """Retrieve a chat completion by ID.
+
+        Args:
+            id: The ID of the chat completion to retrieve.
+
+        Returns:
+            The chat completion response.
+
+        Raises:
+            CloudGlueError: If there is an error making the API request or processing the response.
+        """
+        try:
+            return self.api.get_chat_completion(id=id)
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        created_before: Optional[str] = None,
+        created_after: Optional[str] = None,
+    ):
+        """List chat completions with optional filtering.
+
+        Args:
+            limit: Maximum number of chat completions to return (max 100).
+            offset: Number of chat completions to skip.
+            created_before: Filter completions created before this date (YYYY-MM-DD format, UTC).
+            created_after: Filter completions created after this date (YYYY-MM-DD format, UTC).
+
+        Returns:
+            A list response containing chat completions.
+
+        Raises:
+            CloudGlueError: If there is an error making the API request or processing the response.
+        """
+        try:
+            return self.api.list_chat_completions(
+                limit=limit,
+                offset=offset,
+                created_before=created_before,
+                created_after=created_after,
+            )
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
 
 class Chat:
     """Chat namespace for the CloudGlue client."""
