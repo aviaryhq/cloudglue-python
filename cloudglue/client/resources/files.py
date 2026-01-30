@@ -523,17 +523,19 @@ class Files:
         segmentation_id: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        type: Optional[str] = None,
     ):
         """
         Get thumbnails for a file.
-        
+
         Args:
             file_id: The ID of the file
             is_default: Filter thumbnails by default status. If true, will only return the default thumbnail for the file
             segmentation_id: Filter thumbnails by segmentation ID
             limit: Number of thumbnails to return
             offset: Offset from the start of the list
-            
+            type: Filter thumbnails by type
+
         Returns:
             ThumbnailList response
         """
@@ -542,6 +544,75 @@ class Files:
                 file_id=file_id,
                 is_default=is_default,
                 segmentation_id=segmentation_id,
+                limit=limit,
+                offset=offset,
+                type=type,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def list_segments(
+        self,
+        file_id: str,
+        start_time_after: Optional[float] = None,
+        end_time_before: Optional[float] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """List segments for a file.
+
+        Args:
+            file_id: The ID of the file
+            start_time_after: Filter segments by start time (seconds)
+            end_time_before: Filter segments by end time (seconds)
+            limit: Number of segments to return (max 100)
+            offset: Offset from the start of the list
+
+        Returns:
+            FileSegmentListResponse containing segments
+
+        Raises:
+            CloudGlueError: If there is an error listing segments.
+        """
+        try:
+            response = self.api.list_file_segments(
+                file_id=file_id,
+                start_time_after=start_time_after,
+                end_time_before=end_time_before,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def list_frame_extractions(
+        self,
+        file_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """List frame extraction jobs for a file.
+
+        Args:
+            file_id: The ID of the file
+            limit: Number of frame extractions to return (max 100)
+            offset: Offset from the start of the list
+
+        Returns:
+            FrameExtractionList containing frame extraction jobs
+
+        Raises:
+            CloudGlueError: If there is an error listing frame extractions.
+        """
+        try:
+            response = self.api.list_file_frame_extractions(
+                file_id=file_id,
                 limit=limit,
                 offset=offset,
             )

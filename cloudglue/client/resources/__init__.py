@@ -17,6 +17,8 @@ from cloudglue.client.resources.face_detection import FaceDetection
 from cloudglue.client.resources.face_match import FaceMatch
 from cloudglue.client.resources.tags import Tags
 from cloudglue.client.resources.file_segments import FileSegments
+from cloudglue.client.resources.responses import Responses
+from cloudglue.client.resources.share import Share
 
 __all__ = [
     "CloudGlueError",
@@ -36,5 +38,7 @@ __all__ = [
     "FaceMatch",
     "Tags",
     "FileSegments",
+    "Responses",
+    "Share",
 ]
 

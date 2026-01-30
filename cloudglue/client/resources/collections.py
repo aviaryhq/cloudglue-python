@@ -69,10 +69,12 @@ class Collections:
                     default_segmentation_config = DefaultSegmentationConfig.from_dict(default_segmentation_config)
                 elif isinstance(default_segmentation_config, SegmentationConfig):
                     # Convert SegmentationConfig to DefaultSegmentationConfig
+                    # Note: manual_config is not supported for default segmentation configs
                     default_segmentation_config = DefaultSegmentationConfig(
                         strategy=default_segmentation_config.strategy,
                         uniform_config=default_segmentation_config.uniform_config,
                         shot_detector_config=default_segmentation_config.shot_detector_config,
+                        narrative_config=default_segmentation_config.narrative_config,
                         keyframe_config=default_segmentation_config.keyframe_config,
                         start_time_seconds=default_segmentation_config.start_time_seconds,
                         end_time_seconds=default_segmentation_config.end_time_seconds,
@@ -693,4 +695,95 @@ class Collections:
             raise CloudGlueError(
                 f"Failed to get face detections for file {file_id} in collection {collection_id}: {str(e)}"
             )
+
+    def add_media(
+        self,
+        collection_id: str,
+        file_id: Optional[str] = None,
+        url: Optional[str] = None,
+        segmentation_id: Optional[str] = None,
+        segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
+        wait_until_finish: bool = False,
+        poll_interval: int = 5,
+        timeout: int = 600,
+    ):
+        """Add a media file (video or audio) to a collection.
+
+        This is the recommended endpoint for adding media files to collections.
+
+        Media Type Handling:
+        - Video files: Processed with full visual analysis (scene description, text extraction, etc.)
+        - Audio files: Visual features automatically disabled; only speech and audio analysis available
+
+        Audio File Restrictions:
+        - Audio files cannot be added to face-analysis collections
+        - Shot-detector segmentation is not available for audio files
+
+        Args:
+            collection_id: The ID of the collection
+            file_id: The ID of the file to add (optional, either file_id or url is required)
+            url: The URL of the file to add (optional, either file_id or url is required)
+            segmentation_id: Segmentation job id to use. Cannot be provided together with segmentation_config.
+            segmentation_config: Configuration for segmentation. Cannot be provided together with segmentation_id.
+            wait_until_finish: Whether to wait for the processing to complete
+            poll_interval: How often to check the status (in seconds) if waiting
+            timeout: Maximum time to wait for processing (in seconds) if waiting
+
+        Returns:
+            The typed CollectionFile object with association details. If wait_until_finish
+            is True, waits for processing to complete and returns the final state.
+
+        Raises:
+            CloudGlueError: If there is an error adding the media or processing the request.
+        """
+        try:
+            # Validate that either file_id or url is provided
+            if not file_id and not url:
+                raise CloudGlueError("Either file_id or url must be provided")
+
+            if segmentation_id and segmentation_config:
+                raise ValueError("Cannot provide both segmentation_id and segmentation_config")
+
+            # Handle segmentation_config parameter
+            if isinstance(segmentation_config, dict):
+                segmentation_config = SegmentationConfig.from_dict(segmentation_config)
+
+            # Create request object
+            request = AddCollectionFile(
+                file_id=file_id,
+                url=url,
+                segmentation_id=segmentation_id,
+                segmentation_config=segmentation_config,
+            )
+
+            response = self.api.add_media(
+                collection_id=collection_id, add_collection_file=request
+            )
+
+            # If not waiting for completion, return immediately
+            if not wait_until_finish:
+                return response
+
+            # Otherwise poll until completion or timeout
+            response_file_id = response.file_id
+            elapsed = 0
+            terminal_states = ["ready", "completed", "failed", "not_applicable"]
+
+            while elapsed < timeout:
+                status = self.get_video(collection_id=collection_id, file_id=response_file_id)
+
+                if status.status in terminal_states:
+                    return status
+
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+
+            raise TimeoutError(
+                f"Media processing did not complete within {timeout} seconds"
+            )
+
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
 
