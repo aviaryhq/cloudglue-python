@@ -69,10 +69,12 @@ class Collections:
                     default_segmentation_config = DefaultSegmentationConfig.from_dict(default_segmentation_config)
                 elif isinstance(default_segmentation_config, SegmentationConfig):
                     # Convert SegmentationConfig to DefaultSegmentationConfig
+                    # Note: manual_config is not supported for default segmentation configs
                     default_segmentation_config = DefaultSegmentationConfig(
                         strategy=default_segmentation_config.strategy,
                         uniform_config=default_segmentation_config.uniform_config,
                         shot_detector_config=default_segmentation_config.shot_detector_config,
+                        narrative_config=default_segmentation_config.narrative_config,
                         keyframe_config=default_segmentation_config.keyframe_config,
                         start_time_seconds=default_segmentation_config.start_time_seconds,
                         end_time_seconds=default_segmentation_config.end_time_seconds,

@@ -7,6 +7,7 @@ from cloudglue.sdk.models.segmentation_uniform_config import SegmentationUniform
 from cloudglue.sdk.models.segmentation_shot_detector_config import SegmentationShotDetectorConfig
 from cloudglue.sdk.models.segmentation_manual_config import SegmentationManualConfig
 from cloudglue.sdk.models.segmentation_manual_config_segments_inner import SegmentationManualConfigSegmentsInner
+from cloudglue.sdk.models.narrative_config import NarrativeConfig
 from cloudglue.sdk.models.keyframe_config import KeyframeConfig
 from cloudglue.sdk.rest import ApiException
 
@@ -204,14 +205,90 @@ class Segmentations:
             )
             for seg in segments
         ]
-        
+
         manual_config = SegmentationManualConfig(
             segments=segment_objects,
         )
-        
+
         return SegmentationConfig(
             strategy="manual",
             manual_config=manual_config,
+        )
+
+    @staticmethod
+    def create_narrative_config(
+        strategy: Optional[str] = "balanced",
+        prompt: Optional[str] = None,
+        number_of_chapters: Optional[int] = None,
+        min_chapters: Optional[int] = None,
+        max_chapters: Optional[int] = None,
+        start_time_seconds: Optional[Union[int, float]] = None,
+        end_time_seconds: Optional[Union[int, float]] = None,
+        keyframe_config: Optional[Union[KeyframeConfig, Dict[str, Any]]] = None,
+    ) -> SegmentationConfig:
+        """Create a narrative segmentation configuration.
+
+        Narrative segmentation uses AI to identify logical chapter boundaries based on
+        content, topics, and narrative flow rather than fixed time intervals or visual changes.
+
+        Args:
+            strategy: Narrative segmentation strategy:
+                - 'balanced' (default): Balanced analysis using multiple modalities.
+                  Supports YouTube URLs and audio files.
+                - 'comprehensive': Deep VLM analysis of logical segments.
+                  Only available for video files (not YouTube or audio).
+            prompt: Optional custom prompt to guide the narrative segmentation analysis.
+                This will be incorporated into the main segmentation prompt as additional guidance.
+            number_of_chapters: Optional target number of chapters to generate.
+                If provided, min_chapters and max_chapters will be calculated automatically if not specified.
+            min_chapters: Optional minimum number of chapters to generate.
+            max_chapters: Optional maximum number of chapters to generate.
+            start_time_seconds: Optional start time of the video in seconds to start segmenting from
+            end_time_seconds: Optional end time of the video in seconds to stop segmenting at
+            keyframe_config: Optional configuration for keyframe extraction (not supported for YouTube videos)
+
+        Returns:
+            SegmentationConfig configured for narrative segmentation
+
+        Example:
+            # Basic narrative segmentation with balanced strategy
+            config = client.segmentations.create_narrative_config()
+
+            # Comprehensive strategy for detailed video analysis
+            config = client.segmentations.create_narrative_config(
+                strategy="comprehensive",
+                number_of_chapters=5
+            )
+
+            # With custom prompt guidance
+            config = client.segmentations.create_narrative_config(
+                prompt="Focus on topic changes and speaker transitions",
+                min_chapters=3,
+                max_chapters=10
+            )
+        """
+        narrative_config = NarrativeConfig(
+            strategy=strategy,
+            prompt=prompt,
+            number_of_chapters=number_of_chapters,
+            min_chapters=min_chapters,
+            max_chapters=max_chapters,
+        )
+
+        # Handle keyframe_config parameter
+        keyframe_config_obj = None
+        if keyframe_config is not None:
+            if isinstance(keyframe_config, dict):
+                keyframe_config_obj = KeyframeConfig.from_dict(keyframe_config)
+            else:
+                keyframe_config_obj = keyframe_config
+
+        return SegmentationConfig(
+            strategy="narrative",
+            narrative_config=narrative_config,
+            start_time_seconds=start_time_seconds,
+            end_time_seconds=end_time_seconds,
+            keyframe_config=keyframe_config_obj,
         )
 
     def get(
