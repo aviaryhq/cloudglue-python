@@ -96,8 +96,8 @@ class FileSegments:
     def list(
         self,
         file_id: str,
-        segmentation_id: Optional[str] = None,
-        include_thumbnails: Optional[bool] = None,
+        start_time_after: Optional[float] = None,
+        end_time_before: Optional[float] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
     ):
@@ -105,8 +105,8 @@ class FileSegments:
 
         Args:
             file_id: The ID of the file
-            segmentation_id: Filter segments by segmentation ID
-            include_thumbnails: Include thumbnail URLs in the response
+            start_time_after: Filter segments by start time (seconds)
+            end_time_before: Filter segments by end time (seconds)
             limit: Number of segments to return (max 100)
             offset: Offset from the start of the list
 
@@ -119,8 +119,8 @@ class FileSegments:
         try:
             response = self.api.list_file_segments(
                 file_id=file_id,
-                segmentation_id=segmentation_id,
-                include_thumbnails=include_thumbnails,
+                start_time_after=start_time_after,
+                end_time_before=end_time_before,
                 limit=limit,
                 offset=offset,
             )

@@ -18,31 +18,34 @@ class Share:
 
     def create(
         self,
-        asset_type: str,
-        asset_id: str,
-        name: Optional[str] = None,
-        expires_at: Optional[str] = None,
+        file_id: str,
+        file_segment_id: Optional[str] = None,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
     ):
         """Create a publicly available shareable asset.
 
         Args:
-            asset_type: The type of asset to share (e.g., 'file', 'collection').
-            asset_id: The ID of the asset to share.
-            name: Optional name for the shareable asset.
-            expires_at: Optional expiration date (ISO 8601 format).
+            file_id: The ID of the file to create a shareable asset for.
+            file_segment_id: Optional ID of a file segment to share instead of the whole file.
+            title: Optional title for the shareable asset.
+            description: Optional description for the shareable asset.
+            metadata: Optional metadata for the shareable asset.
 
         Returns:
-            ShareableAsset object with the public URL.
+            ShareableAsset object with the share_url.
 
         Raises:
             CloudGlueError: If there is an error creating the shareable asset.
         """
         try:
             request = CreateShareableAssetRequest(
-                asset_type=asset_type,
-                asset_id=asset_id,
-                name=name,
-                expires_at=expires_at,
+                file_id=file_id,
+                file_segment_id=file_segment_id,
+                title=title,
+                description=description,
+                metadata=metadata,
             )
             return self.api.create_shareable_asset(create_shareable_asset_request=request)
         except ApiException as e:
@@ -71,18 +74,20 @@ class Share:
 
     def list(
         self,
+        file_id: Optional[str] = None,
+        file_segment_id: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        asset_type: Optional[str] = None,
         created_before: Optional[str] = None,
         created_after: Optional[str] = None,
     ):
         """List shareable assets with optional filtering.
 
         Args:
+            file_id: Filter by file ID.
+            file_segment_id: Filter by file segment ID.
             limit: Maximum number of assets to return.
             offset: Number of assets to skip.
-            asset_type: Filter by asset type.
             created_before: Filter by creation date (YYYY-MM-DD format, UTC).
             created_after: Filter by creation date (YYYY-MM-DD format, UTC).
 
@@ -94,9 +99,10 @@ class Share:
         """
         try:
             return self.api.list_shareable_assets(
+                file_id=file_id,
+                file_segment_id=file_segment_id,
                 limit=limit,
                 offset=offset,
-                asset_type=asset_type,
                 created_before=created_before,
                 created_after=created_after,
             )
@@ -108,15 +114,17 @@ class Share:
     def update(
         self,
         shareable_asset_id: str,
-        name: Optional[str] = None,
-        expires_at: Optional[str] = None,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
     ):
         """Update a shareable asset.
 
         Args:
             shareable_asset_id: The ID of the shareable asset to update.
-            name: New name for the shareable asset.
-            expires_at: New expiration date (ISO 8601 format).
+            title: New title for the shareable asset.
+            description: New description for the shareable asset.
+            metadata: New metadata for the shareable asset.
 
         Returns:
             Updated ShareableAsset object.
@@ -126,8 +134,9 @@ class Share:
         """
         try:
             request = UpdateShareableAssetRequest(
-                name=name,
-                expires_at=expires_at,
+                title=title,
+                description=description,
+                metadata=metadata,
             )
             return self.api.update_shareable_asset(
                 id=shareable_asset_id,

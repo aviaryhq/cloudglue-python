@@ -1,8 +1,9 @@
 # cloudglue/client/resources/responses.py
 """Responses resource for CloudGlue API."""
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 
 from cloudglue.sdk.models.create_response_request import CreateResponseRequest
+from cloudglue.sdk.models.response_knowledge_base import ResponseKnowledgeBase
 from cloudglue.sdk.rest import ApiException
 
 from cloudglue.client.resources.base import CloudGlueError
@@ -17,20 +18,25 @@ class Responses:
 
     def create(
         self,
-        input: List[Dict[str, Any]],
+        input: Union[str, List[Dict[str, Any]]],
+        collections: List[str],
         model: str = "nimbus-001",
-        knowledge_bases: Optional[List[Dict[str, Any]]] = None,
+        instructions: Optional[str] = None,
+        temperature: Optional[float] = None,
         background: Optional[bool] = None,
-        **kwargs,
+        include: Optional[List[str]] = None,
     ):
         """Create a new response.
 
         Args:
-            input: List of input messages with role and content.
-            model: The model to use for the response.
-            knowledge_bases: List of knowledge base configurations to search.
-            background: Whether to run in background mode.
-            **kwargs: Additional parameters for the request.
+            input: The input for the response. Can be a simple string (treated as user message)
+                or a list of message dicts with 'role' and 'content' keys.
+            collections: List of collection IDs to search for relevant context.
+            model: The model to use for the response (default: 'nimbus-001').
+            instructions: Optional system instructions to guide the model's behavior.
+            temperature: Sampling temperature for the model (0-2, default: 0.7).
+            background: Set to True to process the response in the background.
+            include: Additional data to include in the response annotations.
 
         Returns:
             The Response object.
@@ -39,12 +45,15 @@ class Responses:
             CloudGlueError: If there is an error creating the response.
         """
         try:
+            knowledge_base = ResponseKnowledgeBase(collections=collections)
             request = CreateResponseRequest(
                 input=input,
                 model=model,
-                knowledge_bases=knowledge_bases,
+                knowledge_base=knowledge_base,
+                instructions=instructions,
+                temperature=temperature,
                 background=background,
-                **kwargs,
+                include=include,
             )
             return self.api.create_response(create_response_request=request)
         except ApiException as e:
