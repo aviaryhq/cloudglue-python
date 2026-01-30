@@ -10,9 +10,11 @@ from cloudglue.sdk.api.face_match_api import FaceMatchApi
 from cloudglue.sdk.api.file_segments_api import FileSegmentsApi
 from cloudglue.sdk.api.files_api import FilesApi
 from cloudglue.sdk.api.frames_api import FramesApi
+from cloudglue.sdk.api.response_api import ResponseApi
 from cloudglue.sdk.api.search_api import SearchApi
 from cloudglue.sdk.api.segmentations_api import SegmentationsApi
 from cloudglue.sdk.api.segments_api import SegmentsApi
+from cloudglue.sdk.api.share_api import ShareApi
 from cloudglue.sdk.api.tags_api import TagsApi
 from cloudglue.sdk.api.thumbnails_api import ThumbnailsApi
 from cloudglue.sdk.api.transcribe_api import TranscribeApi

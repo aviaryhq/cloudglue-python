@@ -274,13 +274,13 @@ class Segmentations:
     ):
         """
         Get thumbnails for a segmentation.
-        
+
         Args:
             segmentation_id: The ID of the segmentation to retrieve thumbnails for
             segment_ids: Filter thumbnails by segment IDs. If provided, will only return thumbnails for the specified segments. Comma separated list of segment IDs.
             limit: Number of thumbnails to return
             offset: Offset from the start of the list
-            
+
         Returns:
             ThumbnailList response
         """
@@ -288,6 +288,46 @@ class Segmentations:
             response = self.api.get_segmentation_thumbnails(
                 segmentation_id=segmentation_id,
                 segment_ids=segment_ids,
+                limit=limit,
+                offset=offset,
+            )
+            return response
+        except ApiException as e:
+            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+        except Exception as e:
+            raise CloudGlueError(str(e))
+
+    def list_describes(
+        self,
+        segmentation_id: str,
+        include_data: Optional[bool] = None,
+        response_format: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        """List describe jobs for a segmentation.
+
+        List all describe jobs that referenced the specified segmentation.
+        Returns describe job records associated with the segmentation.
+
+        Args:
+            segmentation_id: The ID of the segmentation job
+            include_data: Include the describe data in the response. Defaults to false.
+            response_format: Output format for the describe data ('json' or 'markdown')
+            limit: Number of items to return (max 100)
+            offset: Offset from the start of the list
+
+        Returns:
+            DescribeList containing describe jobs for the segmentation
+
+        Raises:
+            CloudGlueError: If there is an error listing describes.
+        """
+        try:
+            response = self.api.list_segmentation_describes(
+                segmentation_id=segmentation_id,
+                include_data=include_data,
+                response_format=response_format,
                 limit=limit,
                 offset=offset,
             )

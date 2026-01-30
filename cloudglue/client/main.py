@@ -18,6 +18,8 @@ from cloudglue.sdk.api.face_detection_api import FaceDetectionApi
 from cloudglue.sdk.api.face_match_api import FaceMatchApi
 from cloudglue.sdk.api.tags_api import TagsApi
 from cloudglue.sdk.api.file_segments_api import FileSegmentsApi
+from cloudglue.sdk.api.response_api import ResponseApi
+from cloudglue.sdk.api.share_api import ShareApi
 from cloudglue.sdk.configuration import Configuration
 from cloudglue.sdk.api_client import ApiClient
 
@@ -38,6 +40,8 @@ from cloudglue.client.resources import (
     FaceMatch,
     Tags,
     FileSegments,
+    Responses,
+    Share,
 )
 from cloudglue._version import __version__
 
@@ -87,6 +91,8 @@ class CloudGlue:
         self.face_match_api = FaceMatchApi(self.api_client)
         self.tags_api = TagsApi(self.api_client)
         self.file_segments_api = FileSegmentsApi(self.api_client)
+        self.response_api = ResponseApi(self.api_client)
+        self.share_api = ShareApi(self.api_client)
 
         # Set up resources with their respective API clients
         self.chat = Chat(self.chat_api)
@@ -104,6 +110,8 @@ class CloudGlue:
         self.face_match = FaceMatch(self.face_match_api)
         self.tags = Tags(self.tags_api)
         self.file_segments = FileSegments(self.file_segments_api)
+        self.responses = Responses(self.response_api)
+        self.share = Share(self.share_api)
 
     def close(self):
         """Close the API client."""

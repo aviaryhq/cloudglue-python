@@ -1,7 +1,7 @@
 # cloudglue/client/resources/describe.py
 """Describe resource for CloudGlue API."""
 import time
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, List, Optional, Union
 
 from cloudglue.sdk.models.new_describe import NewDescribe
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
@@ -91,6 +91,7 @@ class Describe:
         response_format: Optional[str] = None,
         start_time_seconds: Optional[float] = None,
         end_time_seconds: Optional[float] = None,
+        modalities: Optional[List[str]] = None,
     ):
         """Get the status and data of a media description job.
 
@@ -98,7 +99,9 @@ class Describe:
             job_id: The unique identifier of the description job.
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
             start_time_seconds: The start time in seconds to filter the media descriptions
-            end_time_seconds: The end time in seconds to filter the media descriptions  
+            end_time_seconds: The end time in seconds to filter the media descriptions
+            modalities: Filter results by modality types (e.g., ['speech', 'visual_scene_description'])
+
         Returns:
             The typed Describe job object with current status and data (if completed).
 
@@ -107,7 +110,13 @@ class Describe:
         """
         try:
             # Use the standard method to get a properly typed object
-            response = self.api.get_describe(job_id=job_id, response_format=response_format, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds)
+            response = self.api.get_describe(
+                job_id=job_id,
+                response_format=response_format,
+                start_time_seconds=start_time_seconds,
+                end_time_seconds=end_time_seconds,
+                modalities=modalities,
+            )
             return response
         except ApiException as e:
             raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -196,6 +205,7 @@ class Describe:
         segmentation_config: Optional[Union[SegmentationConfig, Dict[str, Any]]] = None,
         thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
         response_format: Optional[str] = None,
+        modalities: Optional[List[str]] = None,
     ):
         """Create a media description job and wait for it to complete.
 
@@ -212,6 +222,8 @@ class Describe:
             segmentation_config: Configuration for video segmentation. Cannot be provided together with segmentation_id.
             thumbnails_config: Optional configuration for segment thumbnails
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
+            modalities: Filter results by modality types (e.g., ['speech', 'visual_scene_description'])
+
         Returns:
             The completed typed Describe job object.
 
@@ -237,7 +249,7 @@ class Describe:
             # Poll for completion
             elapsed = 0
             while elapsed < timeout:
-                status = self.get(job_id=job_id, response_format=response_format)
+                status = self.get(job_id=job_id, response_format=response_format, modalities=modalities)
 
                 if status.status in ["completed", "failed"]:
                     return status
