@@ -3,10 +3,45 @@
 from typing import List, Dict, Any, Optional, Union
 
 from cloudglue.sdk.models.create_response_request import CreateResponseRequest
+from cloudglue.sdk.models.create_response_request_input import CreateResponseRequestInput
+from cloudglue.sdk.models.response_input_content import ResponseInputContent
+from cloudglue.sdk.models.response_input_message import ResponseInputMessage
 from cloudglue.sdk.models.response_knowledge_base import ResponseKnowledgeBase
 from cloudglue.sdk.rest import ApiException
 
 from cloudglue.client.resources.base import CloudGlueError
+
+
+def _normalize_input(input: Union[str, List[Dict[str, Any]]]) -> CreateResponseRequestInput:
+    """Normalize user-friendly input into a CreateResponseRequestInput.
+
+    Accepts:
+        - A plain string: "What does amy talk about"
+        - A list of simple message dicts: [{"role": "user", "content": "Hello"}]
+        - A list of fully-structured message dicts matching the API schema
+    """
+    if isinstance(input, str):
+        return CreateResponseRequestInput(input)
+
+    # Normalize list of message dicts into ResponseInputMessage objects
+    messages = []
+    for msg in input:
+        # If content is a plain string, wrap it in the expected structure
+        content = msg.get("content")
+        if isinstance(content, str):
+            content = [ResponseInputContent(type="input_text", text=content)]
+        elif isinstance(content, list):
+            content = [
+                ResponseInputContent(type=c.get("type", "input_text"), text=c["text"])
+                if isinstance(c, dict) else c
+                for c in content
+            ]
+        messages.append(ResponseInputMessage(
+            type=msg.get("type", "message"),
+            role=msg["role"],
+            content=content,
+        ))
+    return CreateResponseRequestInput(messages)
 
 
 class Responses:
@@ -47,7 +82,7 @@ class Responses:
         try:
             knowledge_base = ResponseKnowledgeBase(collections=collections)
             request = CreateResponseRequest(
-                input=input,
+                input=_normalize_input(input),
                 model=model,
                 knowledge_base=knowledge_base,
                 instructions=instructions,
