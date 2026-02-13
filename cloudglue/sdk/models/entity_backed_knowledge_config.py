@@ -19,15 +19,18 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Any, ClassVar, Dict, List, Optional
+from typing_extensions import Annotated
+from cloudglue.sdk.models.entity_collection_config import EntityCollectionConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
-class UpdateFileSegmentRequest(BaseModel):
+class EntityBackedKnowledgeConfig(BaseModel):
     """
-    UpdateFileSegmentRequest
+    Configuration for entity-backed knowledge. Required when `type` is `entity_backed_knowledge`. Contains entity collections with pre-extracted structured data and optional domain context.
     """ # noqa: E501
-    metadata: Optional[Dict[str, Any]] = Field(default=None, description="The user defined metadata for the segment. Nullable")
-    __properties: ClassVar[List[str]] = ["metadata"]
+    entity_collections: Annotated[List[EntityCollectionConfig], Field(min_length=1)] = Field(description="List of entity collections that provide pre-extracted structured data. Only supported with `nimbus-002-preview` model.  Entity collections contain structured entities extracted from the same videos in the main collection (e.g., action items, speakers, topics). The model can use these for fast, structured lookups instead of searching raw content.")
+    description: Optional[Annotated[str, Field(strict=True, max_length=2000)]] = Field(default=None, description="General context about the videos in this collection. Helps the model understand the domain.  Examples: - \"Sales call recordings with enterprise prospects from Q4 2024\" - \"Product demo videos for the Acme Analytics platform\" - \"Weekly team standup recordings from the engineering org\"")
+    __properties: ClassVar[List[str]] = ["entity_collections", "description"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -47,7 +50,7 @@ class UpdateFileSegmentRequest(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of UpdateFileSegmentRequest from a JSON string"""
+        """Create an instance of EntityBackedKnowledgeConfig from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -68,11 +71,18 @@ class UpdateFileSegmentRequest(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in entity_collections (list)
+        _items = []
+        if self.entity_collections:
+            for _item_entity_collections in self.entity_collections:
+                if _item_entity_collections:
+                    _items.append(_item_entity_collections.to_dict())
+            _dict['entity_collections'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of UpdateFileSegmentRequest from a dict"""
+        """Create an instance of EntityBackedKnowledgeConfig from a dict"""
         if obj is None:
             return None
 
@@ -80,7 +90,8 @@ class UpdateFileSegmentRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "metadata": obj.get("metadata")
+            "entity_collections": [EntityCollectionConfig.from_dict(_item) for _item in obj["entity_collections"]] if obj.get("entity_collections") is not None else None,
+            "description": obj.get("description")
         })
         return _obj
 
