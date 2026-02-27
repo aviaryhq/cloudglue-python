@@ -1,16 +1,16 @@
 # cloudglue/client/resources/tags.py
-"""Tags resource for CloudGlue API."""
+"""Tags resource for Cloudglue API."""
 from typing import Optional
 
 from cloudglue.sdk.models.create_video_tag_request import CreateVideoTagRequest
 from cloudglue.sdk.models.update_video_tag_request import UpdateVideoTagRequest
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Tags:
-    """Client for the CloudGlue Tags API."""
+    """Client for the Cloudglue Tags API."""
 
     def __init__(self, api):
         """Initialize the Tags client.
@@ -39,7 +39,7 @@ class Tags:
             VideoTag object
 
         Raises:
-            CloudGlueError: If there is an error creating the tag.
+            CloudglueError: If there is an error creating the tag.
         """
         try:
             request = CreateVideoTagRequest(
@@ -51,9 +51,9 @@ class Tags:
             response = self.api.create_tag(request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, tag_id: str):
         """Get a tag by ID.
@@ -65,15 +65,15 @@ class Tags:
             VideoTag object
 
         Raises:
-            CloudGlueError: If there is an error retrieving the tag.
+            CloudglueError: If there is an error retrieving the tag.
         """
         try:
             response = self.api.get_tag(tag_id=tag_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def update(
         self,
@@ -92,7 +92,7 @@ class Tags:
             VideoTag object
 
         Raises:
-            CloudGlueError: If there is an error updating the tag.
+            CloudglueError: If there is an error updating the tag.
         """
         try:
             request = UpdateVideoTagRequest(
@@ -102,9 +102,9 @@ class Tags:
             response = self.api.update_tag(tag_id=tag_id, update_video_tag_request=request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, tag_id: str):
         """Delete a tag.
@@ -116,15 +116,15 @@ class Tags:
             The deletion confirmation
 
         Raises:
-            CloudGlueError: If there is an error deleting the tag.
+            CloudglueError: If there is an error deleting the tag.
         """
         try:
             response = self.api.delete_tag(tag_id=tag_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -143,7 +143,7 @@ class Tags:
             ListVideoTagsResponse object
 
         Raises:
-            CloudGlueError: If there is an error listing tags.
+            CloudglueError: If there is an error listing tags.
         """
         try:
             response = self.api.list_tags(
@@ -153,9 +153,9 @@ class Tags:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_file_tags(self, file_id: str):
         """List all tags for a specific file.
@@ -167,15 +167,15 @@ class Tags:
             ListVideoTagsResponse object
 
         Raises:
-            CloudGlueError: If there is an error listing file tags.
+            CloudglueError: If there is an error listing file tags.
         """
         try:
             response = self.api.list_file_tags(file_id=file_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_file_segment_tags(self, file_id: str, segment_id: str):
         """List all tags for a specific file segment.
@@ -188,13 +188,13 @@ class Tags:
             ListVideoTagsResponse object
 
         Raises:
-            CloudGlueError: If there is an error listing segment tags.
+            CloudglueError: If there is an error listing segment tags.
         """
         try:
             response = self.api.list_file_segment_tags(file_id=file_id, segment_id=segment_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

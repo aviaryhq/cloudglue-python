@@ -1,5 +1,5 @@
 # cloudglue/client/resources/files.py
-"""Files resource for CloudGlue API."""
+"""Files resource for Cloudglue API."""
 import json
 import os
 import pathlib
@@ -20,7 +20,7 @@ from cloudglue.sdk.models.frame_extraction_thumbnails_config import FrameExtract
 from cloudglue.sdk.models.create_file_frame_extraction_request import CreateFileFrameExtractionRequest
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Files:
@@ -201,7 +201,7 @@ class Files:
         poll_interval: int = 5,
         timeout: int = 600,
     ):
-        """Upload a file to CloudGlue.
+        """Upload a file to Cloudglue.
 
         Args:
             file_path: Path to the local file to upload.
@@ -216,7 +216,7 @@ class Files:
             to complete and returns the final file state.
 
         Raises:
-            CloudGlueError: If there is an error uploading or processing the file.
+            CloudglueError: If there is an error uploading or processing the file.
         """
         try:
             file_path = pathlib.Path(file_path)
@@ -259,9 +259,9 @@ class Files:
             )
 
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -291,7 +291,7 @@ class Files:
             A list of file objects.
 
         Raises:
-            CloudGlueError: If there is an error listing files or processing the request.
+            CloudglueError: If there is an error listing files or processing the request.
         """
         try:
             # Convert filter dict to SearchFilter object if needed
@@ -314,9 +314,9 @@ class Files:
                 filter=json.dumps(filter_obj.to_dict()) if filter_obj else None,
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, file_id: str):
         """Get details about a specific file.
@@ -328,14 +328,14 @@ class Files:
             The file object.
 
         Raises:
-            CloudGlueError: If there is an error retrieving the file or processing the request.
+            CloudglueError: If there is an error retrieving the file or processing the request.
         """
         try:
             return self.api.get_file(file_id=file_id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, file_id: str):
         """Delete a file.
@@ -347,14 +347,14 @@ class Files:
             The deletion confirmation.
 
         Raises:
-            CloudGlueError: If there is an error deleting the file or processing the request.
+            CloudglueError: If there is an error deleting the file or processing the request.
         """
         try:
             return self.api.delete_file(file_id=file_id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def update(
         self,
@@ -373,7 +373,7 @@ class Files:
             The updated file object.
 
         Raises:
-            CloudGlueError: If there is an error updating the file or processing the request.
+            CloudglueError: If there is an error updating the file or processing the request.
         """
         try:
             # Create the update request object
@@ -384,9 +384,9 @@ class Files:
             
             return self.api.update_file(file_id=file_id, file_update=file_update)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def create_segmentation(
         self,
@@ -412,7 +412,7 @@ class Files:
             to complete and returns the final segmentation state.
 
         Raises:
-            CloudGlueError: If there is an error creating the segmentation or processing the request.
+            CloudglueError: If there is an error creating the segmentation or processing the request.
 
         Example:
             # Create uniform segmentation
@@ -481,9 +481,9 @@ class Files:
             )
 
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_segmentations(
         self,
@@ -502,7 +502,7 @@ class Files:
             A SegmentationList object containing segmentation objects for the file
 
         Raises:
-            CloudGlueError: If there is an error listing the segmentations or processing the request.
+            CloudglueError: If there is an error listing the segmentations or processing the request.
         """
         try:
             response = self.api.list_file_segmentations(
@@ -512,9 +512,9 @@ class Files:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get_thumbnails(
         self,
@@ -550,9 +550,9 @@ class Files:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_segments(
         self,
@@ -575,7 +575,7 @@ class Files:
             FileSegmentListResponse containing segments
 
         Raises:
-            CloudGlueError: If there is an error listing segments.
+            CloudglueError: If there is an error listing segments.
         """
         try:
             response = self.api.list_file_segments(
@@ -587,9 +587,9 @@ class Files:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_frame_extractions(
         self,
@@ -608,7 +608,7 @@ class Files:
             FrameExtractionList containing frame extraction jobs
 
         Raises:
-            CloudGlueError: If there is an error listing frame extractions.
+            CloudglueError: If there is an error listing frame extractions.
         """
         try:
             response = self.api.list_file_frame_extractions(
@@ -618,9 +618,9 @@ class Files:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def create_frame_extraction(
         self,
@@ -651,7 +651,7 @@ class Files:
             FrameExtraction: The frame extraction job object
 
         Raises:
-            CloudGlueError: If there is an error creating the frame extraction job
+            CloudglueError: If there is an error creating the frame extraction job
         """
         try:
             # Convert config dicts to objects if needed
@@ -697,8 +697,8 @@ class Files:
                     
                     # Get updated status
                     try:
-                        from cloudglue.client.main import CloudGlue
-                        client = CloudGlue()  # This is not ideal but we need access to frames API
+                        from cloudglue.client.main import Cloudglue
+                        client = Cloudglue()  # This is not ideal but we need access to frames API
                         response = client.frames.get(response.id)
                     except Exception:
                         # If we can't get status, just return what we have
@@ -706,11 +706,11 @@ class Files:
                         
                 # Check if we timed out
                 if hasattr(response, 'status') and response.status not in ['completed', 'failed']:
-                    raise CloudGlueError(f"Frame extraction job timed out after {timeout} seconds")
+                    raise CloudglueError(f"Frame extraction job timed out after {timeout} seconds")
 
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

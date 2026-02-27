@@ -1,5 +1,5 @@
 # cloudglue/client/resources/face_match.py
-"""Face Match resource for CloudGlue API."""
+"""Face Match resource for Cloudglue API."""
 import base64
 import os
 import pathlib
@@ -11,11 +11,11 @@ from cloudglue.sdk.models.source_image import SourceImage
 from cloudglue.sdk.models.frame_extraction_config import FrameExtractionConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class FaceMatch:
-    """Client for the CloudGlue Face Match API."""
+    """Client for the Cloudglue Face Match API."""
 
     def __init__(self, api):
         """Initialize the FaceMatch client.
@@ -36,16 +36,16 @@ class FaceMatch:
             Base64 encoded image string
 
         Raises:
-            CloudGlueError: If file is not found, not a valid image type, or cannot be read
+            CloudglueError: If file is not found, not a valid image type, or cannot be read
         """
         try:
             if not os.path.exists(file_path):
-                raise CloudGlueError(f"File not found: {file_path}")
+                raise CloudglueError(f"File not found: {file_path}")
             
             # Check file extension
             file_ext = pathlib.Path(file_path).suffix.lower()
             if file_ext not in ['.jpg', '.jpeg', '.png']:
-                raise CloudGlueError(f"Unsupported file type: {file_ext}. Only JPG and PNG are supported.")
+                raise CloudglueError(f"Unsupported file type: {file_ext}. Only JPG and PNG are supported.")
             
             # Read and encode the file
             with open(file_path, 'rb') as image_file:
@@ -54,9 +54,9 @@ class FaceMatch:
                 return base64_string
                 
         except Exception as e:
-            if isinstance(e, CloudGlueError):
+            if isinstance(e, CloudglueError):
                 raise
-            raise CloudGlueError(f"Error encoding image file: {str(e)}")
+            raise CloudglueError(f"Error encoding image file: {str(e)}")
 
     @staticmethod
     def create_face_match_request(
@@ -87,7 +87,7 @@ class FaceMatch:
             FaceMatchRequest object
 
         Raises:
-            CloudGlueError: If source_image format is invalid or file operations fail
+            CloudglueError: If source_image format is invalid or file operations fail
         """
         try:
             # Handle source_image parameter
@@ -112,7 +112,7 @@ class FaceMatch:
                     # Assume raw base64 string
                     source_image_obj = SourceImage(base64_image=source_image)
             else:
-                raise CloudGlueError("source_image must be a string (URL, file path, or base64) or dictionary")
+                raise CloudglueError("source_image must be a string (URL, file path, or base64) or dictionary")
             
             request_params = {
                 "source_image": source_image_obj,
@@ -132,9 +132,9 @@ class FaceMatch:
             return FaceMatchRequest(**request_params)
             
         except Exception as e:
-            if isinstance(e, CloudGlueError):
+            if isinstance(e, CloudglueError):
                 raise
-            raise CloudGlueError(f"Error creating face match request: {str(e)}")
+            raise CloudglueError(f"Error creating face match request: {str(e)}")
 
     def create(
         self,
@@ -149,7 +149,7 @@ class FaceMatch:
             FaceMatch object
 
         Raises:
-            CloudGlueError: If there is an error creating the face match job.
+            CloudglueError: If there is an error creating the face match job.
         """
         try:
             if isinstance(face_match_request, dict):
@@ -158,9 +158,9 @@ class FaceMatch:
             response = self.api.create_face_match(face_match_request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(
         self,
@@ -179,7 +179,7 @@ class FaceMatch:
             FaceMatch object
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.get_face_match(
@@ -189,9 +189,9 @@ class FaceMatch:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -208,7 +208,7 @@ class FaceMatch:
             FaceMatchListResponse object containing list of face match jobs
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.list_face_match(
@@ -217,9 +217,9 @@ class FaceMatch:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, face_match_id: str):
         """Delete a face match analysis.
@@ -231,15 +231,15 @@ class FaceMatch:
             The deletion confirmation
 
         Raises:
-            CloudGlueError: If there is an error deleting the face match.
+            CloudglueError: If there is an error deleting the face match.
         """
         try:
             response = self.api.delete_face_match(face_match_id=face_match_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def run(
         self,
@@ -270,7 +270,7 @@ class FaceMatch:
             FaceMatch: The completed face match object with status and results
 
         Raises:
-            CloudGlueError: If there is an error creating or processing the face match job.
+            CloudglueError: If there is an error creating or processing the face match job.
             TimeoutError: If the job does not complete within the specified timeout.
         """
         try:
@@ -302,7 +302,7 @@ class FaceMatch:
                 f"Face match job did not complete within {timeout} seconds"
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

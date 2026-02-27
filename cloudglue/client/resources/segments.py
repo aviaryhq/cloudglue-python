@@ -1,5 +1,5 @@
 # cloudglue/client/resources/segments.py
-"""Segments resource for CloudGlue API."""
+"""Segments resource for Cloudglue API."""
 import time
 from typing import Dict, Any, Optional, Union
 
@@ -10,11 +10,11 @@ from cloudglue.sdk.models.segments import Segments as SegmentsModel
 from cloudglue.sdk.models.segments_list import SegmentsList
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Segments:
-    """Client for the CloudGlue Segments API."""
+    """Client for the Cloudglue Segments API."""
 
     def __init__(self, api):
         """Initialize the Segments client.
@@ -108,7 +108,7 @@ class Segments:
             Segments object representing the created job
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             # Convert dict configs to objects if needed
@@ -127,9 +127,9 @@ class Segments:
             response = self.api.create_segments(new_segments)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, job_id: str) -> SegmentsModel:
         """Get a segmentation job by ID.
@@ -141,15 +141,15 @@ class Segments:
             Segments object
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.get_segments(job_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -176,7 +176,7 @@ class Segments:
             SegmentsList object
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.list_segments(
@@ -190,9 +190,9 @@ class Segments:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, job_id: str):
         """Delete a segments job.
@@ -204,15 +204,15 @@ class Segments:
             The deletion confirmation
 
         Raises:
-            CloudGlueError: If there is an error deleting the segments job.
+            CloudglueError: If there is an error deleting the segments job.
         """
         try:
             response = self.api.delete_segments(job_id=job_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def run(
         self,
@@ -240,7 +240,7 @@ class Segments:
             Segments: The completed Segments object with status and segments data.
 
         Raises:
-            CloudGlueError: If there is an error creating or processing the segmentation job.
+            CloudglueError: If there is an error creating or processing the segmentation job.
             TimeoutError: If the job does not complete within the specified timeout.
         """
         try:
@@ -268,7 +268,7 @@ class Segments:
                 f"Segmentation job did not complete within {timeout} seconds"
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

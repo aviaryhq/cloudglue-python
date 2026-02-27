@@ -1,5 +1,5 @@
 # cloudglue/client/resources/segmentations.py
-"""Segmentations resource for CloudGlue API."""
+"""Segmentations resource for Cloudglue API."""
 from typing import List, Dict, Any, Optional, Union
 
 from cloudglue.sdk.models.segmentation_config import SegmentationConfig
@@ -11,11 +11,11 @@ from cloudglue.sdk.models.narrative_config import NarrativeConfig
 from cloudglue.sdk.models.keyframe_config import KeyframeConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Segmentations:
-    """Client for the CloudGlue Segmentations API."""
+    """Client for the Cloudglue Segmentations API."""
 
     def __init__(self, api):
         """Initialize the Segmentations client.
@@ -308,7 +308,7 @@ class Segmentations:
             The typed Segmentation object with segments and metadata
 
         Raises:
-            CloudGlueError: If there is an error retrieving the segmentation or processing the request.
+            CloudglueError: If there is an error retrieving the segmentation or processing the request.
         """
         try:
             response = self.api.get_segmentation(
@@ -318,9 +318,9 @@ class Segmentations:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, segmentation_id: str):
         """Delete a segmentation.
@@ -332,15 +332,15 @@ class Segmentations:
             The deletion confirmation
 
         Raises:
-            CloudGlueError: If there is an error deleting the segmentation or processing the request.
+            CloudglueError: If there is an error deleting the segmentation or processing the request.
         """
         try:
             response = self.api.delete_segmentation(segmentation_id=segmentation_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get_thumbnails(
         self,
@@ -370,9 +370,9 @@ class Segmentations:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_describes(
         self,
@@ -398,7 +398,7 @@ class Segmentations:
             DescribeList containing describe jobs for the segmentation
 
         Raises:
-            CloudGlueError: If there is an error listing describes.
+            CloudglueError: If there is an error listing describes.
         """
         try:
             response = self.api.list_segmentation_describes(
@@ -410,7 +410,7 @@ class Segmentations:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

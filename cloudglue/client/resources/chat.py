@@ -1,5 +1,5 @@
 # cloudglue/client/resources/chat.py
-"""Chat and Completions resources for CloudGlue API."""
+"""Chat and Completions resources for Cloudglue API."""
 from typing import List, Dict, Any, Optional, Union
 
 from cloudglue.sdk.models.chat_completion_request import ChatCompletionRequest
@@ -9,7 +9,7 @@ from cloudglue.sdk.models.chat_completion_request_filter_video_info_inner import
 from cloudglue.sdk.models.chat_completion_request_filter_file_inner import ChatCompletionRequestFilterFileInner
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Completions:
@@ -198,7 +198,7 @@ class Completions:
             The API response with generated completion.
 
         Raises:
-            CloudGlueError: If there is an error making the API request or processing the response.
+            CloudglueError: If there is an error making the API request or processing the response.
         """
         try:
             # Handle filter parameter
@@ -222,9 +222,9 @@ class Completions:
             )
             return self.api.create_completion(chat_completion_request=request)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, id: str):
         """Retrieve a chat completion by ID.
@@ -236,14 +236,14 @@ class Completions:
             The chat completion response.
 
         Raises:
-            CloudGlueError: If there is an error making the API request or processing the response.
+            CloudglueError: If there is an error making the API request or processing the response.
         """
         try:
             return self.api.get_chat_completion(id=id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -264,7 +264,7 @@ class Completions:
             A list response containing chat completions.
 
         Raises:
-            CloudGlueError: If there is an error making the API request or processing the response.
+            CloudglueError: If there is an error making the API request or processing the response.
         """
         try:
             return self.api.list_chat_completions(
@@ -274,13 +274,13 @@ class Completions:
                 created_after=created_after,
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
 
 class Chat:
-    """Chat namespace for the CloudGlue client."""
+    """Chat namespace for the Cloudglue client."""
 
     def __init__(self, api):
         """Initialize with the API client."""

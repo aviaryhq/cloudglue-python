@@ -1,10 +1,10 @@
 # cloudglue/client/resources/thumbnails.py
-"""Thumbnails resource for CloudGlue API."""
+"""Thumbnails resource for Cloudglue API."""
 from typing import Optional
 
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Thumbnails:
@@ -48,7 +48,7 @@ class Thumbnails:
             return response
         except Exception as e:
             if hasattr(e, 'status') and hasattr(e, 'data'):
-                raise CloudGlueError(
+                raise CloudglueError(
                     message=str(e),
                     status_code=e.status,
                     data=e.data,
@@ -89,7 +89,7 @@ class Thumbnails:
             return response
         except Exception as e:
             if hasattr(e, 'status') and hasattr(e, 'data'):
-                raise CloudGlueError(
+                raise CloudglueError(
                     message=str(e),
                     status_code=e.status,
                     data=e.data,

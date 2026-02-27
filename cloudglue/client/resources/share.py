@@ -1,16 +1,16 @@
 # cloudglue/client/resources/share.py
-"""Share resource for CloudGlue API."""
+"""Share resource for Cloudglue API."""
 from typing import Dict, Any, Optional
 
 from cloudglue.sdk.models.create_shareable_asset_request import CreateShareableAssetRequest
 from cloudglue.sdk.models.update_shareable_asset_request import UpdateShareableAssetRequest
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Share:
-    """Handles shareable asset operations for the CloudGlue API."""
+    """Handles shareable asset operations for the Cloudglue API."""
 
     def __init__(self, api):
         """Initialize with the API client."""
@@ -37,7 +37,7 @@ class Share:
             ShareableAsset object with the share_url.
 
         Raises:
-            CloudGlueError: If there is an error creating the shareable asset.
+            CloudglueError: If there is an error creating the shareable asset.
         """
         try:
             request = CreateShareableAssetRequest(
@@ -49,9 +49,9 @@ class Share:
             )
             return self.api.create_shareable_asset(create_shareable_asset_request=request)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, shareable_asset_id: str):
         """Get a specific shareable asset by ID.
@@ -63,14 +63,14 @@ class Share:
             ShareableAsset object.
 
         Raises:
-            CloudGlueError: If there is an error retrieving the shareable asset.
+            CloudglueError: If there is an error retrieving the shareable asset.
         """
         try:
             return self.api.get_shareable_asset(id=shareable_asset_id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -95,7 +95,7 @@ class Share:
             ShareableAssetListResponse object.
 
         Raises:
-            CloudGlueError: If there is an error listing shareable assets.
+            CloudglueError: If there is an error listing shareable assets.
         """
         try:
             return self.api.list_shareable_assets(
@@ -107,9 +107,9 @@ class Share:
                 created_after=created_after,
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def update(
         self,
@@ -130,7 +130,7 @@ class Share:
             Updated ShareableAsset object.
 
         Raises:
-            CloudGlueError: If there is an error updating the shareable asset.
+            CloudglueError: If there is an error updating the shareable asset.
         """
         try:
             request = UpdateShareableAssetRequest(
@@ -143,9 +143,9 @@ class Share:
                 update_shareable_asset_request=request,
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, shareable_asset_id: str):
         """Delete a shareable asset.
@@ -157,11 +157,11 @@ class Share:
             Deletion confirmation.
 
         Raises:
-            CloudGlueError: If there is an error deleting the shareable asset.
+            CloudglueError: If there is an error deleting the shareable asset.
         """
         try:
             return self.api.delete_shareable_asset(id=shareable_asset_id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))

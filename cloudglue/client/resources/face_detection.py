@@ -1,5 +1,5 @@
 # cloudglue/client/resources/face_detection.py
-"""Face Detection resource for CloudGlue API."""
+"""Face Detection resource for Cloudglue API."""
 import time
 from typing import Dict, Any, Optional, Union
 
@@ -7,11 +7,11 @@ from cloudglue.sdk.models.face_detection_request import FaceDetectionRequest
 from cloudglue.sdk.models.frame_extraction_config import FrameExtractionConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class FaceDetection:
-    """Client for the CloudGlue Face Detection API."""
+    """Client for the Cloudglue Face Detection API."""
 
     def __init__(self, api):
         """Initialize the FaceDetection client.
@@ -66,7 +66,7 @@ class FaceDetection:
             FaceDetection object
 
         Raises:
-            CloudGlueError: If there is an error creating the face detection job.
+            CloudglueError: If there is an error creating the face detection job.
         """
         try:
             if isinstance(face_detection_request, dict):
@@ -75,9 +75,9 @@ class FaceDetection:
             response = self.api.create_face_detection(face_detection_request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(
         self,
@@ -96,7 +96,7 @@ class FaceDetection:
             FaceDetection object
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.get_face_detection(
@@ -106,9 +106,9 @@ class FaceDetection:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -131,7 +131,7 @@ class FaceDetection:
             FaceDetectionListResponse object containing list of face detection jobs
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.list_face_detection(
@@ -143,9 +143,9 @@ class FaceDetection:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, face_detection_id: str):
         """Delete a face detection analysis.
@@ -157,15 +157,15 @@ class FaceDetection:
             The deletion confirmation
 
         Raises:
-            CloudGlueError: If there is an error deleting the face detection.
+            CloudglueError: If there is an error deleting the face detection.
         """
         try:
             response = self.api.delete_face_detection(face_detection_id=face_detection_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def run(
         self,
@@ -190,7 +190,7 @@ class FaceDetection:
             FaceDetection: The completed face detection object with status and results
 
         Raises:
-            CloudGlueError: If there is an error creating or processing the face detection job.
+            CloudglueError: If there is an error creating or processing the face detection job.
             TimeoutError: If the job does not complete within the specified timeout.
         """
         try:
@@ -219,7 +219,7 @@ class FaceDetection:
                 f"Face detection job did not complete within {timeout} seconds"
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

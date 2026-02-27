@@ -1,5 +1,5 @@
 # cloudglue/client/resources/transcribe.py
-"""Transcribe resource for CloudGlue API."""
+"""Transcribe resource for Cloudglue API."""
 import time
 from typing import Dict, Any, Optional, Union
 
@@ -8,7 +8,7 @@ from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Transcribe:
@@ -47,7 +47,7 @@ class Transcribe:
             The typed Transcribe job object with job_id and status.
 
         Raises:
-            CloudGlueError: If there is an error creating the transcribe job or processing the request.
+            CloudglueError: If there is an error creating the transcribe job or processing the request.
         """
         try:
             if segmentation_id and segmentation_config:
@@ -81,9 +81,9 @@ class Transcribe:
             response = self.api.create_transcribe(new_transcribe=request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     # TODO (kdr): asyncio version of this
     def get(self, job_id: str, response_format: Optional[str] = None):
@@ -97,16 +97,16 @@ class Transcribe:
             The typed Transcribe job object with status and data.
 
         Raises:
-            CloudGlueError: If there is an error retrieving the transcribe job or processing the request.
+            CloudglueError: If there is an error retrieving the transcribe job or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
             response = self.api.get_transcribe(job_id=job_id, response_format=response_format)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
         
     def list(
         self,
@@ -133,7 +133,7 @@ class Transcribe:
             A list of transcribe jobs.
 
         Raises:
-            CloudGlueError: If there is an error listing the transcribe jobs or processing the request.
+            CloudglueError: If there is an error listing the transcribe jobs or processing the request.
         """
         try:
             return self.api.list_transcribes(
@@ -146,9 +146,9 @@ class Transcribe:
                 url=url,
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def run(
         self,
@@ -184,7 +184,7 @@ class Transcribe:
             The completed typed Transcribe job object.
 
         Raises:
-            CloudGlueError: If there is an error creating or processing the transcribe job.
+            CloudglueError: If there is an error creating or processing the transcribe job.
         """
         try:
             # Create the job
@@ -218,7 +218,7 @@ class Transcribe:
             )
 
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

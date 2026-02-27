@@ -1,5 +1,5 @@
 # cloudglue/client/resources/collections.py
-"""Collections resource for CloudGlue API."""
+"""Collections resource for Cloudglue API."""
 import json
 import time
 from typing import Dict, Any, Optional, Union
@@ -13,11 +13,11 @@ from cloudglue.sdk.models.collection_update import CollectionUpdate
 from cloudglue.sdk.models.new_collection_face_detection_config import NewCollectionFaceDetectionConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Collections:
-    """Client for the CloudGlue Collections API."""
+    """Client for the Cloudglue Collections API."""
 
     def __init__(self, api):
         """Initialize the Collections client.
@@ -56,7 +56,7 @@ class Collections:
             The typed Collection object with all properties
 
         Raises:
-            CloudGlueError: If there is an error creating the collection or processing the request.
+            CloudglueError: If there is an error creating the collection or processing the request.
         """
         try:
             # Create request object using the SDK model
@@ -98,9 +98,9 @@ class Collections:
             response = self.api.create_collection(new_collection=request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -123,7 +123,7 @@ class Collections:
             The typed CollectionList object with collections and metadata
 
         Raises:
-            CloudGlueError: If there is an error listing collections or processing the request.
+            CloudglueError: If there is an error listing collections or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
@@ -132,9 +132,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, collection_id: str):
         """Get a specific collection by ID.
@@ -146,16 +146,16 @@ class Collections:
             The typed Collection object with all properties
 
         Raises:
-            CloudGlueError: If there is an error retrieving the collection or processing the request.
+            CloudglueError: If there is an error retrieving the collection or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
             response = self.api.get_collection(collection_id=collection_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, collection_id: str):
         """Delete a collection.
@@ -167,16 +167,16 @@ class Collections:
             The typed DeleteResponse object with deletion confirmation
 
         Raises:
-            CloudGlueError: If there is an error deleting the collection or processing the request.
+            CloudglueError: If there is an error deleting the collection or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
             response = self.api.delete_collection(collection_id=collection_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def update(
         self,
@@ -195,7 +195,7 @@ class Collections:
             The updated Collection object
 
         Raises:
-            CloudGlueError: If there is an error updating the collection or processing the request.
+            CloudglueError: If there is an error updating the collection or processing the request.
         """
         try:
             # Create update request object
@@ -206,7 +206,7 @@ class Collections:
                 update_data["description"] = description
             
             if not update_data:
-                raise CloudGlueError("At least one field (name or description) must be provided for update")
+                raise CloudglueError("At least one field (name or description) must be provided for update")
             
             collection_update = CollectionUpdate(**update_data)
             response = self.api.update_collection(
@@ -215,9 +215,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def add_video(
         self,
@@ -247,12 +247,12 @@ class Collections:
             is True, waits for processing to complete and returns the final video state.
 
         Raises:
-            CloudGlueError: If there is an error adding the video or processing the request.
+            CloudglueError: If there is an error adding the video or processing the request.
         """
         try:
             # Validate that either file_id or url is provided
             if not file_id and not url:
-                raise CloudGlueError("Either file_id or url must be provided")
+                raise CloudglueError("Either file_id or url must be provided")
             
             if segmentation_id and segmentation_config:
                 raise ValueError("Cannot provide both segmentation_id and segmentation_config")
@@ -299,9 +299,9 @@ class Collections:
             )
 
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get_video(self, collection_id: str, file_id: str):
         """Get information about a specific video in a collection.
@@ -314,16 +314,16 @@ class Collections:
             The typed CollectionFile object with video details
 
         Raises:
-            CloudGlueError: If there is an error retrieving the video or processing the request.
+            CloudglueError: If there is an error retrieving the video or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
             response = self.api.get_video(collection_id=collection_id, file_id=file_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_videos(
         self,
@@ -354,7 +354,7 @@ class Collections:
             The typed CollectionFileList object with videos and metadata
 
         Raises:
-            CloudGlueError: If there is an error listing the videos or processing the request.
+            CloudglueError: If there is an error listing the videos or processing the request.
         """
         try:
             # Convert filter dict to SearchFilter object if needed
@@ -380,9 +380,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def remove_video(self, collection_id: str, file_id: str):
         """Remove a video from a collection.
@@ -395,7 +395,7 @@ class Collections:
             The typed DeleteResponse object with removal confirmation
 
         Raises:
-            CloudGlueError: If there is an error removing the video or processing the request.
+            CloudglueError: If there is an error removing the video or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
@@ -404,9 +404,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get_rich_transcripts(
         self,
@@ -429,7 +429,7 @@ class Collections:
             The typed RichTranscript object with video rich transcript data
 
         Raises:
-            CloudGlueError: If there is an error retrieving the rich transcript or processing the request.
+            CloudglueError: If there is an error retrieving the rich transcript or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
@@ -438,9 +438,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get_video_entities(
         self, 
@@ -461,7 +461,7 @@ class Collections:
             The typed FileEntities object with video entities data
 
         Raises:
-            CloudGlueError: If there is an error retrieving the entities or processing the request.
+            CloudglueError: If there is an error retrieving the entities or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
@@ -473,9 +473,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_entities(
         self,
@@ -504,7 +504,7 @@ class Collections:
             Collection entities list response
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.list_collection_entities(
@@ -518,9 +518,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(
+            raise CloudglueError(
                 f"Failed to list entities in collection {collection_id}: {str(e)}"
             )
 
@@ -553,7 +553,7 @@ class Collections:
             Collection rich transcripts list response
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.list_collection_rich_transcripts(
@@ -568,9 +568,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(
+            raise CloudglueError(
                 f"Failed to list rich transcripts in collection {collection_id}: {str(e)}"
             )
 
@@ -595,7 +595,7 @@ class Collections:
             The typed MediaDescription object with video media description data
 
         Raises:
-            CloudGlueError: If there is an error retrieving the media descriptions or processing the request.
+            CloudglueError: If there is an error retrieving the media descriptions or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
@@ -604,9 +604,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_media_descriptions(
         self,
@@ -637,7 +637,7 @@ class Collections:
             Collection media descriptions list response
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.list_collection_media_descriptions(
@@ -652,9 +652,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(
+            raise CloudglueError(
                 f"Failed to list media descriptions in collection {collection_id}: {str(e)}"
             )
 
@@ -679,7 +679,7 @@ class Collections:
             FileFaceDetections object containing detected faces
 
         Raises:
-            CloudGlueError: If the request fails
+            CloudglueError: If the request fails
         """
         try:
             response = self.api.get_face_detections(
@@ -690,9 +690,9 @@ class Collections:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(
+            raise CloudglueError(
                 f"Failed to get face detections for file {file_id} in collection {collection_id}: {str(e)}"
             )
 
@@ -734,12 +734,12 @@ class Collections:
             is True, waits for processing to complete and returns the final state.
 
         Raises:
-            CloudGlueError: If there is an error adding the media or processing the request.
+            CloudglueError: If there is an error adding the media or processing the request.
         """
         try:
             # Validate that either file_id or url is provided
             if not file_id and not url:
-                raise CloudGlueError("Either file_id or url must be provided")
+                raise CloudglueError("Either file_id or url must be provided")
 
             if segmentation_id and segmentation_config:
                 raise ValueError("Cannot provide both segmentation_id and segmentation_config")
@@ -783,7 +783,7 @@ class Collections:
             )
 
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

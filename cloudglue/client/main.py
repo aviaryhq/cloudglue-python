@@ -49,13 +49,13 @@ from cloudglue._version import __version__
 SDK_CLIENT_NAME = "cloudglue-python"
 
 
-class CloudGlue:
-    """Main client for interacting with the CloudGlue API."""
+class Cloudglue:
+    """Main client for interacting with the Cloudglue API."""
 
     def __init__(
         self, api_key: Optional[str] = None, host: str = "https://api.cloudglue.dev/v1"
     ):
-        """Initialize the CloudGlue client.
+        """Initialize the Cloudglue client.
 
         Args:
             api_key: Your API key. If not provided, will try to use CLOUDGLUE_API_KEY env variable.

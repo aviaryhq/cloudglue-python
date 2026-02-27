@@ -1,5 +1,5 @@
 # cloudglue/client/resources/search.py
-"""Search resource for CloudGlue API."""
+"""Search resource for Cloudglue API."""
 import base64
 import os
 import pathlib
@@ -13,11 +13,11 @@ from cloudglue.sdk.models.search_filter_video_info_inner import SearchFilterVide
 from cloudglue.sdk.models.search_request_source_image import SearchRequestSourceImage
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Search:
-    """Client for the CloudGlue Search API."""
+    """Client for the Cloudglue Search API."""
 
     def __init__(self, api):
         """Initialize the Search client.
@@ -223,7 +223,7 @@ class Search:
             SearchResponse: The API response with search results.
 
         Raises:
-            CloudGlueError: If there is an error making the API request or processing the response.
+            CloudglueError: If there is an error making the API request or processing the response.
 
         Example:
             # Text search for content in collections
@@ -295,7 +295,7 @@ class Search:
                         # Check file extension
                         file_ext = pathlib.Path(source_image).suffix.lower()
                         if file_ext not in ['.jpg', '.jpeg', '.png']:
-                            raise CloudGlueError(f"Unsupported file type: {file_ext}. Only JPG and PNG are supported.")
+                            raise CloudglueError(f"Unsupported file type: {file_ext}. Only JPG and PNG are supported.")
                         
                         # Read and encode the file
                         with open(source_image, 'rb') as image_file:
@@ -306,7 +306,7 @@ class Search:
                         # Assume raw base64 string
                         source_image_obj = SearchRequestSourceImage(base64=source_image)
                 else:
-                    raise CloudGlueError("source_image must be a string (URL, file path, or base64) or dictionary")
+                    raise CloudglueError("source_image must be a string (URL, file path, or base64) or dictionary")
             
             request = SearchRequest(
                 scope=scope,
@@ -324,11 +324,11 @@ class Search:
             )
             return self.api.search_content(search_request=request)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            if isinstance(e, CloudGlueError):
+            if isinstance(e, CloudglueError):
                 raise
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -347,7 +347,7 @@ class Search:
             SearchResponseList object
 
         Raises:
-            CloudGlueError: If there is an error listing search responses.
+            CloudglueError: If there is an error listing search responses.
         """
         try:
             response = self.api.get_search(
@@ -356,9 +356,9 @@ class Search:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, search_id: str):
         """Get a search response by ID.
@@ -370,13 +370,13 @@ class Search:
             SearchResponse object
 
         Raises:
-            CloudGlueError: If there is an error retrieving the search response.
+            CloudglueError: If there is an error retrieving the search response.
         """
         try:
             response = self.api.get_search_by_id(search_id=search_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

@@ -1,5 +1,5 @@
 # cloudglue/client/resources/frames.py
-"""Frames resource for CloudGlue API."""
+"""Frames resource for Cloudglue API."""
 from typing import Dict, Any, Optional, Union
 
 from cloudglue.sdk.models.frame_extraction_config import FrameExtractionConfig
@@ -7,11 +7,11 @@ from cloudglue.sdk.models.frame_extraction_uniform_config import FrameExtraction
 from cloudglue.sdk.models.frame_extraction_thumbnails_config import FrameExtractionThumbnailsConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Frames:
-    """Client for the CloudGlue Frames API."""
+    """Client for the Cloudglue Frames API."""
 
     def __init__(self, api):
         """Initialize the Frames client.
@@ -104,7 +104,7 @@ class Frames:
             The typed FrameExtraction object with frames and metadata
 
         Raises:
-            CloudGlueError: If there is an error retrieving the frame extraction or processing the request.
+            CloudglueError: If there is an error retrieving the frame extraction or processing the request.
         """
         try:
             response = self.api.get_frame_extraction(
@@ -114,9 +114,9 @@ class Frames:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, frame_extraction_id: str):
         """Delete a frame extraction.
@@ -128,13 +128,13 @@ class Frames:
             The deletion confirmation
 
         Raises:
-            CloudGlueError: If there is an error deleting the frame extraction or processing the request.
+            CloudglueError: If there is an error deleting the frame extraction or processing the request.
         """
         try:
             response = self.api.delete_frame_extraction(frame_extraction_id=frame_extraction_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

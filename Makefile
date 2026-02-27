@@ -4,7 +4,7 @@
 PYTHON      := python3
 ENV_NAME    := .venv
 PIP         := $(ENV_NAME)/bin/pip
-API_SPEC_REPO := git@github.com:aviaryhq/cloudglue-api-spec.git
+API_SPEC_REPO := git@github.com:cloudglue/cloudglue-api-spec.git
 API_SPEC_DIR  := spec
 API_SPEC_FILE := $(API_SPEC_DIR)/spec/openapi.json
 GENERATE_OP := openapi-generator generate \
