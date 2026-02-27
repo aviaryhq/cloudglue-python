@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-CloudGlue Python SDK - Official SDK for the CloudGlue API that turns video into LLM-ready data. Python 3.10+.
+Cloudglue Python SDK - Official SDK for the Cloudglue API that turns video into LLM-ready data. Python 3.10+.
 
 ## Common Commands
 
@@ -31,9 +31,9 @@ Prerequisite: `brew install openapi-generator`
 ### Two-Layer Design
 
 1. **Custom Client Layer** (`cloudglue/client/`) - User-friendly interface you edit
-   - `main.py` - `CloudGlue` main class, initializes all resources
+   - `main.py` - `Cloudglue` main class, initializes all resources
    - `resources/` - 15 resource wrappers (Chat, Files, Collections, etc.)
-   - `resources/base.py` - `CloudGlueError` exception class
+   - `resources/base.py` - `CloudglueError` exception class
 
 2. **Generated SDK Layer** (`cloudglue/sdk/`) - Auto-generated, DO NOT EDIT
    - Generated from OpenAPI spec via `make generate`
@@ -42,12 +42,12 @@ Prerequisite: `brew install openapi-generator`
 
 ### Key Patterns
 
-**Resource wrappers** convert `ApiException` to `CloudGlueError`:
+**Resource wrappers** convert `ApiException` to `CloudglueError`:
 ```python
 try:
     return self.api.some_method(...)
 except ApiException as e:
-    raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+    raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
 ```
 
 **Filter helpers** use static methods to convert dicts to Pydantic filter objects (see `chat.py` for example).
@@ -64,5 +64,5 @@ The OpenAPI spec is a Git submodule in `spec/` pointing to `cloudglue-api-spec` 
 2. Run `make generate` to create API classes and models
 3. Create a new resource wrapper in `cloudglue/client/resources/`
 4. Import the API class in `cloudglue/client/main.py`
-5. Add the resource to `CloudGlue.__init__()`
+5. Add the resource to `Cloudglue.__init__()`
 6. Export from `cloudglue/client/resources/__init__.py`

@@ -1,15 +1,15 @@
 # cloudglue/client/resources/file_segments.py
-"""File Segments resource for CloudGlue API."""
+"""File Segments resource for Cloudglue API."""
 from typing import Dict, Any, Optional
 
 from cloudglue.sdk.models.update_file_segment_request import UpdateFileSegmentRequest
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class FileSegments:
-    """Client for the CloudGlue File Segments API."""
+    """Client for the Cloudglue File Segments API."""
 
     def __init__(self, api):
         """Initialize the FileSegments client.
@@ -30,15 +30,15 @@ class FileSegments:
             FileSegment object
 
         Raises:
-            CloudGlueError: If there is an error retrieving the segment.
+            CloudglueError: If there is an error retrieving the segment.
         """
         try:
             response = self.api.get_file_segment(file_id=file_id, segment_id=segment_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def update(
         self,
@@ -57,7 +57,7 @@ class FileSegments:
             FileSegment object
 
         Raises:
-            CloudGlueError: If there is an error updating the segment.
+            CloudglueError: If there is an error updating the segment.
         """
         try:
             request = UpdateFileSegmentRequest(metadata=metadata)
@@ -68,9 +68,9 @@ class FileSegments:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_tags(self, file_id: str, segment_id: str):
         """List all tags for a specific file segment.
@@ -83,15 +83,15 @@ class FileSegments:
             ListVideoTagsResponse object
 
         Raises:
-            CloudGlueError: If there is an error listing segment tags.
+            CloudglueError: If there is an error listing segment tags.
         """
         try:
             response = self.api.list_file_segment_tags(file_id=file_id, segment_id=segment_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -114,7 +114,7 @@ class FileSegments:
             FileSegmentListResponse containing segments
 
         Raises:
-            CloudGlueError: If there is an error listing segments.
+            CloudglueError: If there is an error listing segments.
         """
         try:
             response = self.api.list_file_segments(
@@ -126,9 +126,9 @@ class FileSegments:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get_describe(
         self,
@@ -149,7 +149,7 @@ class FileSegments:
             SegmentDescribe object
 
         Raises:
-            CloudGlueError: If there is an error retrieving the segment describe.
+            CloudglueError: If there is an error retrieving the segment describe.
         """
         try:
             response = self.api.get_file_segment_describe(
@@ -160,9 +160,9 @@ class FileSegments:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list_describes(
         self,
@@ -187,7 +187,7 @@ class FileSegments:
             SegmentDescribeListResponse containing segment describes
 
         Raises:
-            CloudGlueError: If there is an error listing segment describes.
+            CloudglueError: If there is an error listing segment describes.
         """
         try:
             response = self.api.list_file_segment_describes(
@@ -200,7 +200,7 @@ class FileSegments:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

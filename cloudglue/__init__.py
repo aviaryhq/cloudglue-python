@@ -3,8 +3,8 @@
 from cloudglue._version import __version__
 
 # Import and re-export the client
-from cloudglue.client.main import CloudGlue
-from cloudglue.client.resources import CloudGlueError
+from cloudglue.client.main import Cloudglue
+from cloudglue.client.resources import CloudglueError
 
 # Re-export key models from the SDK
 from cloudglue.sdk.models.chat_completion_request import ChatCompletionRequest
@@ -17,7 +17,7 @@ from cloudglue.sdk.models.file_update import FileUpdate
 
 # Export key classes at the module level for clean imports
 __all__ = [
-    "CloudGlue",
+    "Cloudglue",
     "ChatCompletionRequest",
     "ChatCompletionResponse",
     "ChatCompletionRequestFilter",
@@ -25,5 +25,5 @@ __all__ = [
     "ChatCompletionRequestFilterVideoInfoInner",
     "ChatCompletionRequestFilterFileInner",
     "FileUpdate",
-    "CloudGlueError",
+    "CloudglueError",
 ]

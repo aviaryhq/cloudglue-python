@@ -1,5 +1,5 @@
 # cloudglue/client/resources/responses.py
-"""Responses resource for CloudGlue API."""
+"""Responses resource for Cloudglue API."""
 import json
 from typing import List, Dict, Any, Optional, Union, Generator
 
@@ -16,7 +16,7 @@ from cloudglue.sdk.models.search_filter_metadata_inner import SearchFilterMetada
 from cloudglue.sdk.models.search_filter_video_info_inner import SearchFilterVideoInfoInner
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 def _normalize_input(input: Union[str, List[Dict[str, Any]]]) -> CreateResponseRequestInput:
@@ -103,7 +103,7 @@ def _iter_sse_events(raw_response) -> Generator[Dict[str, Any], None, None]:
 
 
 class Responses:
-    """Handles response operations for the CloudGlue API."""
+    """Handles response operations for the Cloudglue API."""
 
     def __init__(self, api):
         """Initialize with the API client."""
@@ -145,7 +145,7 @@ class Responses:
             The Response object, or a generator of SSE event dicts when stream=True.
 
         Raises:
-            CloudGlueError: If there is an error creating the response.
+            CloudglueError: If there is an error creating the response.
         """
         try:
             kb_kwargs = {"collections": collections}
@@ -178,7 +178,7 @@ class Responses:
                 )
                 if raw_response.status != 200:
                     error_body = raw_response.read().decode("utf-8")
-                    raise CloudGlueError(
+                    raise CloudglueError(
                         f"({raw_response.status})\nReason: {raw_response.reason}\n"
                         f"HTTP response body: {error_body}",
                         raw_response.status,
@@ -186,12 +186,12 @@ class Responses:
                 return _iter_sse_events(raw_response)
             else:
                 return self.api.create_response(create_response_request=request)
-        except CloudGlueError:
+        except CloudglueError:
             raise
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(self, response_id: str):
         """Get a specific response by ID.
@@ -203,14 +203,14 @@ class Responses:
             The Response object.
 
         Raises:
-            CloudGlueError: If there is an error retrieving the response.
+            CloudglueError: If there is an error retrieving the response.
         """
         try:
             return self.api.get_response(id=response_id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -233,7 +233,7 @@ class Responses:
             ResponseList object containing responses.
 
         Raises:
-            CloudGlueError: If there is an error listing responses.
+            CloudglueError: If there is an error listing responses.
         """
         try:
             return self.api.list_responses(
@@ -244,9 +244,9 @@ class Responses:
                 created_after=created_after,
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, response_id: str):
         """Delete a response.
@@ -258,14 +258,14 @@ class Responses:
             Deletion confirmation.
 
         Raises:
-            CloudGlueError: If there is an error deleting the response.
+            CloudglueError: If there is an error deleting the response.
         """
         try:
             return self.api.delete_response(id=response_id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def cancel(self, response_id: str):
         """Cancel a background response that is in progress.
@@ -277,14 +277,14 @@ class Responses:
             The Response object (may be completed, failed, or cancelled).
 
         Raises:
-            CloudGlueError: If there is an error cancelling the response.
+            CloudglueError: If there is an error cancelling the response.
         """
         try:
             return self.api.cancel_response(id=response_id)
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     @staticmethod
     def create_entity_collection_config(

@@ -1,5 +1,5 @@
 # cloudglue/client/resources/extract.py
-"""Extract resource for CloudGlue API."""
+"""Extract resource for Cloudglue API."""
 import time
 from typing import Dict, Any, Optional, Union
 
@@ -8,11 +8,11 @@ from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Extract:
-    """Client for the CloudGlue Extract API."""
+    """Client for the Cloudglue Extract API."""
 
     def __init__(self, api):
         """Initialize the Extract client.
@@ -49,7 +49,7 @@ class Extract:
             Extract: A typed Extract object containing job_id, status, and other fields.
 
         Raises:
-            CloudGlueError: If there is an error creating the extraction job or processing the request.
+            CloudglueError: If there is an error creating the extraction job or processing the request.
         """
         try:
             if not prompt and not schema:
@@ -86,9 +86,9 @@ class Extract:
             response = self.api.create_extract(new_extract=request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(
         self, 
@@ -106,15 +106,15 @@ class Extract:
             Extract: A typed Extract object containing the job status and extracted data if available.
 
         Raises:
-            CloudGlueError: If there is an error retrieving the extraction job or processing the request.
+            CloudglueError: If there is an error retrieving the extraction job or processing the request.
         """
         try:
             response = self.api.get_extract(job_id=job_id, limit=limit, offset=offset)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
         
     def list(
         self,
@@ -142,7 +142,7 @@ class Extract:
             A list of extraction jobs.
 
         Raises:
-            CloudGlueError: If there is an error listing the extraction jobs or processing the request.
+            CloudglueError: If there is an error listing the extraction jobs or processing the request.
         """
         try:
             return self.api.list_extracts(
@@ -155,9 +155,9 @@ class Extract:
                 include_data=include_data,
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, job_id: str):
         """Delete an extraction job.
@@ -169,15 +169,15 @@ class Extract:
             The deletion confirmation.
 
         Raises:
-            CloudGlueError: If there is an error deleting the extraction job.
+            CloudglueError: If there is an error deleting the extraction job.
         """
         try:
             response = self.api.delete_extract(job_id=job_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def run(
         self,
@@ -210,7 +210,7 @@ class Extract:
             Extract: The completed Extract object with status and data.
 
         Raises:
-            CloudGlueError: If there is an error creating or processing the extraction job.
+            CloudglueError: If there is an error creating or processing the extraction job.
         """
         try:
             # Create the extraction job
@@ -241,7 +241,7 @@ class Extract:
                 f"Extraction job did not complete within {timeout} seconds"
             )
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 

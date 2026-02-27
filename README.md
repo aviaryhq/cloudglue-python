@@ -27,10 +27,10 @@ pip install cloudglue
 ## Quick Start
 
 ```python
-from cloudglue import CloudGlue
+from cloudglue import Cloudglue
 
 # Initialize the client
-client = CloudGlue(api_key="your_api_key")  # Or use CLOUDGLUE_API_KEY env variable
+client = Cloudglue(api_key="your_api_key")  # Or use CLOUDGLUE_API_KEY env variable
 
 # Define your messages
 messages = [
@@ -62,7 +62,7 @@ print(generated_text)
 Clone the repository and set up the development environment:
 
 ```bash
-git clone https://github.com/aviaryhq/cloudglue-python.git
+git clone https://github.com/cloudglue/cloudglue-python.git
 cd cloudglue-python
 
 brew install openapi-generator
@@ -74,7 +74,7 @@ make submodule-init
 
 ### API Specification
 
-The OpenAPI specification is maintained in a separate [repository](https://github.com/aviaryhq/cloudglue-api-spec) and included as a Git submodule:
+The OpenAPI specification is maintained in a separate [repository](https://github.com/cloudglue/cloudglue-api-spec) and included as a Git submodule:
 
 ```bash
 # Update the API spec to the latest version
@@ -99,7 +99,7 @@ Project directory structure described below:
 cloudglue/
 ├── __init__.py       # Main package initialization
 ├── client/           # Custom client wrapper code
-│   └── main.py       # CloudGlue class implementation  
+│   └── main.py       # Cloudglue class implementation  
 └── sdk/              # Auto-generated API code
 dist/                 # Pre-built package dist
 spec/                 # Git submodule with OpenAPI specification
@@ -109,5 +109,5 @@ spec/                 # Git submodule with OpenAPI specification
 
 ## Contact
 
-* [Open an Issue](https://github.com/aviaryhq/cloudglue-python/issues/new)
+* [Open an Issue](https://github.com/cloudglue/cloudglue-python/issues/new)
 * [Email](mailto:support@cloudglue.dev)

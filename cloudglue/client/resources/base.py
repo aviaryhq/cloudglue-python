@@ -1,10 +1,10 @@
 # cloudglue/client/resources/base.py
-"""Base classes and exceptions for CloudGlue resources."""
+"""Base classes and exceptions for Cloudglue resources."""
 from typing import Dict, Any
 
 
-class CloudGlueError(Exception):
-    """Base exception for CloudGlue errors."""
+class CloudglueError(Exception):
+    """Base exception for Cloudglue errors."""
 
     def __init__(
         self,
@@ -19,5 +19,5 @@ class CloudGlueError(Exception):
         self.data = data
         self.headers = headers
         self.reason = reason
-        super(CloudGlueError, self).__init__(self.message)
+        super(CloudglueError, self).__init__(self.message)
 

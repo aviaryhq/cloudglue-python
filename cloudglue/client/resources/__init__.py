@@ -1,7 +1,7 @@
 # cloudglue/client/resources/__init__.py
-"""CloudGlue client resource classes."""
+"""Cloudglue client resource classes."""
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 from cloudglue.client.resources.chat import Chat, Completions
 from cloudglue.client.resources.collections import Collections
 from cloudglue.client.resources.extract import Extract
@@ -21,7 +21,7 @@ from cloudglue.client.resources.responses import Responses
 from cloudglue.client.resources.share import Share
 
 __all__ = [
-    "CloudGlueError",
+    "CloudglueError",
     "Chat",
     "Completions",
     "Collections",

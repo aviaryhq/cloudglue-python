@@ -1,5 +1,5 @@
 # cloudglue/client/resources/describe.py
-"""Describe resource for CloudGlue API."""
+"""Describe resource for Cloudglue API."""
 import time
 from typing import Dict, Any, List, Optional, Union
 
@@ -8,7 +8,7 @@ from cloudglue.sdk.models.segmentation_config import SegmentationConfig
 from cloudglue.sdk.models.thumbnails_config import ThumbnailsConfig
 from cloudglue.sdk.rest import ApiException
 
-from cloudglue.client.resources.base import CloudGlueError
+from cloudglue.client.resources.base import CloudglueError
 
 
 class Describe:
@@ -47,7 +47,7 @@ class Describe:
             The typed Describe job object with job_id and status.
 
         Raises:
-            CloudGlueError: If there is an error creating the describe job or processing the request.
+            CloudglueError: If there is an error creating the describe job or processing the request.
         """
         try:
             if segmentation_id and segmentation_config:
@@ -81,9 +81,9 @@ class Describe:
             response = self.api.create_describe(new_describe=request)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def get(
         self,
@@ -106,7 +106,7 @@ class Describe:
             The typed Describe job object with current status and data (if completed).
 
         Raises:
-            CloudGlueError: If there is an error retrieving the describe job or processing the request.
+            CloudglueError: If there is an error retrieving the describe job or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
@@ -119,9 +119,9 @@ class Describe:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def list(
         self,
@@ -151,7 +151,7 @@ class Describe:
             The typed DescribeList object with array of describe jobs.
 
         Raises:
-            CloudGlueError: If there is an error retrieving the describe jobs or processing the request.
+            CloudglueError: If there is an error retrieving the describe jobs or processing the request.
         """
         try:
             # Use the standard method to get a properly typed object
@@ -167,9 +167,9 @@ class Describe:
             )
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def delete(self, job_id: str):
         """Delete a media description job.
@@ -181,15 +181,15 @@ class Describe:
             The deletion confirmation.
 
         Raises:
-            CloudGlueError: If there is an error deleting the description job.
+            CloudglueError: If there is an error deleting the description job.
         """
         try:
             response = self.api.delete_describe(job_id=job_id)
             return response
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
     def run(
         self,
@@ -228,7 +228,7 @@ class Describe:
             The completed typed Describe job object.
 
         Raises:
-            CloudGlueError: If there is an error creating or processing the describe job.
+            CloudglueError: If there is an error creating or processing the describe job.
         """
         try:
             # Create the job
@@ -262,7 +262,7 @@ class Describe:
             )
 
         except ApiException as e:
-            raise CloudGlueError(str(e), e.status, e.data, e.headers, e.reason)
+            raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
         except Exception as e:
-            raise CloudGlueError(str(e))
+            raise CloudglueError(str(e))
 
