@@ -17,29 +17,35 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.response_annotation import ResponseAnnotation
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ResponseOutputContent(BaseModel):
+class DataConnector(BaseModel):
     """
-    ResponseOutputContent
+    DataConnector
     """ # noqa: E501
-    type: Optional[StrictStr] = Field(default=None, description="The type of content")
-    text: Optional[StrictStr] = Field(default=None, description="The generated text")
-    annotations: Optional[List[ResponseAnnotation]] = Field(default=None, description="Citations and references in the output")
-    __properties: ClassVar[List[str]] = ["type", "text", "annotations"]
+    id: StrictStr = Field(description="Unique identifier for the data connector")
+    object: StrictStr = Field(description="Object type, always 'data_connector'")
+    type: StrictStr = Field(description="The type of data connector")
+    created_at: StrictInt = Field(description="Unix timestamp in milliseconds when the data connector was created")
+    updated_at: StrictInt = Field(description="Unix timestamp in milliseconds when the data connector config was last modified")
+    metadata: Dict[str, Any] = Field(description="Safe metadata for the connector (varies by type). Never includes tokens or secrets.")
+    __properties: ClassVar[List[str]] = ["id", "object", "type", "created_at", "updated_at", "metadata"]
+
+    @field_validator('object')
+    def object_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in set(['data_connector']):
+            raise ValueError("must be one of enum values ('data_connector')")
+        return value
 
     @field_validator('type')
     def type_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
-        if value not in set(['output_text']):
-            raise ValueError("must be one of enum values ('output_text')")
+        if value not in set(['s3', 'dropbox', 'google-drive', 'zoom', 'gong', 'recall', 'gcs']):
+            raise ValueError("must be one of enum values ('s3', 'dropbox', 'google-drive', 'zoom', 'gong', 'recall', 'gcs')")
         return value
 
     model_config = ConfigDict(
@@ -60,7 +66,7 @@ class ResponseOutputContent(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ResponseOutputContent from a JSON string"""
+        """Create an instance of DataConnector from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -81,18 +87,11 @@ class ResponseOutputContent(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in annotations (list)
-        _items = []
-        if self.annotations:
-            for _item_annotations in self.annotations:
-                if _item_annotations:
-                    _items.append(_item_annotations.to_dict())
-            _dict['annotations'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ResponseOutputContent from a dict"""
+        """Create an instance of DataConnector from a dict"""
         if obj is None:
             return None
 
@@ -100,9 +99,12 @@ class ResponseOutputContent(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "id": obj.get("id"),
+            "object": obj.get("object"),
             "type": obj.get("type"),
-            "text": obj.get("text"),
-            "annotations": [ResponseAnnotation.from_dict(_item) for _item in obj["annotations"]] if obj.get("annotations") is not None else None
+            "created_at": obj.get("created_at"),
+            "updated_at": obj.get("updated_at"),
+            "metadata": obj.get("metadata")
         })
         return _obj
 

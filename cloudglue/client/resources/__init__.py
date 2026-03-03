@@ -19,6 +19,7 @@ from cloudglue.client.resources.tags import Tags
 from cloudglue.client.resources.file_segments import FileSegments
 from cloudglue.client.resources.responses import Responses
 from cloudglue.client.resources.share import Share
+from cloudglue.client.resources.data_connectors import DataConnectors
 
 __all__ = [
     "CloudglueError",
@@ -40,5 +41,6 @@ __all__ = [
     "FileSegments",
     "Responses",
     "Share",
+    "DataConnectors",
 ]
 

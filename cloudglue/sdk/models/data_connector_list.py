@@ -17,29 +17,28 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.response_annotation import ResponseAnnotation
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List
+from cloudglue.sdk.models.data_connector import DataConnector
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ResponseOutputContent(BaseModel):
+class DataConnectorList(BaseModel):
     """
-    ResponseOutputContent
+    DataConnectorList
     """ # noqa: E501
-    type: Optional[StrictStr] = Field(default=None, description="The type of content")
-    text: Optional[StrictStr] = Field(default=None, description="The generated text")
-    annotations: Optional[List[ResponseAnnotation]] = Field(default=None, description="Citations and references in the output")
-    __properties: ClassVar[List[str]] = ["type", "text", "annotations"]
+    object: StrictStr = Field(description="Object type, always 'list'")
+    data: List[DataConnector] = Field(description="Array of data connector objects")
+    total: StrictInt = Field(description="Total number of data connectors")
+    limit: StrictInt = Field(description="Number of items returned in this response")
+    offset: StrictInt = Field(description="Offset from the start of the list")
+    __properties: ClassVar[List[str]] = ["object", "data", "total", "limit", "offset"]
 
-    @field_validator('type')
-    def type_validate_enum(cls, value):
+    @field_validator('object')
+    def object_validate_enum(cls, value):
         """Validates the enum"""
-        if value is None:
-            return value
-
-        if value not in set(['output_text']):
-            raise ValueError("must be one of enum values ('output_text')")
+        if value not in set(['list']):
+            raise ValueError("must be one of enum values ('list')")
         return value
 
     model_config = ConfigDict(
@@ -60,7 +59,7 @@ class ResponseOutputContent(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ResponseOutputContent from a JSON string"""
+        """Create an instance of DataConnectorList from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -81,18 +80,18 @@ class ResponseOutputContent(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in annotations (list)
+        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
         _items = []
-        if self.annotations:
-            for _item_annotations in self.annotations:
-                if _item_annotations:
-                    _items.append(_item_annotations.to_dict())
-            _dict['annotations'] = _items
+        if self.data:
+            for _item_data in self.data:
+                if _item_data:
+                    _items.append(_item_data.to_dict())
+            _dict['data'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ResponseOutputContent from a dict"""
+        """Create an instance of DataConnectorList from a dict"""
         if obj is None:
             return None
 
@@ -100,9 +99,11 @@ class ResponseOutputContent(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "type": obj.get("type"),
-            "text": obj.get("text"),
-            "annotations": [ResponseAnnotation.from_dict(_item) for _item in obj["annotations"]] if obj.get("annotations") is not None else None
+            "object": obj.get("object"),
+            "data": [DataConnector.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None,
+            "total": obj.get("total"),
+            "limit": obj.get("limit"),
+            "offset": obj.get("offset")
         })
         return _obj
 
