@@ -20,6 +20,7 @@ from cloudglue.sdk.api.tags_api import TagsApi
 from cloudglue.sdk.api.file_segments_api import FileSegmentsApi
 from cloudglue.sdk.api.response_api import ResponseApi
 from cloudglue.sdk.api.share_api import ShareApi
+from cloudglue.sdk.api.data_connectors_api import DataConnectorsApi
 from cloudglue.sdk.configuration import Configuration
 from cloudglue.sdk.api_client import ApiClient
 
@@ -42,6 +43,7 @@ from cloudglue.client.resources import (
     FileSegments,
     Responses,
     Share,
+    DataConnectors,
 )
 from cloudglue._version import __version__
 
@@ -93,6 +95,7 @@ class Cloudglue:
         self.file_segments_api = FileSegmentsApi(self.api_client)
         self.response_api = ResponseApi(self.api_client)
         self.share_api = ShareApi(self.api_client)
+        self.data_connectors_api = DataConnectorsApi(self.api_client)
 
         # Set up resources with their respective API clients
         self.chat = Chat(self.chat_api)
@@ -112,6 +115,7 @@ class Cloudglue:
         self.file_segments = FileSegments(self.file_segments_api)
         self.responses = Responses(self.response_api)
         self.share = Share(self.share_api)
+        self.data_connectors = DataConnectors(self.data_connectors_api)
 
     def close(self):
         """Close the API client."""

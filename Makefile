@@ -13,6 +13,8 @@ GENERATE_OP := openapi-generator generate \
                -o temp-sdk \
                --additional-properties=packageName=cloudglue.sdk
 
+.PHONY: default help setup submodule-init submodule-update generate build publish clean
+
 # Default target when just running `make`
 default: help
 

@@ -63,15 +63,19 @@ class Search:
         operator: str,
         value_text: Optional[str] = None,
         value_text_array: Optional[List[str]] = None,
+        scope: Optional[Literal['file', 'segment']] = None,
     ) -> SearchFilterVideoInfoInner:
         """Create a video info filter for search.
-        
+
         Args:
             path: Video info field ('duration_seconds', 'has_audio')
             operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll', 'Like')
             value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, Like)
             value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll, In)
-            
+            scope: Scope of the filter. 'file' filters by source video properties,
+                   'segment' filters by segment properties. Only duration_seconds is
+                   supported with segment scope. Defaults to 'file'.
+
         Returns:
             SearchFilterVideoInfoInner object
         """
@@ -80,6 +84,7 @@ class Search:
             operator=operator,
             value_text=value_text,
             value_text_array=value_text_array,
+            scope=scope,
         )
 
     @staticmethod
@@ -125,7 +130,8 @@ class Search:
                 - 'value_text': (optional) Text value for scalar comparison  
                 - 'value_text_array': (optional) Array of values for array comparisons
                 - 'scope': (optional) Scope of eligible search items ('file' or 'segment'). Defaults to 'file'.
-            video_info_filters: List of video info filter dictionaries (same structure, without scope)
+            video_info_filters: List of video info filter dictionaries. Same structure as metadata_filters,
+                plus optional 'scope' ('file' or 'segment'). Defaults to 'file'.
             file_filters: List of file filter dictionaries (same structure, without scope)
             
         Returns:

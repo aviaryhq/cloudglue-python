@@ -1,6 +1,6 @@
 # cloudglue/client/resources/chat.py
 """Chat and Completions resources for Cloudglue API."""
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Union, Literal
 
 from cloudglue.sdk.models.chat_completion_request import ChatCompletionRequest
 from cloudglue.sdk.models.chat_completion_request_filter import ChatCompletionRequestFilter
@@ -50,15 +50,19 @@ class Completions:
         operator: str,
         value_text: Optional[str] = None,
         value_text_array: Optional[List[str]] = None,
+        scope: Optional[Literal['file', 'segment']] = None,
     ) -> ChatCompletionRequestFilterVideoInfoInner:
         """Create a video info filter.
-        
+
         Args:
             path: JSON path on video_info object (e.g. 'has_audio', 'duration_seconds')
             operator: Comparison operator ('NotEqual', 'Equal', 'LessThan', 'GreaterThan', 'In', 'ContainsAny', 'ContainsAll')
             value_text: Text value for scalar comparison (used with NotEqual, Equal, LessThan, GreaterThan, In)
             value_text_array: Array of values for array comparisons (used with ContainsAny, ContainsAll)
-            
+            scope: Scope of the filter. 'file' filters by source video properties,
+                   'segment' filters by segment properties. Only duration_seconds is
+                   supported with segment scope. Defaults to 'file'.
+
         Returns:
             ChatCompletionRequestFilterVideoInfoInner object
         """
@@ -67,6 +71,7 @@ class Completions:
             operator=operator,
             value_text=value_text,
             value_text_array=value_text_array,
+            scope=scope,
         )
 
     @staticmethod
@@ -133,8 +138,9 @@ class Completions:
                 - 'operator': Comparison operator
                 - 'value_text': (optional) Text value for scalar comparison  
                 - 'value_text_array': (optional) Array of values for array comparisons
-            video_info_filters: List of video info filter dictionaries (same structure)
-            file_filters: List of file filter dictionaries (same structure)
+            video_info_filters: List of video info filter dictionaries. Same structure as metadata_filters,
+                plus optional 'scope' ('file' or 'segment'). Defaults to 'file'.
+            file_filters: List of file filter dictionaries (same structure as metadata_filters)
             
         Returns:
             ChatCompletionRequestFilter object
