@@ -92,6 +92,7 @@ class Describe:
         start_time_seconds: Optional[float] = None,
         end_time_seconds: Optional[float] = None,
         modalities: Optional[List[str]] = None,
+        include_thumbnails: Optional[bool] = None,
     ):
         """Get the status and data of a media description job.
 
@@ -101,6 +102,7 @@ class Describe:
             start_time_seconds: The start time in seconds to filter the media descriptions
             end_time_seconds: The end time in seconds to filter the media descriptions
             modalities: Filter results by modality types (e.g., ['speech', 'visual_scene_description'])
+            include_thumbnails: When true, include thumbnail_url on the response and segment_summary entries
 
         Returns:
             The typed Describe job object with current status and data (if completed).
@@ -116,6 +118,7 @@ class Describe:
                 start_time_seconds=start_time_seconds,
                 end_time_seconds=end_time_seconds,
                 modalities=modalities,
+                include_thumbnails=include_thumbnails,
             )
             return response
         except ApiException as e:
@@ -206,6 +209,7 @@ class Describe:
         thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
         response_format: Optional[str] = None,
         modalities: Optional[List[str]] = None,
+        include_thumbnails: Optional[bool] = None,
     ):
         """Create a media description job and wait for it to complete.
 
@@ -223,6 +227,7 @@ class Describe:
             thumbnails_config: Optional configuration for segment thumbnails
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
             modalities: Filter results by modality types (e.g., ['speech', 'visual_scene_description'])
+            include_thumbnails: When true, include thumbnail_url on the response and segment_summary entries
 
         Returns:
             The completed typed Describe job object.
@@ -249,7 +254,7 @@ class Describe:
             # Poll for completion
             elapsed = 0
             while elapsed < timeout:
-                status = self.get(job_id=job_id, response_format=response_format, modalities=modalities)
+                status = self.get(job_id=job_id, response_format=response_format, modalities=modalities, include_thumbnails=include_thumbnails)
 
                 if status.status in ["completed", "failed"]:
                     return status
