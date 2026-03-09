@@ -17,21 +17,21 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
-from cloudglue.sdk.models.webhook_events import WebhookEvents
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
+from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing import Optional, Set
 from typing_extensions import Self
 
-class WebhookUpdateRequest(BaseModel):
+class DescribeDataAllOfSegmentSummaryInner(BaseModel):
     """
-    WebhookUpdateRequest
+    DescribeDataAllOfSegmentSummaryInner
     """ # noqa: E501
-    description: Optional[StrictStr] = Field(default=None, description="Description of the webhook")
-    endpoint: Optional[StrictStr] = Field(default=None, description="URL of the webhook endpoint")
-    subscribed_events: Optional[List[WebhookEvents]] = Field(default=None, description="Events that the webhook is subscribed to")
-    active: Optional[StrictBool] = Field(default=None, description="Whether the webhook is active")
-    __properties: ClassVar[List[str]] = ["description", "endpoint", "subscribed_events", "active"]
+    title: Optional[StrictStr] = Field(default=None, description="Generated segment-level title")
+    summary: Optional[StrictStr] = Field(default=None, description="Generated segment-level summary")
+    start_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start time of segment in seconds")
+    end_time: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="End time of segment in seconds")
+    thumbnail_url: Optional[StrictStr] = Field(default=None, description="URL of the segment thumbnail, when available.")
+    __properties: ClassVar[List[str]] = ["title", "summary", "start_time", "end_time", "thumbnail_url"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +51,7 @@ class WebhookUpdateRequest(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of WebhookUpdateRequest from a JSON string"""
+        """Create an instance of DescribeDataAllOfSegmentSummaryInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -76,7 +76,7 @@ class WebhookUpdateRequest(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of WebhookUpdateRequest from a dict"""
+        """Create an instance of DescribeDataAllOfSegmentSummaryInner from a dict"""
         if obj is None:
             return None
 
@@ -84,10 +84,11 @@ class WebhookUpdateRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "description": obj.get("description"),
-            "endpoint": obj.get("endpoint"),
-            "subscribed_events": obj.get("subscribed_events"),
-            "active": obj.get("active")
+            "title": obj.get("title"),
+            "summary": obj.get("summary"),
+            "start_time": obj.get("start_time"),
+            "end_time": obj.get("end_time"),
+            "thumbnail_url": obj.get("thumbnail_url")
         })
         return _obj
 

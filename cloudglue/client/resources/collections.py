@@ -443,11 +443,12 @@ class Collections:
             raise CloudglueError(str(e))
 
     def get_video_entities(
-        self, 
-        collection_id: str, 
+        self,
+        collection_id: str,
         file_id: str,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        include_thumbnails: Optional[bool] = None,
     ):
         """Get the entities extracted from a video in a collection.
 
@@ -456,6 +457,7 @@ class Collections:
             file_id: The ID of the file to retrieve entities for
             limit: Maximum number of segment entities to return (1-100)
             offset: Number of segment entities to skip
+            include_thumbnails: When true, include thumbnail_url on the response and segment entities
 
         Returns:
             The typed FileEntities object with video entities data
@@ -470,6 +472,7 @@ class Collections:
                 file_id=file_id,
                 limit=limit,
                 offset=offset,
+                include_thumbnails=include_thumbnails,
             )
             return response
         except ApiException as e:
@@ -581,6 +584,7 @@ class Collections:
         start_time_seconds: Optional[float] = None,
         end_time_seconds: Optional[float] = None,
         response_format: Optional[str] = None,
+        include_thumbnails: Optional[bool] = None,
     ):
         """Get the media descriptions of a video in a collection.
 
@@ -590,6 +594,7 @@ class Collections:
             start_time_seconds: The start time in seconds to filter the media descriptions
             end_time_seconds: The end time in seconds to filter the media descriptions
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
+            include_thumbnails: When true, include thumbnail_url on the response and segment_summary entries
 
         Returns:
             The typed MediaDescription object with video media description data
@@ -600,7 +605,7 @@ class Collections:
         try:
             # Use the standard method to get a properly typed object
             response = self.api.get_media_descriptions(
-                collection_id=collection_id, file_id=file_id, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds, response_format=response_format
+                collection_id=collection_id, file_id=file_id, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds, response_format=response_format, include_thumbnails=include_thumbnails
             )
             return response
         except ApiException as e:

@@ -91,10 +91,11 @@ class Extract:
             raise CloudglueError(str(e))
 
     def get(
-        self, 
+        self,
         job_id: str,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        include_thumbnails: Optional[bool] = None,
         ):
         """Get the status of an extraction job.
 
@@ -102,6 +103,7 @@ class Extract:
             job_id: The ID of the extraction job.
             limit: Maximum number of segment entities to return (1-100)
             offset: Number of segment entities to skip
+            include_thumbnails: When true, include thumbnail_url on the data object and segment entities
         Returns:
             Extract: A typed Extract object containing the job status and extracted data if available.
 
@@ -109,7 +111,7 @@ class Extract:
             CloudglueError: If there is an error retrieving the extraction job or processing the request.
         """
         try:
-            response = self.api.get_extract(job_id=job_id, limit=limit, offset=offset)
+            response = self.api.get_extract(job_id=job_id, limit=limit, offset=offset, include_thumbnails=include_thumbnails)
             return response
         except ApiException as e:
             raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -191,6 +193,7 @@ class Extract:
         thumbnails_config: Optional[Union[Dict[str, Any], Any]] = None,
         poll_interval: int = 5,
         timeout: int = 600,
+        include_thumbnails: Optional[bool] = None,
     ):
         """Create an extraction job and wait for it to complete.
 
@@ -205,6 +208,7 @@ class Extract:
             thumbnails_config: Optional configuration for segment thumbnails
             poll_interval: How often to check the job status (in seconds).
             timeout: Maximum time to wait for the job to complete (in seconds).
+            include_thumbnails: When true, include thumbnail_url on the data object and segment entities
 
         Returns:
             Extract: The completed Extract object with status and data.
@@ -229,7 +233,7 @@ class Extract:
             # Poll for completion
             elapsed = 0
             while elapsed < timeout:
-                status = self.get(job_id=job_id)
+                status = self.get(job_id=job_id, include_thumbnails=include_thumbnails)
 
                 if status.status in ["completed", "failed"]:
                     return status

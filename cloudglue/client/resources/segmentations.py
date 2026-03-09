@@ -120,17 +120,19 @@ class Segmentations:
         start_time_seconds: Optional[Union[int, float]] = None,
         end_time_seconds: Optional[Union[int, float]] = None,
         keyframe_config: Optional[Union[KeyframeConfig, Dict[str, Any]]] = None,
+        fill_gaps: Optional[bool] = None,
     ) -> SegmentationConfig:
         """Create a shot detector segmentation configuration.
 
         Args:
             detector: The detector strategy ('adaptive' for dynamic footage, 'content' for controlled footage)
             threshold: Detection sensitivity threshold (lower values create more segments)
-            min_seconds: The minimum length of a shot in seconds (2-60)
-            max_seconds: The maximum length of a shot in seconds (2-60)
+            min_seconds: The minimum length of a shot in seconds (1-600)
+            max_seconds: The maximum length of a shot in seconds (1-600)
             start_time_seconds: Optional start time of the video in seconds to start segmenting from
             end_time_seconds: Optional end time of the video in seconds to stop segmenting at
             keyframe_config: Optional configuration for keyframe extraction (not supported for YouTube videos)
+            fill_gaps: When true, gaps between detected shots are filled. Defaults to true.
 
         Returns:
             SegmentationConfig configured for shot detection
@@ -155,6 +157,7 @@ class Segmentations:
             threshold=threshold,
             min_seconds=min_seconds,
             max_seconds=max_seconds,
+            fill_gaps=fill_gaps,
         )
         
         # Handle keyframe_config parameter
