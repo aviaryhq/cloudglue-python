@@ -449,6 +449,8 @@ class Collections:
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         include_thumbnails: Optional[bool] = None,
+        include_chapters: Optional[bool] = None,
+        include_shots: Optional[bool] = None,
     ):
         """Get the entities extracted from a video in a collection.
 
@@ -458,6 +460,8 @@ class Collections:
             limit: Maximum number of segment entities to return (1-100)
             offset: Number of segment entities to skip
             include_thumbnails: When true, include thumbnail_url on the response and segment entities
+            include_chapters: When true, include narrative chapters in the response (when segmentation strategy is 'narrative')
+            include_shots: When true, include shot boundaries in the response (when segmentation strategy is 'shot-detector')
 
         Returns:
             The typed FileEntities object with video entities data
@@ -473,6 +477,8 @@ class Collections:
                 limit=limit,
                 offset=offset,
                 include_thumbnails=include_thumbnails,
+                include_chapters=include_chapters,
+                include_shots=include_shots,
             )
             return response
         except ApiException as e:
@@ -585,6 +591,9 @@ class Collections:
         end_time_seconds: Optional[float] = None,
         response_format: Optional[str] = None,
         include_thumbnails: Optional[bool] = None,
+        include_word_timestamps: Optional[bool] = None,
+        include_chapters: Optional[bool] = None,
+        include_shots: Optional[bool] = None,
     ):
         """Get the media descriptions of a video in a collection.
 
@@ -595,6 +604,9 @@ class Collections:
             end_time_seconds: The end time in seconds to filter the media descriptions
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
             include_thumbnails: When true, include thumbnail_url on the response and segment_summary entries
+            include_word_timestamps: When true, include word-level timestamps on speech entries. Not available for YouTube sources. Only applies when response_format=json.
+            include_chapters: When true, include narrative chapters in the response (when segmentation strategy is 'narrative')
+            include_shots: When true, include shot boundaries in the response (when segmentation strategy is 'shot-detector')
 
         Returns:
             The typed MediaDescription object with video media description data
@@ -605,7 +617,7 @@ class Collections:
         try:
             # Use the standard method to get a properly typed object
             response = self.api.get_media_descriptions(
-                collection_id=collection_id, file_id=file_id, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds, response_format=response_format, include_thumbnails=include_thumbnails
+                collection_id=collection_id, file_id=file_id, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds, response_format=response_format, include_thumbnails=include_thumbnails, include_word_timestamps=include_word_timestamps, include_chapters=include_chapters, include_shots=include_shots
             )
             return response
         except ApiException as e:

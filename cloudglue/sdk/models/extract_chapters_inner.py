@@ -17,23 +17,21 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List
-from cloudglue.sdk.models.file_face_detections_faces_inner import FileFaceDetectionsFacesInner
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from typing import Any, ClassVar, Dict, List, Union
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
-class FileFaceDetections(BaseModel):
+class ExtractChaptersInner(BaseModel):
     """
-    FileFaceDetections
+    ExtractChaptersInner
     """ # noqa: E501
-    collection_id: StrictStr = Field(description="ID of the collection")
-    file_id: StrictStr = Field(description="ID of the file")
-    faces: List[FileFaceDetectionsFacesInner] = Field(description="Array of detected faces")
-    total: StrictInt = Field(description="Total number of faces detected")
-    limit: StrictInt = Field(description="Maximum number of faces returned per request")
-    offset: StrictInt = Field(description="Number of faces skipped")
-    __properties: ClassVar[List[str]] = ["collection_id", "file_id", "faces", "total", "limit", "offset"]
+    index: Annotated[int, Field(strict=True, ge=0)]
+    start_time: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]]
+    end_time: Union[Annotated[float, Field(strict=True, ge=0)], Annotated[int, Field(strict=True, ge=0)]]
+    description: StrictStr
+    __properties: ClassVar[List[str]] = ["index", "start_time", "end_time", "description"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -53,7 +51,7 @@ class FileFaceDetections(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of FileFaceDetections from a JSON string"""
+        """Create an instance of ExtractChaptersInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,18 +72,11 @@ class FileFaceDetections(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in faces (list)
-        _items = []
-        if self.faces:
-            for _item_faces in self.faces:
-                if _item_faces:
-                    _items.append(_item_faces.to_dict())
-            _dict['faces'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of FileFaceDetections from a dict"""
+        """Create an instance of ExtractChaptersInner from a dict"""
         if obj is None:
             return None
 
@@ -93,12 +84,10 @@ class FileFaceDetections(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "collection_id": obj.get("collection_id"),
-            "file_id": obj.get("file_id"),
-            "faces": [FileFaceDetectionsFacesInner.from_dict(_item) for _item in obj["faces"]] if obj.get("faces") is not None else None,
-            "total": obj.get("total"),
-            "limit": obj.get("limit"),
-            "offset": obj.get("offset")
+            "index": obj.get("index"),
+            "start_time": obj.get("start_time"),
+            "end_time": obj.get("end_time"),
+            "description": obj.get("description")
         })
         return _obj
 

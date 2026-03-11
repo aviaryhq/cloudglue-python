@@ -93,6 +93,9 @@ class Describe:
         end_time_seconds: Optional[float] = None,
         modalities: Optional[List[str]] = None,
         include_thumbnails: Optional[bool] = None,
+        include_word_timestamps: Optional[bool] = None,
+        include_chapters: Optional[bool] = None,
+        include_shots: Optional[bool] = None,
     ):
         """Get the status and data of a media description job.
 
@@ -103,6 +106,9 @@ class Describe:
             end_time_seconds: The end time in seconds to filter the media descriptions
             modalities: Filter results by modality types (e.g., ['speech', 'visual_scene_description'])
             include_thumbnails: When true, include thumbnail_url on the response and segment_summary entries
+            include_word_timestamps: When true, include word-level timestamps on speech entries. Not available for YouTube sources. Only applies when response_format=json.
+            include_chapters: When true, include narrative chapters in the response (when segmentation strategy is 'narrative')
+            include_shots: When true, include shot boundaries in the response (when segmentation strategy is 'shot-detector')
 
         Returns:
             The typed Describe job object with current status and data (if completed).
@@ -119,6 +125,9 @@ class Describe:
                 end_time_seconds=end_time_seconds,
                 modalities=modalities,
                 include_thumbnails=include_thumbnails,
+                include_word_timestamps=include_word_timestamps,
+                include_chapters=include_chapters,
+                include_shots=include_shots,
             )
             return response
         except ApiException as e:
@@ -210,6 +219,9 @@ class Describe:
         response_format: Optional[str] = None,
         modalities: Optional[List[str]] = None,
         include_thumbnails: Optional[bool] = None,
+        include_word_timestamps: Optional[bool] = None,
+        include_chapters: Optional[bool] = None,
+        include_shots: Optional[bool] = None,
     ):
         """Create a media description job and wait for it to complete.
 
@@ -228,6 +240,9 @@ class Describe:
             response_format: The format of the response, one of 'json' or 'markdown' (json by default)
             modalities: Filter results by modality types (e.g., ['speech', 'visual_scene_description'])
             include_thumbnails: When true, include thumbnail_url on the response and segment_summary entries
+            include_word_timestamps: When true, include word-level timestamps on speech entries. Not available for YouTube sources. Only applies when response_format=json.
+            include_chapters: When true, include narrative chapters in the response (when segmentation strategy is 'narrative')
+            include_shots: When true, include shot boundaries in the response (when segmentation strategy is 'shot-detector')
 
         Returns:
             The completed typed Describe job object.
@@ -254,7 +269,7 @@ class Describe:
             # Poll for completion
             elapsed = 0
             while elapsed < timeout:
-                status = self.get(job_id=job_id, response_format=response_format, modalities=modalities, include_thumbnails=include_thumbnails)
+                status = self.get(job_id=job_id, response_format=response_format, modalities=modalities, include_thumbnails=include_thumbnails, include_word_timestamps=include_word_timestamps, include_chapters=include_chapters, include_shots=include_shots)
 
                 if status.status in ["completed", "failed"]:
                     return status
