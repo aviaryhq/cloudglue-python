@@ -96,6 +96,8 @@ class Extract:
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         include_thumbnails: Optional[bool] = None,
+        include_chapters: Optional[bool] = None,
+        include_shots: Optional[bool] = None,
         ):
         """Get the status of an extraction job.
 
@@ -104,6 +106,8 @@ class Extract:
             limit: Maximum number of segment entities to return (1-100)
             offset: Number of segment entities to skip
             include_thumbnails: When true, include thumbnail_url on the data object and segment entities
+            include_chapters: When true, include narrative chapters in the response (when segmentation strategy is 'narrative')
+            include_shots: When true, include shot boundaries in the response (when segmentation strategy is 'shot-detector')
         Returns:
             Extract: A typed Extract object containing the job status and extracted data if available.
 
@@ -111,7 +115,7 @@ class Extract:
             CloudglueError: If there is an error retrieving the extraction job or processing the request.
         """
         try:
-            response = self.api.get_extract(job_id=job_id, limit=limit, offset=offset, include_thumbnails=include_thumbnails)
+            response = self.api.get_extract(job_id=job_id, limit=limit, offset=offset, include_thumbnails=include_thumbnails, include_chapters=include_chapters, include_shots=include_shots)
             return response
         except ApiException as e:
             raise CloudglueError(str(e), e.status, e.data, e.headers, e.reason)
@@ -194,6 +198,8 @@ class Extract:
         poll_interval: int = 5,
         timeout: int = 600,
         include_thumbnails: Optional[bool] = None,
+        include_chapters: Optional[bool] = None,
+        include_shots: Optional[bool] = None,
     ):
         """Create an extraction job and wait for it to complete.
 
@@ -209,6 +215,8 @@ class Extract:
             poll_interval: How often to check the job status (in seconds).
             timeout: Maximum time to wait for the job to complete (in seconds).
             include_thumbnails: When true, include thumbnail_url on the data object and segment entities
+            include_chapters: When true, include narrative chapters in the response (when segmentation strategy is 'narrative')
+            include_shots: When true, include shot boundaries in the response (when segmentation strategy is 'shot-detector')
 
         Returns:
             Extract: The completed Extract object with status and data.
@@ -233,7 +241,7 @@ class Extract:
             # Poll for completion
             elapsed = 0
             while elapsed < timeout:
-                status = self.get(job_id=job_id, include_thumbnails=include_thumbnails)
+                status = self.get(job_id=job_id, include_thumbnails=include_thumbnails, include_chapters=include_chapters, include_shots=include_shots)
 
                 if status.status in ["completed", "failed"]:
                     return status
